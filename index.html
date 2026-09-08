@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A working map of physical AI tasks, benchmarks, models, and evaluation metrics." />
+  <title>PhAIL Notes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="header-row">
+      <a class="site-name" href="#top"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="#tasks">Tasks</a><a href="#metrics">Metrics</a><a href="#models">Models</a><a href="#benchmarks">Benchmarks</a><a href="about.html">About</a>
+      </nav>
+    </div>
+    <p class="site-expansion"><span data-full-name>Physical AI Evaluation &amp; Intelligence Ledger</span></p>
+    <p class="site-wordplay">Pronounced like “fail” - because honest evaluation starts with what breaks.</p>
+    <p class="site-deck dashboard-deck">We map physical AI tasks, metrics, models, and benchmarks.</p>
+    <p class="header-link"><a href="about.html">About this project <span aria-hidden="true">-&gt;</span></a></p>
+  </header>
+
+  <main class="dashboard">
+    <section class="section dashboard-section" id="tasks" aria-labelledby="tasks-title">
+      <div class="section-heading"><p class="section-kicker">01 / Tasks</p><h1 id="tasks-title">Task categories</h1></div>
+      <div class="task-table" role="list">
+        <div class="task-row task-row-head" aria-hidden="true"><span>Task category</span><span>What is being tested</span><span>Representative benchmarks</span></div>
+        <div class="task-row" role="listitem"><strong>Tabletop / single-arm manipulation</strong><span>Pick-place, insertion, tool use on a fixed base</span><span><a href="#benchmarks">LIBERO</a>, RLBench, Meta-World, RoboCasa</span></div>
+        <div class="task-row" role="listitem"><strong>Bimanual manipulation</strong><span>Coordinated two-arm tasks</span><span>RoboTwin / RoboTwin 2.0, RoboTwin Dual-Arm Challenge</span></div>
+        <div class="task-row" role="listitem"><strong>Mobile manipulation</strong><span>Manipulation combined with base movement</span><span>BEHAVIOR-1K, ManiSkill3</span></div>
+        <div class="task-row" role="listitem"><strong>Loco-manipulation</strong><span>Whole-body humanoid control while manipulating</span><span>SIMPLE, Psi-0, Omega-0</span></div>
+        <div class="task-row" role="listitem"><strong>Whole-body locomotion</strong><span>Balance, gait, disturbance rejection</span><span>HumanoidBench</span></div>
+        <div class="task-row" role="listitem"><strong>Long-horizon household activities</strong><span>Multi-step, chained tasks</span><span>BEHAVIOR-1K, CALVIN</span></div>
+        <div class="task-row" role="listitem"><strong>Industrial / commercial tasks</strong><span>Bin-picking, sorting, assembly</span><span>PhAIL</span></div>
+        <div class="task-row" role="listitem"><strong>World-model prediction</strong><span>Predicting or generating physical-world video, not acting</span><span>PAI-Bench, WorldArena</span></div>
+        <div class="task-row" role="listitem"><strong>Autonomous driving</strong><span>Perception + planning + control for vehicles</span><span>No trustworthy cross-company leaderboard yet</span></div>
+        <div class="task-row" role="listitem"><strong>Environment-perceiving software agents <em>(boundary case)</em></strong><span>Perceives through camera or mic, acts only through software</span><span>Project Astra; tracked separately</span></div>
+      </div>
+    </section>
+
+    <section class="section dashboard-section" id="metrics" aria-labelledby="metrics-title">
+      <div class="section-heading"><p class="section-kicker">02 / Metrics</p><h2 id="metrics-title">Evaluation metrics</h2></div>
+      <div class="data-table-wrap" tabindex="0" aria-label="Evaluation metrics table">
+        <table class="data-table metrics-table"><thead><tr><th>Metric</th><th>Used in</th><th>Measures</th><th>Limitation</th></tr></thead><tbody>
+          <tr><td>Binary success rate</td><td>Meta-World, RLBench, LIBERO, RoboTwin, ManiSkill3</td><td>Did the task complete?</td><td>Coarse - hides near-misses, smoothness, safety</td></tr>
+          <tr><td>Chain / sequential success rate</td><td>CALVIN</td><td>Average consecutive subtasks completed (0-5)</td><td>Only for explicitly chained task designs</td></tr>
+          <tr><td>Partial-completion / progress score</td><td>RoboChallenge, BEHAVIOR-1K, RoboDojo</td><td>Credit for partial progress, not just pass/fail</td><td>Scoring rubric differs per benchmark</td></tr>
+          <tr><td>Success-rate drop under perturbation</td><td>The Colosseum</td><td>Robustness across 14 environment-perturbation axes</td><td>Measures robustness, not raw capability</td></tr>
+          <tr><td>Sim-real correlation (Pearson / MMRV)</td><td>SIMPLER</td><td>Whether sim ranking predicts real-robot ranking</td><td>Does not score capability directly</td></tr>
+          <tr><td>Pairwise preference / Elo</td><td>RoboArena</td><td>Head-to-head human preference across policies</td><td>Expensive, hard to scale, no absolute success number</td></tr>
+          <tr><td>Lifelong-learning transfer (FWT / NBT / AUC)</td><td>LIBERO</td><td>Transfer over a task sequence</td><td>Specific to continual-learning setups</td></tr>
+          <tr><td>Integration cost</td><td>XPolicyLab</td><td>Time to plug a new policy into an evaluation harness</td><td>Infrastructure metric, not model quality</td></tr>
+          <tr><td>Throughput (units/hour) + MTBF</td><td>PhAIL</td><td>Industrial productivity and reliability</td><td>Economic metrics remain rare in real-world evaluation</td></tr>
+        </tbody></table>
+      </div>
+      <p class="table-footnote">Not yet standardized: cost per successful rollout, longitudinal reliability drift, contamination auditing, safety incidents, and robustness to ambiguous instructions.</p>
+    </section>
+
+    <section class="section dashboard-section" id="models" aria-labelledby="models-title">
+      <div class="section-heading"><p class="section-kicker">03 / Models</p><h2 id="models-title">Model specifications</h2></div>
+      <div class="data-table-wrap" tabindex="0" aria-label="Model specifications table">
+        <table class="data-table models-table"><thead><tr><th>Model</th><th>Maker</th><th>Open / Closed</th><th>Embodiment</th><th>Inference requirement</th><th>Control frequency</th><th>Notes</th></tr></thead><tbody>
+          <tr><td>GR00T N1.5 / N1.6 / N1.7</td><td>NVIDIA</td><td>Open weights</td><td>Humanoid manipulation, bimanual</td><td>-</td><td>-</td><td>N1.7 trained on 20,854 hrs egocentric video</td></tr>
+          <tr><td>Gemini Robotics 1.5</td><td>Google DeepMind</td><td>Closed (select partners)</td><td>Complex multi-step manipulation</td><td>-</td><td>-</td><td>-</td></tr>
+          <tr><td>Gemini Robotics On-Device</td><td>Google DeepMind</td><td>Closed</td><td>Bi-arm</td><td>Runs locally</td><td>-</td><td>Adapts with 50-100 demos</td></tr>
+          <tr><td>π0 / π0-FAST / π0.5 / π0.7</td><td>Physical Intelligence</td><td>Open (openpi)</td><td>Single/dual-arm, mobile manipulation</td><td>&gt;8GB VRAM</td><td>-</td><td>Pretrained on 10k+ hrs robot data</td></tr>
+          <tr><td>Helix</td><td>Figure AI</td><td>Closed</td><td>Humanoid upper-body</td><td>Embedded GPU</td><td>200Hz</td><td>Household tasks, package sorting</td></tr>
+          <tr><td>OpenVLA</td><td>Open-source community</td><td>Open</td><td>Cross-embodiment manipulation</td><td>-</td><td>-</td><td>7B params, 970k real demonstrations</td></tr>
+          <tr><td>Octo</td><td>UC Berkeley</td><td>Open</td><td>Tabletop manipulation</td><td>-</td><td>-</td><td>27M-93M params</td></tr>
+          <tr><td>SmolVLA</td><td>Hugging Face / LeRobot</td><td>Open</td><td>Tabletop, accessibility-focused</td><td>Consumer GPU</td><td>-</td><td>450M params, 10M community frames</td></tr>
+          <tr><td>AGIBOT BFM &amp; GCFM</td><td>AGIBOT (Shanghai)</td><td>-</td><td>Commercial/household manipulation</td><td>-</td><td>-</td><td>Imitation learning and generative control</td></tr>
+          <tr><td>Psi-0 (Ψ0)</td><td>USC PSI Lab + NVIDIA + WorldEngine</td><td>Open (GitHub)</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>Unitree G1 + Dex3-1; 8 long-horizon tasks</td></tr>
+          <tr><td>Omega-0 (ω-0)</td><td>Org TBD</td><td>-</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>Latent predictive world-action model</td></tr>
+          <tr><td>NVIDIA Cosmos / GR00T-Dreams</td><td>NVIDIA</td><td>-</td><td>World model / synthetic data generation</td><td>-</td><td>-</td><td>Cuts synthetic data generation to ~36 hrs</td></tr>
+        </tbody></table>
+      </div>
+      <p class="table-footnote">Reported benchmark scores are intentionally omitted for now. Different task sets, rollout counts, and reporting conventions are not directly comparable.</p>
+    </section>
+
+    <section class="section dashboard-section" id="benchmarks" aria-labelledby="benchmarks-title">
+      <div class="section-heading"><p class="section-kicker">04 / Benchmarks</p><h2 id="benchmarks-title">Benchmarks &amp; evaluation systems</h2></div>
+      <div class="data-table-wrap" tabindex="0" aria-label="Benchmarks table">
+        <table class="data-table benchmarks-table"><thead><tr><th>Benchmark</th><th>Year</th><th>Sim / Real</th><th>Scale</th><th>Embodiment</th><th>Scoring</th><th>Link</th></tr></thead><tbody>
+          <tr><td>Meta-World</td><td>2019</td><td>Sim (MuJoCo)</td><td>50 tasks</td><td>Sawyer arm</td><td>Binary success rate</td><td><a href="https://meta-world.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>RLBench</td><td>2019</td><td>Sim (CoppeliaSim)</td><td>100+ tasks</td><td>Franka Panda</td><td>Success rate + few-shot curves</td><td><a href="https://sites.google.com/view/rlbench" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>CALVIN</td><td>2022</td><td>Sim (PyBullet)</td><td>Long-horizon chains, 4 envs</td><td>Franka Panda</td><td>Chain success rate (0-5)</td><td><a href="https://calvin-rl.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>LIBERO</td><td>2023</td><td>Sim (robosuite)</td><td>130 tasks / 4 suites</td><td>Franka Panda</td><td>Success rate + FWT/NBT/AUC</td><td><a href="https://libero-project.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>BEHAVIOR-1K</td><td>2023</td><td>Sim + small real transfer</td><td>1000 activities, 50 scenes</td><td>Mobile bi-arm</td><td>Binary + predicate-level Q-score</td><td><a href="https://behavior.stanford.edu/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>RoboCasa</td><td>2024</td><td>Sim (robosuite/MuJoCo)</td><td>100+ tasks, 150+ categories</td><td>Franka Panda</td><td>Success rate, scaling curves</td><td><a href="https://robocasa.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>The Colosseum</td><td>2024</td><td>Sim + real correlation</td><td>20 tasks, 14 perturbation axes</td><td>RLBench single arm</td><td>Success-rate drop</td><td><a href="https://github.com/robot-colosseum/robot-colosseum" target="_blank" rel="noreferrer">source</a></td></tr>
+          <tr><td>ManiSkill3</td><td>2024</td><td>Sim (SAPIEN, GPU-parallel)</td><td>Dozens of families</td><td>Multi-embodiment</td><td>Success + sim throughput</td><td><a href="https://maniskill.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>SIMPLER</td><td>2024</td><td>Sim-real paired</td><td>Google Robot and WidowX setups</td><td>Google Robot, WidowX</td><td>Sim-real correlation</td><td><a href="https://simpler-env.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>RoboTwin / 2.0</td><td>2024-2025</td><td>Sim + real alignment</td><td>50 dual-arm tasks, 5 platforms</td><td>Aloha, Piper</td><td>Success rate, Easy/Hard</td><td><a href="https://robotwin-benchmark.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>RoboTwin Dual-Arm Challenge</td><td>2025</td><td>Sim + real</td><td>17 dual-arm tasks</td><td>AgileX COBOT-Magic</td><td>Stage success ranking</td><td><a href="https://robotwin-benchmark.github.io/" target="_blank" rel="noreferrer">challenge</a></td></tr>
+          <tr><td>AutoEval</td><td>2025</td><td>Real only, unattended</td><td>Open task set</td><td>WidowX</td><td>Binary success rate</td><td><a href="https://auto-eval.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>RoboArena</td><td>2025</td><td>Real, crowdsourced</td><td>600+ head-to-head matches</td><td>DROID platform</td><td>Pairwise preference to Elo</td><td><a href="https://roboarena.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>RoboChallenge</td><td>2025</td><td>Real only, online</td><td>Table30 (30 tasks)</td><td>UR5, Franka, Aloha, ARX-5</td><td>Success + Progress Score</td><td><a href="https://robochallenge.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>RoboDojo</td><td>2026</td><td>Sim + real unified</td><td>42 sim + 18 real tasks</td><td>ARX X5, Piper</td><td>Success + average score</td><td><a href="https://robodojo.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>XPolicyLab</td><td>2026</td><td>Standardization layer</td><td>42 policies integrated</td><td>Embodiment-agnostic</td><td>Integration cost</td><td><a href="https://xpolicylab.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>SIMPLE</td><td>2026</td><td>Sim</td><td>-</td><td>Humanoid</td><td>Support for π0.5 / GR00T</td><td><a href="https://simple-robot.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>WorldArena / 2.0</td><td>2026</td><td>World-model evaluation</td><td>-</td><td>-</td><td>Perception &amp; functional utility</td><td><a href="https://world-arena.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>HumanoidBench</td><td>2024</td><td>Sim</td><td>Whole-body tasks</td><td>Humanoid</td><td>-</td><td><a href="https://humanoid-bench.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>M3Bench</td><td>2024</td><td>Sim</td><td>3D scene manipulation</td><td>Mobile / whole-body</td><td>-</td><td><a href="https://m3bench.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>PAI-Bench</td><td>2026</td><td>Video-based</td><td>AD, robotics, industrial, egocentric</td><td>-</td><td>Video generation / understanding</td><td><a href="https://pai-bench.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
+          <tr><td>PhAIL</td><td>2026</td><td>Real only</td><td>1 task, 4 models currently</td><td>Franka FR3 + Robotiq</td><td>Throughput + MTBF</td><td><a href="https://phail.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
+        </tbody></table>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="About PhAIL Notes, an independent research notebook on physical AI evaluation." />
+  <title>About - PhAIL Notes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="header-row">
+      <a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="index.html#tasks">Tasks</a><a href="index.html#metrics">Metrics</a><a href="index.html#models">Models</a><a href="index.html#benchmarks">Benchmarks</a><a href="about.html" aria-current="page">About</a>
+      </nav>
+    </div>
+    <p class="site-expansion"><span data-full-name>Physical AI Evaluation &amp; Intelligence Ledger</span></p>
+    <p class="site-wordplay">Pronounced like “fail” - because honest evaluation starts with what breaks.</p>
+    <p class="site-deck">A research notebook, not a company.</p>
+  </header>
+
+  <main class="about-page">
+    <section class="section about-section" aria-labelledby="about-title">
+      <p class="section-kicker">About this project</p>
+      <h1 id="about-title">A small, honest piece of the missing picture.</h1>
+      <div class="prose">
+        <p>This is a research notebook, not a company.</p>
+        <p>Artificial Analysis has spent the last two years building an independent, quantitative answer to “which AI model is actually good?” - for language, image, video, and speech models. Physical AI - models that perceive, predict, or act in the physical world, from tabletop manipulation to full-body humanoid control to autonomous driving - doesn’t have an equivalent yet, and not by accident: you can’t call a robot the way you call an API.</p>
+        <p>This project is an attempt to build a small, honest piece of that missing picture: a map of what’s already being measured, by whom, and how well; a growing, transparently-sourced comparison of the models and benchmarks that matter; and, where something is clearly missing, some proposals of our own.</p>
+        <p>Run out of NTU / MMLab, updated irregularly, always a work in progress. If you think something here is wrong, incomplete, or missing, I’d genuinely like to hear about it.</p>
+      </div>
+    </section>
+
+    <section class="section about-section" aria-labelledby="scope-title">
+      <p class="section-kicker">Scope</p>
+      <h2 id="scope-title">What we mean by physical AI</h2>
+      <div class="prose">
+        <p>“Physical AI” gets used loosely. Before comparing anything, it helps to be explicit about what’s being compared:</p>
+        <ul class="definition-list">
+          <li><strong>Perceives the physical world, acts only in software.</strong> An assistant that sees through a camera but completes tasks via search, email, or app control - Project Astra is the clearest current example.</li>
+          <li><strong>Predicts or simulates the physical world, but doesn’t act.</strong> World models used for planning or generating training data.</li>
+          <li><strong>Directly drives physical actuators.</strong> Robot manipulation, humanoid whole-body control, autonomous driving, and drones.</li>
+        </ul>
+        <p>We mostly focus on the third category, and try to be explicit about which one we mean whenever it matters - mixing them into one ranking is, in our opinion, one of the more common ways this space misleads people.</p>
+      </div>
+    </section>
+
+    <section class="section about-section" aria-labelledby="scoring-title">
+      <p class="section-kicker">Scoring</p>
+      <h2 id="scoring-title">Why there is no composite score yet</h2>
+      <div class="prose">
+        <p>Artificial Analysis can average different models into one Intelligence Index because every model is run on the exact same private test set. Most physical AI models are reported on different task sets, different rollout counts, and by different labs - the numbers are not comparable yet.</p>
+        <p>Rather than force a fake composite score, this site filters by task, embodiment, and openness, and shows each reported number with its source. A real composite score becomes honest once models are run through a shared harness, such as SIMPLE or XPolicyLab. That’s a later milestone, not a v0 feature.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
+  <script src="script.js"></script>
+</body>
+</html>
