@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tasks - PhAIL</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="tasks">
+<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="tasks.html" aria-current="page">Tasks</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
+<main class="task-database-page">
+	<section class="database-intro"><p class="section-kicker">Tasks / filtered ledger</p><h1>Find models by what they need to do.</h1><p>Connect a task to its benchmarks, models, reported metrics, resource requirements, and sources.</p></section>
+	<section class="filter-panel" aria-label="Filter evaluation records">
+		<label>Task<select id="task-filter"></select></label><label>Benchmark<select id="benchmark-filter"></select></label><label>Model<select id="model-filter"></select></label><label>Open / closed<select id="openness-filter"><option value="">All models</option><option>Open</option><option>Open weights</option><option>Closed</option></select></label><label>Embodiment<select id="embodiment-filter"><option value="">All embodiments</option><option>Tabletop</option><option>Humanoid</option><option>Bi-arm</option><option>Cross-embodiment</option><option>World model</option></select></label><label>Model size<select id="size-filter"><option value="">All sizes</option><option>450M</option><option>7B</option><option>27M-93M</option><option>Not reported</option></select></label><label>Track<select id="track-filter"><option value="">All tracks</option><option>Sim</option><option>Real</option></select></label><label>Metric<select id="metric-filter"><option value="">All metrics</option><option>Success rate</option><option>Capability score</option><option>Mean task score</option><option>Easy / Hard success</option><option>Predicate Q-score</option><option>Long-horizon success</option><option>Sim-real correlation</option><option>Video utility</option></select></label><label class="search-filter">Search<input id="search-filter" type="search" placeholder="model, maker, source..." /></label>
+	</section>
+	<div class="database-summary"><strong data-result-count>0 records</strong><span>Missing data stays visible as missing. No composite score is implied.</span></div>
+	<div class="recommendation" data-recommendation aria-live="polite"></div>
+	<div class="data-table-wrap task-database-table" tabindex="0" aria-label="Filtered physical AI model evaluation records"><table class="data-table"><thead><tr><th>Rank</th><th>Model</th><th>Task</th><th>Benchmark</th><th>Track</th><th>Metric</th><th>Latency</th><th>Cost</th><th>Source</th></tr></thead><tbody class="task-database"><tr><td colspan="9">Loading evaluation ledger...</td></tr></tbody></table></div>
+</main>
+<script src="script.js?v=2"></script><script src="tasks-data-new.js?v=1"></script><script src="tasks-app.js?v=5"></script>
+</body>
+</html>

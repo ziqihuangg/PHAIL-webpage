@@ -12,30 +12,43 @@
     <div class="header-row">
       <a class="site-name" href="#top"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
       <nav aria-label="Primary navigation">
-        <a href="#tasks">Tasks</a><a href="#metrics">Metrics</a><a href="#models">Models</a><a href="#benchmarks">Benchmarks</a><a href="about.html">About</a>
+        <a href="tasks.html">Tasks</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
       </nav>
     </div>
-    <p class="site-expansion"><span data-full-name>Physical AI Evaluation &amp; Intelligence Ledger</span></p>
+    <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
     <p class="site-wordplay">Pronounced like “fail” - because honest evaluation starts with what breaks.</p>
     <p class="site-deck dashboard-deck">We map physical AI tasks, metrics, models, and benchmarks.</p>
     <p class="header-link"><a href="about.html">About this project <span aria-hidden="true">-&gt;</span></a></p>
   </header>
 
-  <main class="dashboard">
+  <main class="home-page">
     <section class="section dashboard-section" id="tasks" aria-labelledby="tasks-title">
       <div class="section-heading"><p class="section-kicker">01 / Tasks</p><h1 id="tasks-title">Task categories</h1></div>
-      <div class="task-table" role="list">
-        <div class="task-row task-row-head" aria-hidden="true"><span>Task category</span><span>What is being tested</span><span>Representative benchmarks</span></div>
-        <div class="task-row" role="listitem"><strong>Tabletop / single-arm manipulation</strong><span>Pick-place, insertion, tool use on a fixed base</span><span><a href="#benchmarks">LIBERO</a>, RLBench, Meta-World, RoboCasa</span></div>
-        <div class="task-row" role="listitem"><strong>Bimanual manipulation</strong><span>Coordinated two-arm tasks</span><span>RoboTwin / RoboTwin 2.0, RoboTwin Dual-Arm Challenge</span></div>
-        <div class="task-row" role="listitem"><strong>Mobile manipulation</strong><span>Manipulation combined with base movement</span><span>BEHAVIOR-1K, ManiSkill3</span></div>
-        <div class="task-row" role="listitem"><strong>Loco-manipulation</strong><span>Whole-body humanoid control while manipulating</span><span>SIMPLE, Psi-0, Omega-0</span></div>
-        <div class="task-row" role="listitem"><strong>Whole-body locomotion</strong><span>Balance, gait, disturbance rejection</span><span>HumanoidBench</span></div>
-        <div class="task-row" role="listitem"><strong>Long-horizon household activities</strong><span>Multi-step, chained tasks</span><span>BEHAVIOR-1K, CALVIN</span></div>
-        <div class="task-row" role="listitem"><strong>Industrial / commercial tasks</strong><span>Bin-picking, sorting, assembly</span><span>PhAIL</span></div>
-        <div class="task-row" role="listitem"><strong>World-model prediction</strong><span>Predicting or generating physical-world video, not acting</span><span>PAI-Bench, WorldArena</span></div>
-        <div class="task-row" role="listitem"><strong>Autonomous driving</strong><span>Perception + planning + control for vehicles</span><span>No trustworthy cross-company leaderboard yet</span></div>
-        <div class="task-row" role="listitem"><strong>Environment-perceiving software agents <em>(boundary case)</em></strong><span>Perceives through camera or mic, acts only through software</span><span>Project Astra; tracked separately</span></div>
+      <div class="task-roadmap">
+        <section class="roadmap-group" aria-labelledby="robotics-title">
+          <div class="roadmap-label"><h2 id="robotics-title">Robotics</h2></div>
+          <div class="roadmap-items">
+            <div class="roadmap-item"><strong>Tabletop / single-arm manipulation</strong><span>Pick-place, insertion, tool use on a fixed base</span><a href="benchmarks.html">LIBERO, RLBench, Meta-World, RoboCasa</a></div>
+            <div class="roadmap-item"><strong>Bimanual manipulation</strong><span>Coordinated two-arm tasks</span><a href="benchmarks.html">RoboTwin / RoboTwin 2.0, Dual-Arm Challenge</a></div>
+            <div class="roadmap-item"><strong>Mobile manipulation</strong><span>Manipulation combined with base movement</span><a href="benchmarks.html">BEHAVIOR-1K, ManiSkill3</a></div>
+            <div class="roadmap-item"><strong>Loco-manipulation</strong><span>Whole-body humanoid control while manipulating</span><a href="benchmarks.html">SIMPLE, Psi-0, Omega-0</a></div>
+            <div class="roadmap-item"><strong>Whole-body locomotion</strong><span>Balance, gait, and disturbance rejection</span><a href="benchmarks.html">HumanoidBench</a></div>
+            <div class="roadmap-item"><strong>Long-horizon household activities</strong><span>Multi-step, chained tasks</span><a href="benchmarks.html">BEHAVIOR-1K, CALVIN</a></div>
+            <div class="roadmap-item"><strong>Industrial / commercial tasks</strong><span>Bin-picking, sorting, assembly</span><a href="benchmarks.html">PhAIL</a></div>
+          </div>
+        </section>
+        <section class="roadmap-group" aria-labelledby="driving-title">
+          <div class="roadmap-label"><h2 id="driving-title">Autonomous driving</h2></div>
+          <div class="roadmap-items"><div class="roadmap-item"><strong>Perception, planning &amp; control</strong><span>Vehicles operating around dynamic agents, road rules, and uncertainty</span><span>No cross-company leaderboard we consider trustworthy yet</span></div></div>
+        </section>
+        <section class="roadmap-group" aria-labelledby="world-models-title">
+          <div class="roadmap-label"><h2 id="world-models-title">World models</h2></div>
+          <div class="roadmap-items"><div class="roadmap-item"><strong>Physical-world prediction</strong><span>Predicting or generating video of what happens next, without directly acting</span><a href="benchmarks.html">PAI-Bench, WorldArena</a></div></div>
+        </section>
+        <section class="roadmap-group" aria-labelledby="agents-title">
+          <div class="roadmap-label"><h2 id="agents-title">Environment-perceiving agents</h2></div>
+          <div class="roadmap-items"><div class="roadmap-item"><strong>Software-only action <em>(boundary case)</em></strong><span>Perceives through camera or mic, then acts through search, apps, or tool calls</span><span>Project Astra; tracked separately from physical actuation</span></div></div>
+        </section>
       </div>
     </section>
 
@@ -109,6 +122,6 @@
     </section>
   </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>

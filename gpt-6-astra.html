@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="What's actually been measured about GPT-6-Astra as an embodied / robot-control policy, gathered from every public report, independent eval, and demo we could read directly." />
+  <title>GPT-6 Astra - PhAIL Notes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="header-row">
+      <a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="tasks.html">Tasks</a><a href="gpt-6-astra.html" aria-current="page">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
+      </nav>
+    </div>
+    <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
+  </header>
+
+  <main class="astra-page">
+
+    <section class="astra-section astra-intro" aria-labelledby="astra-title">
+      <p class="section-kicker">Model spotlight</p>
+      <h1 id="astra-title">GPT-6-Astra as an embodied policy</h1>
+      <div class="prose">
+        <p><code>gpt-6-astra</code> is OpenAI's general flagship model, with no robotics-specific training. Everyone below is prompting it through their own harness and reporting what happened - four labs, four different task sets and robots, none of it averaged into one score.</p>
+        <p><strong>Naming note:</strong> this “Astra” is OpenAI's. Unrelated to Google DeepMind's Project Astra, which this site tracks separately on the <a href="index.html#tasks">Tasks</a> page as a software-only agent.</p>
+        <ul class="legend-list" aria-label="Source-confidence key">
+          <li><span class="source-tag">Benchmark report</span></li>
+          <li><span class="source-tag">Independent / draft</span></li>
+          <li><span class="source-tag">Third-party eval</span></li>
+          <li><span class="source-tag">Small-scale study</span></li>
+          <li><span class="source-tag source-tag--soft">Single demo</span></li>
+          <li><span class="source-tag source-tag--soft">Community index</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="astra-section" id="astra-glance" aria-labelledby="glance-title">
+      <p class="section-kicker">At a glance</p>
+      <h2 id="glance-title">Harness, role, and effort level per source</h2>
+      <div class="prose">
+        <p>RoboDojo defines its own three-level scale for "how the LLM touches the robot," and we reuse that vocabulary below since it's the clearest way to say what's actually comparable. <strong>L1</strong>: a trained policy acts directly, no LLM. <strong>L2 / Hybrid</strong>: the LLM directs a separately-trained policy. <strong>L3 / Direct</strong>: the LLM's own output drives the robot through a fixed, non-learned harness - no trained checkpoint anywhere in the loop. Where a source doesn't state its level or reasoning effort, we mark it "not stated" rather than guess.</p>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Source</th><th>Role</th><th>Reasoning effort</th><th>Robot / scope</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>RoboDojo</td><td>L3 / Direct <span class="table-note">(source's own label)</span></td><td>Medium <span class="table-note">(source's stated default)</span></td><td>Sim (42 tasks) + real ARX X5 / Piper / Franka / humanoid (18 tasks)</td><td>Official benchmark</td></tr>
+            <tr><td>RoboLab (draft report)</td><td>L3 / Direct <em>and</em> L2 / Hybrid (mixed with &pi;<sub>0.5</sub>)</td><td>xhigh <span class="table-note">(source's stated config)</span></td><td>Sim, 10 tasks &times; 5 trials</td><td>Unpublished draft</td></tr>
+            <tr><td>Robocurve</td><td>Not stated <span class="table-note">(appears Direct - no policy mentioned)</span></td><td>Not stated</td><td>Real YAM arm, 2 tasks &times; 20 trials</td><td>Third-party (see note below)</td></tr>
+            <tr><td>GPT-Policy-Eval</td><td>Not labeled by source; functionally L3 / Direct <span class="table-note">(VLM proposes, a constrained controller executes)</span></td><td>Not stated</td><td>Real ARX/YAM arms, 4 tasks &times; 3 trials</td><td>Small independent study</td></tr>
+            <tr><td>innate-os PR #817</td><td>L3 / Direct <span class="table-note">(no trained policy, per PR text)</span></td><td>Low <span class="table-note">(source's stated config)</span></td><td>Real arm, 1 demoed task</td><td>Single demo</td></tr>
+            <tr><td>X / @ax_pey</td><td>Not stated <span class="table-note">(couldn't read post directly)</span></td><td>Not stated</td><td>Mobile manipulation, 1 clip</td><td>Single demo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="astra-section" id="astra-model-card" aria-labelledby="model-card-title">
+      <p class="section-kicker">Model card</p>
+      <h2 id="model-card-title">The model itself</h2>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Field</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Model ID</td><td><code>gpt-6-astra</code></td></tr>
+            <tr><td>Modalities</td><td>Text + image in -&gt; text out</td></tr>
+            <tr><td>Context window</td><td>1,050,000 tokens</td></tr>
+            <tr><td>Knowledge cutoff</td><td>2026-04-30</td></tr>
+            <tr><td>Reasoning effort levels</td><td>low, medium, high, xhigh, max</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-footnote">From OpenAI's model docs. No wheels or motor outputs of its own - every result below comes from a separate harness.</p>
+    </section>
+
+    <section class="astra-section" id="astra-robodojo" aria-labelledby="robodojo-title">
+      <span class="source-tag">Benchmark report</span>
+      <p class="section-kicker">RoboDojo</p>
+      <h2 id="robodojo-title">Official benchmark</h2>
+
+      <h3>Sim leaderboard (43 models, average score 0-30)</h3>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Rank</th><th>Model</th><th>Team</th><th>Score</th><th>Success rate</th></tr></thead>
+          <tbody>
+            <tr class="row-highlight"><td>1</td><td><strong>GPT-6-Astra</strong></td><td>OpenAI</td><td>28.97</td><td>22.48%</td></tr>
+            <tr><td>2</td><td>DM0.5</td><td>Dexmal</td><td>24.90</td><td>19.34%</td></tr>
+            <tr><td>3</td><td>GalaxeaVLA (G0.5)</td><td>Galaxea AI</td><td>20.23</td><td>14.88%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-footnote">1 seed &times; 50 episodes/task. For context: OpenAI's prior model, GPT-5.5, ranks 33rd on the same harness (1.13 / 0.88%) - the result is specific to this model, not "any OpenAI model."</p>
+
+      <h3>By category</h3>
+      <div class="data-table-wrap">
+        <table class="data-table metrics-table">
+          <thead><tr><th>Category</th><th>Success rate</th></tr></thead>
+          <tbody>
+            <tr><td>Memory</td><td>38.67%</td></tr>
+            <tr><td>Open-ended</td><td>31%</td></tr>
+            <tr><td>Generalization</td><td>30.5%</td></tr>
+            <tr><td>Long-horizon</td><td>8.25%</td></tr>
+            <tr><td>Precision</td><td>4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-footnote">Strong on memory and open-ended tasks, weak on precision - consistent with a reasoning model directing coarse motion rather than a policy trained on fine manipulation.</p>
+
+      <h3>Real-world, zero-shot</h3>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Task</th><th>Success rate</th></tr></thead>
+          <tbody>
+            <tr><td>stack_bowls (Piper, best result)</td><td>25%</td></tr>
+            <tr><td>Pooled across 33 retained clips, all real tasks</td><td>3.03%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-footnote">For comparison, RoboDojo's official 18-task real board (policies trained on these specific tasks) tops out at 24.40% (OpenWAM-&alpha;). The sim-leaderboard win doesn't transfer zero-shot.</p>
+
+      <div class="video-grid">
+        <figure>
+          <video controls preload="none" poster="https://media.luminis-sim.com/media/report/gpt-6-astra/astra-real-deployment/web/pour_phase4_stream_dies.jpg">
+            <source src="https://media.luminis-sim.com/media/report/gpt-6-astra/astra-real-deployment/web/pour_phase4_stream_dies.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Real-arm failure mode: the pour stream dies and slides down the cup wall. <a href="https://robodojo-benchmark.com/report/gpt-6-astra-eval" target="_blank" rel="noreferrer">Source: RoboDojo</a></figcaption>
+        </figure>
+        <figure>
+          <video controls preload="none" poster="https://media.luminis-sim.com/media/report/gpt-6-astra/astra-piano-showcase/web/hero_two_hand.jpg">
+            <source src="https://media.luminis-sim.com/media/report/gpt-6-astra/astra-piano-showcase/web/hero_two_hand.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Two-hand piano showcase, F1 0.902 on note onsets, 35/35 correct-hand notes. <a href="https://robodojo-benchmark.com/report/gpt-6-astra-eval" target="_blank" rel="noreferrer">Source: RoboDojo</a></figcaption>
+        </figure>
+      </div>
+      <p class="table-footnote"><a href="https://robodojo-benchmark.com/report/gpt-6-astra-eval" target="_blank" rel="noreferrer">robodojo-benchmark.com/report/gpt-6-astra-eval</a></p>
+    </section>
+
+    <section class="astra-section" id="astra-robolab" aria-labelledby="robolab-title">
+      <span class="source-tag">Independent / draft</span>
+      <p class="section-kicker">RoboLab cross-check</p>
+      <h2 id="robolab-title">Unpublished draft report</h2>
+      <div class="prose">
+        <p>An anonymized report titled <em>"GPT 6 Astra as an Embodied Policy"</em> (draft, 2026-09-13 - reads like a double-blind review companion site) re-ran GPT-6-Astra on <a href="https://arxiv.org/abs/2604.09860" target="_blank" rel="noreferrer">RoboLab</a>, a different sim benchmark from RoboDojo. It says explicitly that its 10-task, 5-trial selection is not a full RoboLab-120 reproduction, and three of five methods below are reused historical baselines, not freshly run.</p>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Method</th><th>Success rate</th></tr></thead>
+          <tbody>
+            <tr class="row-highlight"><td><strong>GPT-6-Astra, direct (L3)</strong></td><td>98% (49/50)</td></tr>
+            <tr class="row-highlight"><td><strong>&pi;<sub>0.5</sub> + GPT-6-Astra (L2 / hybrid)</strong></td><td>92% (46/50)</td></tr>
+            <tr><td>&pi;<sub>0.5</sub> alone (historical)</td><td>36% (18/50)</td></tr>
+            <tr><td>Cosmos3-Nano-Policy (historical)</td><td>36% (18/50)</td></tr>
+            <tr><td>DreamZero (historical)</td><td>34% (17/50)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-footnote">Gap is largest on tasks the &pi;<sub>0.5</sub> baseline fails outright, smallest on tasks everything already handles (e.g. Rubik's cube). Per-task breakdown and token/compute-cost figures are in the source.</p>
+      <p class="table-footnote"><a href="https://anonymous-report-421.github.io/public-website" target="_blank" rel="noreferrer">anonymous-report-421.github.io/public-website</a> - unpublished/draft, treat accordingly.</p>
+    </section>
+
+    <section class="astra-section" id="astra-robocurve" aria-labelledby="robocurve-title">
+      <span class="source-tag">Third-party eval</span>
+      <p class="section-kicker">Robocurve</p>
+      <h2 id="robocurve-title">Independent real-robot test</h2>
+      <div class="callout-note">
+        <p><strong>Domain note:</strong> published at <code>openai.robocurve.org</code>, a subdomain of <strong>robocurve.org</strong> - a third-party evaluator, not an OpenAI-owned domain. We found no stated OpenAI affiliation on the page.</p>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Task</th><th>Success rate</th><th>Cost / run</th><th>Time / run</th></tr></thead>
+          <tbody>
+            <tr><td>Block into bowl</td><td>95% (19/20)</td><td>$0.94</td><td>2.5 min</td></tr>
+            <tr><td>Puzzle piece into groove</td><td>10% (2/20)</td><td>$1.36</td><td>3.4 min</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-footnote">Same pattern as RoboDojo: strong on coarse placement, weak on precise alignment. A "80% fewer output tokens" figure is cited by the community index below but wasn't confirmed on this primary page, so we're not repeating it as fact.</p>
+      <p class="table-footnote"><a href="https://openai.robocurve.org/gpt-6-astra/" target="_blank" rel="noreferrer">openai.robocurve.org/gpt-6-astra</a></p>
+    </section>
+
+    <section class="astra-section" id="astra-gpe" aria-labelledby="gpe-title">
+      <span class="source-tag">Small-scale study</span>
+      <p class="section-kicker">GPT-Policy-Eval</p>
+      <h2 id="gpe-title">In-context learning from video demonstrations</h2>
+      <div class="prose">
+        <p>An independent framework testing whether showing GPT-6-Astra a demonstration (human video, robot video, robot video + action labels) improves real-robot task success, n=3 trials per condition. Two of its task families, in full:</p>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Task</th><th>Context</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+          <tbody>
+            <tr><td>Pick Red Towel</td><td>None</td><td>0/3</td><td>96.3</td><td>24.6</td></tr>
+            <tr class="row-highlight"><td>Pick Red Towel</td><td>Human video</td><td><strong>2/3</strong></td><td>76.7</td><td>18.9</td></tr>
+            <tr><td>Unscrew Bottle Cap</td><td>None</td><td>0/3</td><td>71.0</td><td>16.1</td></tr>
+            <tr><td>Unscrew Bottle Cap</td><td>Robot video</td><td>2/3</td><td>74.3</td><td>15.2</td></tr>
+            <tr class="row-highlight"><td>Unscrew Bottle Cap</td><td>Robot video + action</td><td><strong>3/3</strong></td><td>54.7</td><td>17.9</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-footnote">"Decisions" is the number of model decision-steps in the run, not a dollar cost. Plug-reinsertion and goal-image tasks follow the same pattern in the <a href="https://cheng-haha.github.io/GPT-Policy/#results" target="_blank" rel="noreferrer">full results gallery</a>.</p>
+
+      <div class="video-grid">
+        <figure>
+          <video controls preload="none" poster="https://cheng-haha.github.io/GPT-Policy/assets/images/towel-without-human-poster.jpg">
+            <source src="https://cheng-haha.github.io/GPT-Policy/assets/videos/towel-no-demo.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Pick Red Towel, no demonstration - 0/3.</figcaption>
+        </figure>
+        <figure>
+          <video controls preload="none" poster="https://cheng-haha.github.io/GPT-Policy/assets/images/towel-with-human-poster.jpg">
+            <source src="https://cheng-haha.github.io/GPT-Policy/assets/videos/towel-with-demo.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Same task, with a human video demonstration - 2/3. <a href="https://cheng-haha.github.io/GPT-Policy/" target="_blank" rel="noreferrer">Source: GPT-Policy</a></figcaption>
+        </figure>
+      </div>
+      <p class="table-footnote"><a href="https://github.com/cheng-haha/GPT-Policy-Eval" target="_blank" rel="noreferrer">github.com/cheng-haha/GPT-Policy-Eval</a> · <a href="https://cheng-haha.github.io/GPT-Policy/" target="_blank" rel="noreferrer">project page</a></p>
+    </section>
+
+    <section class="astra-section" id="astra-demos" aria-labelledby="demos-title">
+      <span class="source-tag source-tag--soft">Single demo</span>
+      <p class="section-kicker">One-off showcases</p>
+      <h2 id="demos-title">No success-rate claim</h2>
+      <ul class="source-list">
+        <li>
+          <strong>In-context learning on mobile manipulation</strong> - <a href="https://x.com/ax_pey/status/2098216469012283681" target="_blank" rel="noreferrer">@ax_pey on X</a>, 2026-09-11.
+          <p>Couldn't load the post directly (access error). Referenced here because the same demo is documented in the PR below, which we did read.</p>
+        </li>
+        <li>
+          <strong>Imitate a recorded demonstration</strong> - <a href="https://github.com/innate-inc/innate-os/pull/817" target="_blank" rel="noreferrer">innate-inc/innate-os PR #817</a>.
+          <p>An <code>imitate_demonstration</code> skill: watches one recorded episode, replays it live, "one bounded decision per observation," low reasoning effort, no trained policy. Demoed task: knock a plant off a platform &rarr; drop a rod &rarr; pick up a unit &rarr; place it back. With the task description withheld, it reportedly inferred all six phases from the demonstration alone.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="astra-section" id="astra-community" aria-labelledby="community-title">
+      <span class="source-tag source-tag--soft">Community index</span>
+      <p class="section-kicker">Case list</p>
+      <h2 id="community-title">Awesome-Astra-Embodied-AI</h2>
+      <div class="prose">
+        <p>A community-maintained index of GPT-6-Astra embodied-AI demos (zero-shot control, agentic policy calls, real-to-sim replay, RL environments). It's a discovery index, not a benchmark - it points at other people's demos rather than running its own evaluation.</p>
+      </div>
+      <p class="table-footnote"><a href="https://github.com/zjwzcx/Awesome-Astra-Embodied-AI" target="_blank" rel="noreferrer">github.com/zjwzcx/Awesome-Astra-Embodied-AI</a></p>
+    </section>
+
+    <section class="astra-section astra-sources" id="astra-sources" aria-labelledby="sources-title">
+      <p class="section-kicker">Sources</p>
+      <h2 id="sources-title">Everything we read to build this page</h2>
+      <ul class="source-list">
+        <li><span class="source-tag">Benchmark report</span><p><a href="https://robodojo-benchmark.com/report/gpt-6-astra-eval" target="_blank" rel="noreferrer">RoboDojo - GPT-6-Astra report</a></p></li>
+        <li><span class="source-tag">Independent / draft</span><p><a href="https://anonymous-report-421.github.io/public-website" target="_blank" rel="noreferrer">"GPT 6 Astra as an Embodied Policy" (anonymized draft, 2026-09-13)</a></p></li>
+        <li><span class="source-tag">Third-party eval</span><p><a href="https://openai.robocurve.org/gpt-6-astra/" target="_blank" rel="noreferrer">Robocurve - GPT-6-Astra on robotic manipulation</a> (not an OpenAI-owned domain)</p></li>
+        <li><span class="source-tag">Small-scale study</span><p><a href="https://github.com/cheng-haha/GPT-Policy-Eval" target="_blank" rel="noreferrer">GPT-Policy-Eval</a> / <a href="https://cheng-haha.github.io/GPT-Policy/" target="_blank" rel="noreferrer">project page</a></p></li>
+        <li><span class="source-tag source-tag--soft">Community index</span><p><a href="https://github.com/zjwzcx/Awesome-Astra-Embodied-AI" target="_blank" rel="noreferrer">Awesome-Astra-Embodied-AI</a></p></li>
+        <li><span class="source-tag source-tag--soft">Single demo</span><p><a href="https://x.com/ax_pey/status/2098216469012283681" target="_blank" rel="noreferrer">@ax_pey - mobile manipulation (X post, unread directly)</a></p></li>
+        <li><span class="source-tag source-tag--soft">Single demo</span><p><a href="https://github.com/innate-inc/innate-os/pull/817" target="_blank" rel="noreferrer">innate-inc/innate-os PR #817 - imitate_demonstration</a></p></li>
+        <li><span class="source-tag">Official docs</span><p><a href="https://developers.openai.com/api/docs/models/gpt-6-astra" target="_blank" rel="noreferrer">OpenAI - gpt-6-astra model card</a> (the one clearly OpenAI-owned source in this list)</p></li>
+      </ul>
+    </section>
+
+  </main>
+  <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
+  <script src="script.js?v=2"></script>
+</body>
+</html>
