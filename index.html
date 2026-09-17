@@ -5,20 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A working map of physical AI tasks, benchmarks, models, and evaluation metrics." />
   <title>PhAIL Notes</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
   <header class="site-header" id="top">
     <div class="header-row">
       <a class="site-name" href="#top"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
       <nav aria-label="Primary navigation">
-        <a href="tasks.html">Tasks</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
+        <a href="tasks.html">Tasks</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
       </nav>
     </div>
     <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
     <p class="site-wordplay">Pronounced like “fail” - because honest evaluation starts with what breaks.</p>
-    <p class="site-deck dashboard-deck">We map physical AI tasks, metrics, models, and benchmarks.</p>
-    <p class="header-link"><a href="about.html">About this project <span aria-hidden="true">-&gt;</span></a></p>
+    <p class="site-deck dashboard-deck">We map physical AI tasks, metrics, models, and benchmarks - and record who produced every number.</p>
+    <p class="header-link"><a href="tasks.html">Browse the ledger <span aria-hidden="true">-&gt;</span></a> <a href="charts.html">See the charts <span aria-hidden="true">-&gt;</span></a> <a href="about.html">About this project <span aria-hidden="true">-&gt;</span></a></p>
   </header>
 
   <main class="home-page">
@@ -73,22 +75,23 @@
     <section class="section dashboard-section" id="models" aria-labelledby="models-title">
       <div class="section-heading"><p class="section-kicker">03 / Models</p><h2 id="models-title">Model specifications</h2></div>
       <div class="data-table-wrap" tabindex="0" aria-label="Model specifications table">
-        <table class="data-table models-table"><thead><tr><th>Model</th><th>Maker</th><th>Open / Closed</th><th>Embodiment</th><th>Inference requirement</th><th>Control frequency</th><th>Notes</th></tr></thead><tbody>
-          <tr><td>GR00T N1.5 / N1.6 / N1.7</td><td>NVIDIA</td><td>Open weights</td><td>Humanoid manipulation, bimanual</td><td>-</td><td>-</td><td>N1.7 trained on 20,854 hrs egocentric video</td></tr>
-          <tr><td>Gemini Robotics 1.5</td><td>Google DeepMind</td><td>Closed (select partners)</td><td>Complex multi-step manipulation</td><td>-</td><td>-</td><td>-</td></tr>
-          <tr><td>Gemini Robotics On-Device</td><td>Google DeepMind</td><td>Closed</td><td>Bi-arm</td><td>Runs locally</td><td>-</td><td>Adapts with 50-100 demos</td></tr>
-          <tr><td>π0 / π0-FAST / π0.5 / π0.7</td><td>Physical Intelligence</td><td>Open (openpi)</td><td>Single/dual-arm, mobile manipulation</td><td>&gt;8GB VRAM</td><td>-</td><td>Pretrained on 10k+ hrs robot data</td></tr>
-          <tr><td>Helix</td><td>Figure AI</td><td>Closed</td><td>Humanoid upper-body</td><td>Embedded GPU</td><td>200Hz</td><td>Household tasks, package sorting</td></tr>
-          <tr><td>OpenVLA</td><td>Open-source community</td><td>Open</td><td>Cross-embodiment manipulation</td><td>-</td><td>-</td><td>7B params, 970k real demonstrations</td></tr>
-          <tr><td>Octo</td><td>UC Berkeley</td><td>Open</td><td>Tabletop manipulation</td><td>-</td><td>-</td><td>27M-93M params</td></tr>
-          <tr><td>SmolVLA</td><td>Hugging Face / LeRobot</td><td>Open</td><td>Tabletop, accessibility-focused</td><td>Consumer GPU</td><td>-</td><td>450M params, 10M community frames</td></tr>
-          <tr><td>AGIBOT BFM &amp; GCFM</td><td>AGIBOT (Shanghai)</td><td>-</td><td>Commercial/household manipulation</td><td>-</td><td>-</td><td>Imitation learning and generative control</td></tr>
-          <tr><td>Psi-0 (Ψ0)</td><td>USC PSI Lab + NVIDIA + WorldEngine</td><td>Open (GitHub)</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>Unitree G1 + Dex3-1; 8 long-horizon tasks</td></tr>
-          <tr><td>Omega-0 (ω-0)</td><td>Org TBD</td><td>-</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>Latent predictive world-action model</td></tr>
-          <tr><td>NVIDIA Cosmos / GR00T-Dreams</td><td>NVIDIA</td><td>-</td><td>World model / synthetic data generation</td><td>-</td><td>-</td><td>Cuts synthetic data generation to ~36 hrs</td></tr>
+        <table class="data-table models-table"><thead><tr><th>Model</th><th>Maker</th><th>Open / Closed</th><th>Embodiment</th><th>Inference requirement</th><th>Control frequency</th><th>Best documented benchmark result</th><th>Reported by</th></tr></thead><tbody>
+          <tr><td>GR00T N1.5 / N1.6 / N1.7</td><td>NVIDIA</td><td>Open weights</td><td>Humanoid manipulation, bimanual</td><td>NVIDIA GPU</td><td>-</td><td>N1.7: 96.99% LIBERO average (our mean of NVIDIA&#39;s four suite counts); 72.5% SimplerEnv Fractal; 70.8% RoboCasa</td><td><span class="source-tag">Self-reported</span><a href="https://github.com/NVIDIA/Isaac-GR00T/blob/main/examples/LIBERO/README.md" target="_blank" rel="noreferrer">Isaac-GR00T repo</a></td></tr>
+          <tr><td>Gemini Robotics 1.5</td><td>Google DeepMind</td><td>Closed (select partners)</td><td>Complex multi-step manipulation</td><td>Partner access</td><td>-</td><td>No public benchmark number for the acting model</td><td><span class="source-tag source-tag--soft">No citable number</span><a href="https://deepmind.google/discover/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" target="_blank" rel="noreferrer">DeepMind blog</a></td></tr>
+          <tr><td>Gemini Robotics-ER 1.5</td><td>Google DeepMind</td><td>Closed (Gemini API)</td><td>Reasoning only, no actuation</td><td>API</td><td>-</td><td>State of the art on 15 embodied-reasoning benchmarks; aggregate published only as a chart</td><td><span class="source-tag">Self-reported</span><a href="https://deepmind.google/discover/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" target="_blank" rel="noreferrer">DeepMind blog</a></td></tr>
+          <tr><td>&pi;0 / &pi;0-FAST / &pi;0.5</td><td>Physical Intelligence</td><td>Open (openpi)</td><td>Single/dual-arm, mobile manipulation</td><td>&gt;8GB VRAM</td><td>-</td><td>&pi;0.5: 96.85% LIBERO average (self-reported); 42.7% success / 61.8 progress on RoboChallenge Table30 (benchmark-run); 12.8% on RoboDojo real</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Benchmark-run</span><a href="tasks.html?model=pi05">4 cited sources</a></td></tr>
+          <tr><td>Helix</td><td>Figure AI</td><td>Closed</td><td>Humanoid upper-body</td><td>Embedded GPU</td><td>200Hz</td><td>None published</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
+          <tr><td>OpenVLA</td><td>Stanford / UC Berkeley / TRI</td><td>Open</td><td>Cross-embodiment manipulation</td><td>RTX 4090, 15GB bf16</td><td>~6 Hz</td><td>76.5% LIBERO average - the same figure appears in the authors&#39; README and as a baseline in the OpenVLA-OFT paper</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Third-party</span><a href="https://github.com/openvla/openvla" target="_blank" rel="noreferrer">OpenVLA README</a></td></tr>
+          <tr><td>OpenVLA-OFT</td><td>Stanford (Kim et al.)</td><td>Open</td><td>Cross-embodiment manipulation</td><td>Consumer GPU</td><td>71-110 Hz action generation</td><td>97.1% LIBERO average (self-reported) and 0.02% on RoboDojo simulation (benchmark-run). Both are cited; they measure different task sets</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Benchmark-run</span><a href="charts.html#cross-board">See the chart</a></td></tr>
+          <tr><td>Octo</td><td>UC Berkeley</td><td>Open</td><td>Tabletop manipulation</td><td>Consumer GPU</td><td>-</td><td>75.1% LIBERO average, reported as a baseline by other groups rather than by the Octo authors</td><td><span class="source-tag">Third-party</span><a href="https://arxiv.org/abs/2502.19645" target="_blank" rel="noreferrer">OpenVLA-OFT paper</a></td></tr>
+          <tr><td>SmolVLA</td><td>Hugging Face / LeRobot</td><td>Open</td><td>Tabletop, accessibility-focused</td><td>Consumer GPU or CPU</td><td>-</td><td>0.45B: 87.3% LIBERO average, 57.3% Meta-World, 78.3% on the authors&#39; own SO-100 suite</td><td><span class="source-tag">Self-reported</span><a href="https://arxiv.org/abs/2506.01844" target="_blank" rel="noreferrer">SmolVLA paper</a></td></tr>
+          <tr><td>AGIBOT BFM &amp; GCFM / GO-1</td><td>AgiBot (Shanghai)</td><td>Open weights (GO-1)</td><td>Commercial/household manipulation</td><td>-</td><td>-</td><td>GO-1: 0.99 score / 0.53% on RoboDojo simulation</td><td><span class="source-tag">Benchmark-run</span><a href="https://arxiv.org/abs/2607.04434" target="_blank" rel="noreferrer">RoboDojo paper</a></td></tr>
+          <tr><td>Psi-0 (&Psi;0)</td><td>USC PSI Lab + NVIDIA + WorldEngine</td><td>Open (GitHub)</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>8 long-horizon tasks x 10 rollouts on its own suite; aggregate not yet extracted</td><td><span class="source-tag source-tag--soft">No citable number</span><a href="https://github.com/physical-superintelligence-lab/Psi0" target="_blank" rel="noreferrer">Psi-0 repo</a></td></tr>
+          <tr><td>Omega-0 (&omega;-0)</td><td>Org TBD</td><td>-</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>None extracted</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
+          <tr><td>NVIDIA Cosmos / GR00T-Dreams</td><td>NVIDIA</td><td>Open weights</td><td>World model / synthetic data generation</td><td>GPU-hours</td><td>-</td><td>World-model boards (WorldArena, PAI-Bench) not yet transcribed</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
         </tbody></table>
       </div>
-      <p class="table-footnote">Reported benchmark scores are intentionally omitted for now. Different task sets, rollout counts, and reporting conventions are not directly comparable.</p>
+      <p class="table-footnote">One representative result per model, with the source class attached. Scores from different benchmarks are not comparable - a model can lead one board and trail another without either number being wrong. The full record set, filterable by source class, is on <a href="tasks.html">Tasks</a>; the same data plotted is on <a href="charts.html">Charts</a>.</p>
     </section>
 
     <section class="section dashboard-section" id="benchmarks" aria-labelledby="benchmarks-title">
@@ -122,6 +125,6 @@
     </section>
   </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>

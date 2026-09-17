@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="About PhAIL Notes, an independent research notebook on physical AI evaluation." />
   <title>About - PhAIL Notes</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
   <header class="site-header" id="top">
     <div class="header-row">
       <a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
       <nav aria-label="Primary navigation">
-        <a href="tasks.html">Tasks</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html" aria-current="page">About</a>
+        <a href="tasks.html">Tasks</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html" aria-current="page">About</a>
       </nav>
     </div>
     <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
@@ -46,17 +48,34 @@
       </div>
     </section>
 
+    <section class="section about-section" aria-labelledby="sources-title">
+      <p class="section-kicker">Sources</p>
+      <h2 id="sources-title">Who produced the number</h2>
+      <div class="prose">
+        <p>Almost every number in physical AI comes with an unstated question attached: did the people who built the model also grade it? On this site that question is answered on every single row, because it changes how much a number is worth. We use four labels:</p>
+        <ul class="definition-list">
+          <li><strong>Benchmark-run.</strong> The benchmark operator ran the evaluation on their own hardware and published the result - RoboChallenge, RoboDojo, RoboTwin, RoboArena. This is the strongest evidence class we have. Where the checkpoint was submitted by an outside team, we say who submitted it, because the operator graded the run but did not build the policy.</li>
+          <li><strong>Self-reported.</strong> The model&#39;s own authors published it, on a harness they controlled and usually in a paper arguing that the model is good. That does not make it wrong - several self-reports here are reproducible from a published checkpoint - but it is a different kind of claim.</li>
+          <li><strong>Third-party.</strong> A group that did not build the model produced or re-tabulated the number, typically as a baseline column in a paper whose point is to beat it. Where we cannot confirm whether the authors re-ran a baseline or quoted its original report, we say so on the row rather than guessing.</li>
+          <li><strong>No citable number.</strong> An evaluation is claimed, expected, or in progress, and we have nothing we can cite. These rows stay visible. A blank is information; deleting it is not.</li>
+        </ul>
+        <p>Model affiliations are read off the paper’s own title block rather than the leaderboard row, because leaderboards usually carry only a name and a citation key. Where a paper lists several institutions we file it under the first, with the full list on the record; where we could not establish an affiliation at all, the row says “affiliation not confirmed” and the chart colours it grey. That grey is a finding, not a placeholder — on some 2026 boards it is a substantial share of the field. Organisation logos are each lab’s own site icon and remain their trademarks; they are here to say who published a number, nothing more.</p>
+        <p>Nothing here is graded by us. We have no robots. What this site does is read published tables, copy them without renormalising, and attach the citation and the protocol to every value - number of tasks, rollouts per task, robot platform, and the date we retrieved it. Where we have computed anything at all, such as an average over per-suite numbers the authors published individually, the row says so.</p>
+      </div>
+    </section>
+
     <section class="section about-section" aria-labelledby="scoring-title">
       <p class="section-kicker">Scoring</p>
       <h2 id="scoring-title">Why there is no composite score yet</h2>
       <div class="prose">
         <p>Artificial Analysis can average different models into one Intelligence Index because every model is run on the exact same private test set. Most physical AI models are reported on different task sets, different rollout counts, and by different labs - the numbers are not comparable yet.</p>
-        <p>Rather than force a fake composite score, this site filters by task, embodiment, and openness, and shows each reported number with its source. A real composite score becomes honest once models are run through a shared harness, such as SIMPLE or XPolicyLab. That’s a later milestone, not a v0 feature.</p>
+        <p>Rather than force a fake composite score, this site filters by task, embodiment, openness, and source class, and shows each reported number with its citation. A real composite score becomes honest once models are run through a shared harness, such as SIMPLE or XPolicyLab. That’s a later milestone, not a v0 feature.</p>
+        <p>If you want to see what the alternative would produce: OpenVLA-OFT reports a 97.1% average on LIBERO and scores 0.02% in RoboDojo’s simulation track. DM0 sits second on RoboChallenge’s real-robot board and last on RoboDojo’s. Every one of those numbers is cited, and every one is correct. An index that averaged them would describe nothing. The <a href="charts.html#cross-board">cross-board chart</a> plots it.</p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
