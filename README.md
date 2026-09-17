@@ -121,7 +121,43 @@ The switch above the Ledger filters picks between `track: "Sim"` and `track: "Re
 
 ### Filters are faceted
 
-Task is the primary key. Every dropdown is rebuilt on each render from the records that survive the *other* filters, so the interface can never offer a combination that returns an empty table. A chosen value that stops being reachable falls back to "all" rather than sticking.
+Task is the primary key. Every dropdown is rebuilt on each render from the records that survive the *other* filters, so the interface can never offer a combination that returns an empty table. A chosen value that stops being reachable falls back to "all" rather than sticking. See the next section for the second test an option has to pass.
+
+### What the dropdowns withhold, and why it is not a list
+
+**This is the section to read before adding a new benchmark.**
+
+A dropdown option has to earn its place twice: at least one record must survive
+the other filters, *and* at least one of those records must carry a citable
+number. The second test exists because about a fifth of this ledger is
+`pending` - an evaluation someone has claimed, or that plainly ought to exist,
+with nothing we can cite yet. Those records stay in the table on purpose. But
+offering them in a dropdown is a different promise: picking "Autonomous driving"
+and landing on a single row that reads *leaderboard not transcribed* looks like
+a broken filter, not like an honest gap.
+
+So gaps stay in the table and come out of the dropdowns, and the line under the
+filter panel names everything that was withheld, per view.
+
+**Nothing here is a maintained exclusion list.** It is recomputed from the data
+on every render, in `refreshOptions` and `renderWithheld`. Add one citable
+number for a withheld task, benchmark, model or embodiment and it reappears in
+its dropdown by itself, and drops off the withheld line by itself. There is no
+file to edit and nothing to remember to undo.
+
+As of 2026-09-17 the withheld set is:
+
+| View | Withheld, gaps only |
+| --- | --- |
+| Simulation | Tasks: Autonomous driving, Embodied reasoning, World-model prediction. Benchmarks: Embodied-reasoning suite, PAI-Bench, WorldArena. Models: Gemini Robotics-ER 1.5, NVIDIA Cosmos |
+| Real hardware | Tasks: Autonomous driving, Bimanual manipulation, Bin-picking and assembly, Embodied reasoning, Loco-manipulation, World-model prediction. Benchmarks: Embodied-reasoning suite, PAI-Bench, PhAIL (Positronic), Psi-0 own real suite, WorldArena. Models: AGIBOT BFM / GCFM, Gemini Robotics 1.5, Gemini Robotics-ER 1.5, Helix, NVIDIA Cosmos, Omega-0, Psi-0 |
+
+Separately, two entries in the task taxonomy carry **no record at all**, in
+either view - `mobile` (Mobile manipulation) and `locomotion` (Whole-body
+locomotion). They are not a filtering decision, they are the part of the map
+this ledger has not reached: BEHAVIOR-1K and ManiSkill3 would populate the
+first, HumanoidBench the second. They are named on the same line under the
+filters, as "not started".
 
 ### Percentiles
 

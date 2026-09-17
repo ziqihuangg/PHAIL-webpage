@@ -75,6 +75,10 @@ const stampMount = document.querySelector("[data-updated-stamp]");
 const trackSwitch = document.querySelector("[data-track-switch]");
 const trackNote = document.querySelector("[data-track-note]");
 
+/* Options a dropdown declined to offer this render, per filter key, so they can
+   be named under the panel rather than vanishing. Rebuilt by refreshOptions. */
+let withheld = {};
+
 /* --- track: the view, not a filter ----------------------------------------- */
 let track = "Sim";
 const hasTrack = (record) => record.group.track === "Sim" || record.group.track === "Real";
@@ -148,21 +152,43 @@ function matches(record, skip) {
 }
 
 /* --- faceted dropdowns ------------------------------------------------------
-   Rebuilt on every render. A value that is no longer reachable is dropped and
-   the filter falls back to "all", so the table can never be empty because of a
-   combination the interface itself offered.                                   */
+   Rebuilt on every render, and an option has to earn its place twice:
+
+     1. at least one record survives the OTHER filters, and
+     2. at least one of those records carries a citable number.
+
+   The second test is the one that is easy to get wrong. Roughly a fifth of this
+   ledger is `pending` - an evaluation someone has claimed or that plainly ought
+   to exist, with nothing we can cite yet - and those records are deliberately
+   kept in the table. But offering them in a dropdown is a different promise:
+   picking "Autonomous driving" and landing on one row that says "leaderboard not
+   transcribed" reads as a broken filter, not as an honest gap.
+
+   So gaps stay in the table and come out of the dropdowns, and whatever was
+   withheld is named underneath the filters rather than disappearing quietly.
+   Nothing here is a list of exclusions anyone maintains: it is recomputed from
+   the data every render, so an option returns by itself the moment a citable
+   number for it lands.                                                        */
+const isCitable = (record) => record.value !== null;
+
 function refreshOptions() {
+  withheld = {};
   FILTER_KEYS.forEach((key) => {
     const filter = FILTERS[key];
     if (!filter.node) return;
-    const available = new Map();
+    const offered = new Map();
+    const gapsOnly = new Map();
     records.forEach((record) => {
       if (!matches(record, key)) return;
       const value = filter.get(record);
       if (!value || value === "-") return;
-      if (!available.has(value)) available.set(value, filter.label(record));
+      const label = filter.label(record);
+      if (isCitable(record)) { offered.set(value, label); gapsOnly.delete(value); }
+      else if (!offered.has(value)) gapsOnly.set(value, label);
     });
-    const options = [...available.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+    withheld[key] = [...gapsOnly.values()].sort((a, b) => a.localeCompare(b));
+
+    const options = [...offered.entries()].sort((a, b) => a[1].localeCompare(b[1]));
     const current = filter.node.value;
     const stillThere = options.some(([value]) => value === current);
     filter.node.innerHTML = `<option value="">${filter.all}</option>` +
@@ -170,6 +196,38 @@ function refreshOptions() {
     filter.node.value = stillThere ? current : "";
     filter.node.disabled = options.length === 0;
   });
+}
+
+/* Task categories that carry no record at all, in either view. They are not a
+   filtering decision - they are the part of the taxonomy this ledger has not
+   reached yet, and they are named for the same reason the gaps are. */
+const unstartedTasks = database.tasks
+  .filter((task) => !records.some((record) => record.group.task === task.id))
+  .map((task) => task.name);
+
+function renderWithheld() {
+  const host = document.querySelector("[data-withheld]");
+  if (!host) return;
+  const groups = [
+    ["Tasks", withheld.task],
+    ["Benchmarks", withheld.benchmark],
+    ["Models", withheld.model],
+    ["Embodiments", withheld.embodiment]
+  ].filter(([, list]) => list && list.length)
+   .map(([name, list]) => `<strong>${name}:</strong> ${list.join(", ")}`);
+
+  if (!groups.length && !unstartedTasks.length) { host.innerHTML = ""; return; }
+
+  const parts = [];
+  if (groups.length) {
+    parts.push(`<strong>Held out of the filters above</strong>, because every record under them in this view is a `
+      + `documented gap rather than a number - they are still in the table under "all". ${groups.join(" &middot; ")}.`);
+  }
+  if (unstartedTasks.length) {
+    parts.push(`<strong>Not started:</strong> ${unstartedTasks.join(", ")} - in the task taxonomy, no record in the ledger yet.`);
+  }
+  parts.push(`This list is recomputed from the data, not maintained by hand: anything here reappears in the dropdowns on its own as soon as one citable number for it lands.`);
+  host.innerHTML = parts.join(" ");
 }
 
 if (stampMount) {
@@ -448,6 +506,7 @@ function renderChart(chosen) {
 /* --- main render ------------------------------------------------------------ */
 function render() {
   refreshOptions();
+  renderWithheld();
   paintSize();
 
   const visible = records.filter((record) => matches(record));
