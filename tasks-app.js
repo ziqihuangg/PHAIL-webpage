@@ -1,8 +1,27 @@
 /* =============================================================================
-   PhAIL - Tasks page: filtered evaluation ledger
+   PhAIL - Ledger page: filtered evaluation records
    -----------------------------------------------------------------------------
-   Reads window.phailDatabase (tasks-data-new.js) and renders filters, a chart of
-   whichever benchmark is in view, and the record table. No data lives here.
+   Reads window.phailDatabase (tasks-data-new.js) and renders the sim/real
+   switch, the filters, a chart of whichever benchmark is in view, and the record
+   table. No data lives here.
+
+   Three things in here are worth knowing before editing:
+
+   1. TRACK IS NOT A FILTER, it is the view. Simulation numbers and real-hardware
+      numbers are not two slices of one population; they are two different
+      measurements that happen to share model names. The switch at the top picks
+      one. Records whose source states no track are all documented gaps rather
+      than scores, so they stay visible in both views instead of vanishing.
+
+   2. THE FILTERS ARE FACETED. Task is the primary key: once a task is chosen,
+      every other dropdown is rebuilt from the records that survive the OTHER
+      filters, so it can never offer a combination that returns an empty table.
+
+   3. ONE MODEL IS PLOTTED AS PERCENTILES, NOT VALUES. 97.1% on LIBERO and 0.02%
+      on RoboDojo are both true, and drawing them as neighbouring bars says
+      something false. Position on each board is the comparable quantity, so that
+      is what the single-model view draws - flagged as ours, because no source
+      publishes it.
    ========================================================================== */
 
 const database = window.phailDatabase;
@@ -31,19 +50,19 @@ database.resultGroups.forEach((group) => {
   });
 });
 
-/* --- filter controls -------------------------------------------------------- */
-const controls = {
-  task: document.querySelector("#task-filter"),
-  benchmark: document.querySelector("#benchmark-filter"),
-  model: document.querySelector("#model-filter"),
-  provenance: document.querySelector("#provenance-filter"),
-  openness: document.querySelector("#openness-filter"),
-  embodiment: document.querySelector("#embodiment-filter"),
-  size: document.querySelector("#size-filter"),
-  track: document.querySelector("#track-filter"),
-  metric: document.querySelector("#metric-filter"),
-  search: document.querySelector("#search-filter")
+/* --- the six filters -------------------------------------------------------
+   `get` is the value a record filters on; `label` is what the dropdown shows.
+   Adding a seventh filter means adding one entry here and one <select> in the
+   HTML - the faceting, the deep links and the reset button all follow.        */
+const FILTERS = {
+  task:       { el: "#task-filter",       all: "All tasks",       get: (r) => r.group.task,       label: (r) => r.task.name },
+  benchmark:  { el: "#benchmark-filter",  all: "All benchmarks",  get: (r) => r.group.benchmark,  label: (r) => r.benchmark.name },
+  model:      { el: "#model-filter",      all: "All models",      get: (r) => r.row.model,        label: (r) => r.model.name },
+  openness:   { el: "#openness-filter",   all: "Any licence",     get: (r) => r.model.open,       label: (r) => r.model.open },
+  embodiment: { el: "#embodiment-filter", all: "All embodiments", get: (r) => r.model.embodiment, label: (r) => r.model.embodiment }
 };
+const FILTER_KEYS = Object.keys(FILTERS);
+FILTER_KEYS.forEach((key) => { FILTERS[key].node = document.querySelector(FILTERS[key].el); });
 
 const resultCount = document.querySelector("[data-result-count]");
 const recommendation = document.querySelector("[data-recommendation]");
@@ -53,31 +72,105 @@ const chartCaption = document.querySelector("[data-ledger-chart-caption]");
 const chartTitle = document.querySelector("[data-ledger-chart-title]");
 const legendMount = document.querySelector("[data-provenance-legend]");
 const stampMount = document.querySelector("[data-updated-stamp]");
+const trackSwitch = document.querySelector("[data-track-switch]");
+const trackNote = document.querySelector("[data-track-note]");
 
-function unique(values) {
-  return [...new Set(values.filter((value) => value && value !== "-"))].sort((a, b) => a.localeCompare(b));
+/* --- track: the view, not a filter ----------------------------------------- */
+let track = "Sim";
+const hasTrack = (record) => record.group.track === "Sim" || record.group.track === "Real";
+const inTrack = (record) => !hasTrack(record) || record.group.track === track;
+
+/* --- model size: a range over the sizes that are actually published ---------
+   Only models whose source states a single parameter count carry `sizeB`. The
+   slider steps through those values rather than a smooth axis, so both ends
+   always land on a number some lab actually published. At full width the range
+   is inert and every model is in view, including the ones with no stated size;
+   narrow it at all and those drop out, and the summary line says how many.    */
+const sizeStops = [...new Set(database.models.map((item) => item.sizeB).filter((value) => typeof value === "number"))].sort((a, b) => a - b);
+const sizeInputs = { min: document.querySelector("#size-min"), max: document.querySelector("#size-max") };
+const sizeReadout = document.querySelector("[data-size-readout]");
+const sizeFill = document.querySelector("[data-size-fill]");
+let sizeRange = [0, Math.max(0, sizeStops.length - 1)];
+
+function sizeIsFullWidth() {
+  return sizeRange[0] === 0 && sizeRange[1] === sizeStops.length - 1;
+}
+function matchesSize(record) {
+  if (sizeIsFullWidth()) return true;
+  const size = record.model.sizeB;
+  if (typeof size !== "number") return false;
+  return size >= sizeStops[sizeRange[0]] && size <= sizeStops[sizeRange[1]];
+}
+function formatSize(value) {
+  return value < 1 ? `${Math.round(value * 1000)}M` : `${value}B`;
 }
 
-function fillOptions(select, items, allLabel) {
-  if (!select) return;
-  select.innerHTML = `<option value="">${allLabel}</option>` +
-    items.map((item) => `<option value="${item.value}">${item.label}</option>`).join("");
+if (sizeInputs.min && sizeInputs.max && sizeStops.length > 1) {
+  [sizeInputs.min, sizeInputs.max].forEach((input, index) => {
+    input.min = 0;
+    input.max = sizeStops.length - 1;
+    input.step = 1;
+    input.value = index === 0 ? 0 : sizeStops.length - 1;
+    input.addEventListener("input", () => {
+      const next = [Number(sizeInputs.min.value), Number(sizeInputs.max.value)];
+      /* Either handle may be dragged past the other; keep them ordered rather
+         than blocking the drag, which feels broken under the finger. */
+      sizeRange = [Math.min(next[0], next[1]), Math.max(next[0], next[1])];
+      render();
+    });
+  });
 }
 
-fillOptions(controls.task, database.tasks.map((task) => ({ value: task.id, label: task.name })), "All tasks");
-fillOptions(controls.benchmark, database.benchmarks
-  .filter((benchmark) => records.some((record) => record.benchmark.id === benchmark.id))
-  .map((benchmark) => ({ value: benchmark.id, label: benchmark.name })), "All benchmarks");
-fillOptions(controls.model, database.models
-  .filter((model) => records.some((record) => record.model.id === model.id))
-  .map((model) => ({ value: model.id, label: model.name })), "All models");
-fillOptions(controls.provenance, Object.keys(database.provenance)
-  .map((key) => ({ value: key, label: database.provenance[key].label })), "Any source type");
-fillOptions(controls.openness, unique(database.models.map((model) => model.open)).map((value) => ({ value, label: value })), "Any licence");
-fillOptions(controls.embodiment, unique(database.models.map((model) => model.embodiment)).map((value) => ({ value, label: value })), "All embodiments");
-fillOptions(controls.size, unique(database.models.map((model) => model.size)).map((value) => ({ value, label: value })), "All sizes");
-fillOptions(controls.track, unique(database.resultGroups.map((group) => group.track)).map((value) => ({ value, label: value })), "All tracks");
-fillOptions(controls.metric, unique(database.resultGroups.map((group) => group.metric)).map((value) => ({ value, label: value })), "All metrics");
+function paintSize() {
+  if (!sizeReadout || sizeStops.length < 2) return;
+  const [low, high] = sizeRange;
+  sizeReadout.textContent = sizeIsFullWidth()
+    ? "any size"
+    : `${formatSize(sizeStops[low])} - ${formatSize(sizeStops[high])}`;
+  if (sizeFill) {
+    const span = sizeStops.length - 1;
+    sizeFill.style.left = `${(low / span) * 100}%`;
+    sizeFill.style.right = `${100 - (high / span) * 100}%`;
+  }
+}
+
+/* --- filtering -------------------------------------------------------------
+   `skip` lets the faceting ask "what would be available if this one dropdown
+   were open" without the dropdown narrowing itself to its own value.          */
+function matches(record, skip) {
+  if (!inTrack(record)) return false;
+  if (!matchesSize(record)) return false;
+  return FILTER_KEYS.every((key) => {
+    if (key === skip) return true;
+    const chosen = FILTERS[key].node ? FILTERS[key].node.value : "";
+    return !chosen || String(FILTERS[key].get(record)) === chosen;
+  });
+}
+
+/* --- faceted dropdowns ------------------------------------------------------
+   Rebuilt on every render. A value that is no longer reachable is dropped and
+   the filter falls back to "all", so the table can never be empty because of a
+   combination the interface itself offered.                                   */
+function refreshOptions() {
+  FILTER_KEYS.forEach((key) => {
+    const filter = FILTERS[key];
+    if (!filter.node) return;
+    const available = new Map();
+    records.forEach((record) => {
+      if (!matches(record, key)) return;
+      const value = filter.get(record);
+      if (!value || value === "-") return;
+      if (!available.has(value)) available.set(value, filter.label(record));
+    });
+    const options = [...available.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+    const current = filter.node.value;
+    const stillThere = options.some(([value]) => value === current);
+    filter.node.innerHTML = `<option value="">${filter.all}</option>` +
+      options.map(([value, label]) => `<option value="${value}">${label}</option>`).join("");
+    filter.node.value = stillThere ? current : "";
+    filter.node.disabled = options.length === 0;
+  });
+}
 
 if (stampMount) {
   stampMount.textContent = `${records.length} records · ${database.resultGroups.length} cited sources · last updated ${database.meta.updated}`;
@@ -95,27 +188,6 @@ if (legendMount) {
 Object.values(database.organisations).forEach((org) => {
   if (org.logo) { const img = new Image(); img.src = org.logo; }
 });
-
-/* --- filtering -------------------------------------------------------------- */
-function matches(record) {
-  const query = controls.search.value.trim().toLowerCase();
-  const haystack = [
-    record.task.name, record.task.family, record.benchmark.name, record.model.name, record.model.maker,
-    record.group.metric, record.group.source, record.group.reporter, record.row.variant || "",
-    record.row.submitter || "", record.row.note || "", record.provenance.label
-  ].join(" ").toLowerCase();
-
-  return (!controls.task.value || record.group.task === controls.task.value)
-    && (!controls.benchmark.value || record.group.benchmark === controls.benchmark.value)
-    && (!controls.model.value || record.row.model === controls.model.value)
-    && (!controls.provenance.value || record.provenanceId === controls.provenance.value)
-    && (!controls.openness.value || record.model.open === controls.openness.value)
-    && (!controls.embodiment.value || record.model.embodiment === controls.embodiment.value)
-    && (!controls.size.value || record.model.size === controls.size.value)
-    && (!controls.track.value || record.group.track === controls.track.value)
-    && (!controls.metric.value || record.group.metric === controls.metric.value)
-    && (!query || haystack.includes(query));
-}
 
 /* --- display helpers -------------------------------------------------------- */
 function primaryDisplay(record) {
@@ -149,7 +221,8 @@ function breakdownDisplay(record) {
 }
 
 function extraLabel(key) {
-  return { easy: "clean scenes", hard: "randomised", sd: "SD", evals: "A/B evals", latencyMs: "latency", pairedSuccess: "LIBERO-Long" }[key] || key;
+  return { easy: "clean scenes", hard: "randomised", sd: "SD", evals: "A/B evals", latencyMs: "latency",
+    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X" }[key] || key;
 }
 function extraUnit(key) {
   return { easy: "%", hard: "%", pairedSuccess: "%" }[key] || "";
@@ -166,11 +239,11 @@ function orgOf(model) {
 
 function benchmarkLabel(record) {
   const name = record.benchmark.name;
-  const track = record.group.track;
+  const trackName = record.group.track;
   /* Several benchmark names already carry their track ("RoboDojo (Sim)"), so
      only append it when it is not already in the name. */
-  if (!track || track === "-" || name.toLowerCase().includes(track.toLowerCase())) return name;
-  return `${name} (${track})`;
+  if (!trackName || trackName === "-" || name.toLowerCase().includes(trackName.toLowerCase())) return name;
+  return `${name} (${trackName})`;
 }
 
 function chartRow(record) {
@@ -232,54 +305,92 @@ function pickChartGroup(visible) {
   };
 }
 
-/* --- one model, every board it appears on ------------------------------------
-   The single case where plotting several benchmarks together is defensible: one
-   model, each bar named after its own board, nothing averaged. Restricted to
-   rows that report a binary success rate, so at least the quantity is the same
-   kind of thing even though the task sets are not.
+/* --- one model, its position on every board ----------------------------------
+   The single-model view. Absolute values across boards are not comparable and
+   plotting them side by side implies that they are, so this draws where the
+   model SITS on each board instead: the share of that board's entries it beats.
+   The rank is taken over the whole source table, not over what the filters left
+   visible, because a percentile against a filtered subset would mean nothing.
    --------------------------------------------------------------------------- */
-function renderModelProfile(visible) {
-  const rows = visible
-    .filter((record) => typeof record.row.success === "number" && !record.isReference)
-    .sort((a, b) => b.row.success - a.row.success);
-  const boards = new Set(rows.map((record) => record.group.benchmark));
-  if (rows.length < 3 || boards.size < 2) return false;
+/* Minimum size for a board to be worth a percentile. Below this, "top of the
+   table" is a fact about how few people reported the benchmark. */
+const MIN_BOARD = 5;
 
-  const name = rows[0].model.name;
-  chartTitle.textContent = `${name} · success rate on every board that reports one`;
-  chartCaption.innerHTML = `Each bar is a different benchmark, named on the left, and is never averaged with the others - `
-    + `the task sets, robots, and rollout counts all differ. `
-    + `Rows that report no binary success rate (RoboArena's preference score, for instance) cannot appear here. `
-    + `<a href="charts.html#cross-board">Why the spread is this wide.</a>`;
+function percentileRows(modelId) {
+  /* Pool by BENCHMARK, not by source table. LIBERO is reported by six separate
+     groups and a percentile against only the table this model happens to sit in
+     would flatter whoever published alone. Tables are merged only when they
+     agree on the metric field and the unit - the same rule the benchmark chart
+     uses - and the reference rows never count as competitors. */
+  const pools = new Map();
+  database.resultGroups.forEach((group) => {
+    if (!group.primary) return;
+    if ((group.track === "Sim" || group.track === "Real") && group.track !== track) return;
+    const key = `${group.benchmark}|${group.primary}|${group.unit}`;
+    const pool = pools.get(key) || { benchmark: group.benchmark, field: group.primary, rows: [], groups: [] };
+    group.rows.forEach((row) => {
+      if (typeof row[group.primary] !== "number" || row.reference === true) return;
+      pool.rows.push({ model: row.model, value: row[group.primary], group });
+    });
+    if (!pool.groups.includes(group)) pool.groups.push(group);
+    pools.set(key, pool);
+  });
 
-  charts.mount(chartMount, (container) => charts.verticalBars(container, {
-    unit: "%", max: 100,
-    valueLabel: "success rate",
-    legend: false,
-    rows: rows.map((record) => ({
-      label: record.benchmark.name + (record.row.variant ? ` (${record.row.variant})` : ""),
-      value: record.row.success,
-      org: orgOf(record.model),
-      details: [
-        ["Model", record.model.name],
-        ["Result", primaryDisplay(record)],
-        ["Metric", record.group.metric],
-        ["Source type", record.provenance.label],
-        ["Reported by", record.group.reporter],
-        ["Protocol", record.group.protocol]
-      ]
+  const out = [];
+  pools.forEach((pool) => {
+    if (pool.rows.length < MIN_BOARD) return;
+    const ranked = pool.rows.slice().sort((a, b) => b.value - a.value);
+    const index = ranked.findIndex((row) => row.model === modelId);
+    if (index < 0) return;
+    const entry = ranked[index];
+    out.push({
+      label: byId(database.benchmarks, pool.benchmark).name,
+      value: ((ranked.length - 1 - index) / (ranked.length - 1)) * 100,
+      rank: index + 1,
+      total: ranked.length,
+      sources: pool.groups.length,
+      group: entry.group
+    });
+  });
+  return out.sort((a, b) => b.value - a.value);
+}
+
+function renderModelProfile() {
+  const modelId = FILTERS.model.node.value;
+  const rows = percentileRows(modelId);
+  if (rows.length < 2) return false;
+
+  const model = byId(database.models, modelId);
+  chartTitle.textContent = `${model.name} · where it sits on each board`;
+  chartCaption.innerHTML = `Each bar is one published table, and its length is the share of that table's entries this model beats - `
+    + `100% is top of the board, 0% is bottom. <strong>We compute this; no source publishes it.</strong> `
+    + `Success rates are deliberately not drawn side by side here: `
+    + `<a href="charts.html#cross-board">the same model reads 97.1% on one board and 0.02% on another</a>, `
+    + `and plotting those as neighbouring bars would claim a comparison that does not exist. The cited values are in the table below, per row.`;
+
+  charts.mount(chartMount, (container) => charts.horizontalBars(container, {
+    unit: "%",
+    max: 100,
+    valueWidth: 118,
+    axisLabel: "Percentile within that board (computed by us)",
+    rows: rows.map((entry) => ({
+      label: entry.label,
+      value: entry.value,
+      color: charts.colors.derived,
+      suffix: `#${entry.rank} of ${entry.total}`,
+      title: `#${entry.rank} of ${entry.total} entries on ${entry.group.metric}` + (entry.sources > 1 ? `, pooled from ${entry.sources} source tables` : "") + `. This model's row: ${entry.group.reporter} - ${entry.group.protocol}`
     }))
   }));
   return true;
 }
 
 /* --- chart of whichever benchmark is in view -------------------------------- */
-function renderChart(chosen, visible) {
+function renderChart(chosen) {
   if (!chartMount) return;
   charts.resetMounts();
   chartMount.innerHTML = "";
 
-  if (controls.model.value && renderModelProfile(visible)) return;
+  if (FILTERS.model.node && FILTERS.model.node.value && renderModelProfile()) return;
 
   if (!chosen) {
     chartTitle.textContent = "Nothing numeric to plot in this view";
@@ -313,7 +424,10 @@ function renderChart(chosen, visible) {
 
 /* --- main render ------------------------------------------------------------ */
 function render() {
-  const visible = records.filter(matches);
+  refreshOptions();
+  paintSize();
+
+  const visible = records.filter((record) => matches(record));
 
   /* rank inside each source table, best first */
   const rankMap = new Map();
@@ -347,10 +461,16 @@ function render() {
     return count ? `${count} ${database.provenance[key].short.toLowerCase()}` : null;
   }).filter(Boolean);
 
-  resultCount.textContent = `${visible.length} of ${records.length} records`;
+  const inThisTrack = records.filter(inTrack).length;
+  resultCount.textContent = `${visible.length} of ${inThisTrack} ${track === "Sim" ? "simulation" : "real-hardware"} records`;
   const summaryAside = document.querySelector("[data-result-breakdown]");
   if (summaryAside) {
-    summaryAside.textContent = provenanceCounts.length ? provenanceCounts.join(" · ") : "no records";
+    const parts = provenanceCounts.slice();
+    if (!sizeIsFullWidth()) {
+      const noSize = records.filter((record) => inTrack(record) && typeof record.model.sizeB !== "number").length;
+      if (noSize) parts.push(`${noSize} hidden for publishing no size`);
+    }
+    summaryAside.textContent = parts.length ? parts.join(" · ") : "no records";
   }
 
   /* Highlight: the top row of the one table the chart is showing. Deliberately
@@ -368,7 +488,7 @@ function render() {
     recommendation.innerHTML = `<strong>No citable number in this view</strong><span>Only documented gaps match these filters. Use the source links to see what exists.</span>`;
   }
 
-  renderChart(chosen, visible);
+  renderChart(chosen);
 
   tableBody.innerHTML = ordered.length ? ordered.map((record) => {
     const { group, row, model } = record;
@@ -395,21 +515,64 @@ function render() {
   }).join("") : `<tr><td colspan="8" class="empty-state">No records match these filters. That is a gap in the ledger, not a zero.</td></tr>`;
 }
 
-/* --- deep links: tasks.html?benchmark=robodojo_sim&provenance=model --------- */
-const params = new URLSearchParams(window.location.search);
-["task", "benchmark", "model", "provenance", "openness", "embodiment", "size", "track", "metric"].forEach((key) => {
-  const value = params.get(key);
-  if (!value || !controls[key]) return;
-  const allowed = [...controls[key].options].some((option) => option.value === value);
-  if (allowed) controls[key].value = value;
-});
-if (params.get("q") && controls.search) controls.search.value = params.get("q");
+/* --- the sim/real switch ---------------------------------------------------- */
+function paintTrack() {
+  if (!trackSwitch) return;
+  trackSwitch.querySelectorAll("[data-track]").forEach((button) => {
+    button.setAttribute("aria-selected", String(button.dataset.track === track));
+  });
+  if (trackNote) {
+    const untracked = records.filter((record) => !hasTrack(record)).length;
+    const shared = untracked
+      ? ` ${untracked} records state no track and stay visible in both views - every one of them is a documented gap rather than a score.`
+      : "";
+    trackNote.textContent = (track === "Sim"
+      ? "Simulated evaluations only. Cheap to run, easy to repeat, and no guarantee that any of it transfers."
+      : "Physical hardware only. Every number below cost somebody a robot, a rig, and a person watching it.") + shared;
+  }
+}
 
-Object.values(controls).forEach((control) => control && control.addEventListener("input", render));
+if (trackSwitch) {
+  trackSwitch.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-track]");
+    if (!button) return;
+    track = button.dataset.track;
+    paintTrack();
+    render();
+  });
+}
+
+/* --- deep links: tasks.html?benchmark=robodojo_sim&track=Real --------------- */
+const params = new URLSearchParams(window.location.search);
+if (params.get("track") === "Real" || params.get("track") === "Sim") track = params.get("track");
+
+/* A link from a chart points at one model, and that model may only appear on the
+   other track. Follow it there rather than showing an empty view. */
+const linkedModel = params.get("model");
+if (linkedModel && !records.some((record) => record.row.model === linkedModel && inTrack(record))) {
+  const elsewhere = records.find((record) => record.row.model === linkedModel && hasTrack(record));
+  if (elsewhere) track = elsewhere.group.track;
+}
+
+paintTrack();
+refreshOptions();
+FILTER_KEYS.forEach((key) => {
+  const value = params.get(key);
+  if (!value || !FILTERS[key].node) return;
+  const allowed = [...FILTERS[key].node.options].some((option) => option.value === value);
+  if (allowed) FILTERS[key].node.value = value;
+});
+
+FILTER_KEYS.forEach((key) => FILTERS[key].node && FILTERS[key].node.addEventListener("change", render));
 const resetButton = document.querySelector("[data-reset-filters]");
 if (resetButton) {
   resetButton.addEventListener("click", () => {
-    Object.values(controls).forEach((control) => { if (control) control.value = ""; });
+    FILTER_KEYS.forEach((key) => { if (FILTERS[key].node) FILTERS[key].node.value = ""; });
+    sizeRange = [0, Math.max(0, sizeStops.length - 1)];
+    if (sizeInputs.min && sizeInputs.max) {
+      sizeInputs.min.value = 0;
+      sizeInputs.max.value = sizeStops.length - 1;
+    }
     render();
   });
 }

@@ -4,38 +4,41 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Physical AI evaluation records, filtered by task, benchmark, model, and who produced the number." />
-<title>Tasks - PhAIL</title>
+<title>Ledger - PhAIL</title>
 <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-<link rel="stylesheet" href="style.css?v=6" />
+<link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body data-page="tasks">
-<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="tasks.html" aria-current="page">Tasks</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
+<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="tasks.html" aria-current="page">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
 <main class="task-database-page">
 
   <section class="database-intro">
-    <p class="section-kicker">Tasks / filtered ledger</p>
-    <h1>Find models by what they need to do.</h1>
-    <p>Connect a task to its benchmarks, models, reported metrics, and - for every single number - who produced it.</p>
+    <h1>The ledger</h1>
+    <p>Every cited evaluation record we hold, keyed on the task a model has to do. Pick a task first; everything below narrows to what actually has entries.</p>
   </section>
 
-  <section class="provenance-key" aria-labelledby="provenance-title">
-    <h2 id="provenance-title" class="provenance-title">Where each number comes from</h2>
-    <ul class="provenance-legend" data-provenance-legend></ul>
-    <p class="provenance-stamp" data-updated-stamp></p>
-  </section>
+  <!-- Simulation or real hardware, before anything else. The two are not
+       comparable and putting them in one list was the original mistake. -->
+  <div class="track-switch" role="tablist" aria-label="Simulation or real hardware" data-track-switch>
+    <button type="button" role="tab" data-track="Sim" aria-selected="true">Simulation</button>
+    <button type="button" role="tab" data-track="Real" aria-selected="false">Real hardware</button>
+  </div>
+  <p class="track-switch-note" data-track-note></p>
 
   <section class="filter-panel" aria-label="Filter evaluation records">
     <label>Task<select id="task-filter"></select></label>
     <label>Benchmark<select id="benchmark-filter"></select></label>
     <label>Model<select id="model-filter"></select></label>
-    <label>Reported by<select id="provenance-filter"></select></label>
     <label>Open / closed<select id="openness-filter"></select></label>
     <label>Embodiment<select id="embodiment-filter"></select></label>
-    <label>Model size<select id="size-filter"></select></label>
-    <label>Track<select id="track-filter"></select></label>
-    <label>Metric<select id="metric-filter"></select></label>
-    <label class="search-filter">Search<input id="search-filter" type="search" placeholder="model, maker, source..." /></label>
+    <label class="size-filter"><span class="size-head">Model size <span class="size-readout" data-size-readout></span></span>
+      <span class="size-range" data-size-range>
+        <span class="size-range-rail"><span class="size-range-fill" data-size-fill></span></span>
+        <input id="size-min" type="range" aria-label="Smallest model size" />
+        <input id="size-max" type="range" aria-label="Largest model size" />
+      </span>
+    </label>
     <button class="filter-reset" type="button" data-reset-filters>Clear filters</button>
   </section>
 
@@ -53,6 +56,12 @@
     <p class="chart-caption" data-ledger-chart-caption></p>
   </section>
 
+  <section class="provenance-key" aria-labelledby="provenance-title">
+    <h2 id="provenance-title" class="provenance-title">Who produced each number</h2>
+    <ul class="provenance-legend" data-provenance-legend></ul>
+    <p class="provenance-stamp" data-updated-stamp></p>
+  </section>
+
   <div class="data-table-wrap task-database-table" tabindex="0" aria-label="Filtered physical AI model evaluation records">
     <table class="data-table">
       <colgroup><col class="col-rank" /><col class="col-model" /><col class="col-task" /><col class="col-benchmark" /><col class="col-track" /><col class="col-result" /><col class="col-source-type" /><col class="col-source" /></colgroup>
@@ -65,9 +74,9 @@
 
 </main>
 <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-<script src="script.js?v=3"></script>
-<script src="charts.js?v=4"></script>
-<script src="tasks-data-new.js?v=5"></script>
-<script src="tasks-app.js?v=9"></script>
+<script src="script.js?v=4"></script>
+<script src="charts.js?v=5"></script>
+<script src="tasks-data-new.js?v=6"></script>
+<script src="tasks-app.js?v=10"></script>
 </body>
 </html>

@@ -7,14 +7,14 @@
   <title>GPT-6 Astra - PhAIL Notes</title>
   <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
   <header class="site-header" id="top">
     <div class="header-row">
       <a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
       <nav aria-label="Primary navigation">
-        <a href="tasks.html">Tasks</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html" aria-current="page">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
+        <a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html" aria-current="page">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
       </nav>
     </div>
     <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
@@ -23,11 +23,10 @@
   <main class="astra-page">
 
     <section class="astra-section astra-intro" aria-labelledby="astra-title">
-      <p class="section-kicker">Model spotlight</p>
       <h1 id="astra-title">GPT-6-Astra as an embodied policy</h1>
       <div class="prose">
         <p><code>gpt-6-astra</code> is OpenAI's general flagship model, with no robotics-specific training and no motor outputs of its own. In the three weeks since it shipped, six groups have wired it to a robot through their own harness and published what happened. This page holds all of it in one place: what each group ran, the clips, and &mdash; at the bottom &mdash; the four questions they do not agree on.</p>
-        <p><strong>Naming note:</strong> this &ldquo;Astra&rdquo; is OpenAI's. Unrelated to Google DeepMind's Project Astra, which this site tracks separately on the <a href="index.html#tasks">Tasks</a> page as a software-only agent.</p>
+        <p><strong>Naming note:</strong> this &ldquo;Astra&rdquo; is OpenAI's. Unrelated to Google DeepMind's Project Astra, which this site files separately, under environment-perceiving agents rather than physical actuation.</p>
       </div>
       <div class="provenance-key">
         <h2 class="provenance-title">Who produced the number &mdash; the fill colour of every bar below</h2>
@@ -49,8 +48,7 @@
     </nav>
 
     <section class="astra-section" id="astra-spread" aria-labelledby="spread-title">
-      <p class="section-kicker">00 / The one chart</p>
-      <h2 id="spread-title">One model, eight published numbers, 3% to 98%</h2>
+      <h2 id="spread-title">Eight numbers, 3% to 98%</h2>
       <div class="prose">
         <p>Every bar is GPT-6-Astra. None of them can be averaged, because no two share a task set, a robot, or a scoring rule &mdash; and that is the finding, not a caveat on it. The number you get for this model is mostly a fact about who ran the evaluation.</p>
       </div>
@@ -58,7 +56,7 @@
       <p class="chart-caption">Hover any bar for the protocol behind it. The two Robocurve bars are the sharpest case: 95% and 10%, same rig, same session, same model, two tasks that differ only in how much precision the final placement needs.</p>
 
       <div class="stat-strip">
-        <div class="stat"><span class="stat-value">1st / 43</span><span class="stat-label">RoboDojo-Sim Score, ahead of every learned VLA on the board</span></div>
+        <div class="stat"><span class="stat-value">3rd / 45</span><span class="stat-label">RoboDojo-Sim Score. It was 1st of 43 when the report went up; LiberAI put two policies above it the next day</span></div>
         <div class="stat"><span class="stat-value">16 of 42</span><span class="stat-label">RoboDojo sim tasks where it scores exactly zero &mdash; ten others are above 50%</span></div>
         <div class="stat"><span class="stat-value">stopped</span><span class="stat-label">RoboDojo's real-robot campaign, halted for safety after hardware damage</span></div>
         <div class="stat"><span class="stat-value">6&times;</span><span class="stat-label">fewer output tokens than Fable 5.1 on the same Robocurve task, at 2.4&times; the completion rate</span></div>
@@ -66,8 +64,7 @@
     </section>
 
     <section class="astra-section" id="astra-glance" aria-labelledby="glance-title">
-      <p class="section-kicker">01 / At a glance</p>
-      <h2 id="glance-title">Who ran what, and how the model touched the robot</h2>
+      <h2 id="glance-title">Who ran what</h2>
       <div class="prose">
         <p>RoboDojo's report defines <strong>RoboProbe</strong>, a three-level taxonomy for &ldquo;what occupies the action path.&rdquo; We reuse its vocabulary because it is the clearest way to say what is actually comparable. <strong>L1</strong>: a trained policy acts, no language model anywhere. <strong>L2 / Hybrid</strong>: the model directs a separately-trained policy, which still emits every action. <strong>L3 / Direct</strong>: the model's own output drives the robot through a fixed, non-learned harness &mdash; no trained checkpoint in the loop. Where a source does not state its level or reasoning effort, the cell says &ldquo;not stated&rdquo; rather than guessing.</p>
       </div>
@@ -78,15 +75,14 @@
     </section>
 
     <section class="astra-section" id="astra-robodojo" aria-labelledby="robodojo-title">
-      <p class="section-kicker">02 / RoboDojo</p>
-      <h2 id="robodojo-title">The benchmark operator's own report</h2>
+      <h2 id="robodojo-title">RoboDojo Team: the operator's own run</h2>
       <div class="prose">
         <p>The only source here that is a benchmark running its own harness on its own board. Three frontier models were put through an identical L3 interface &mdash; GPT-6-Astra and GPT-5.5 at 50 episodes per task, DeepSeek-Flash at 10 &mdash; so any gap between them is the model, not the wire format.</p>
       </div>
 
       <h3>Sim leaderboard, official protocol</h3>
       <div class="data-table-wrap" data-table="simBoard"></div>
-      <p class="table-footnote">The three L3 rows are the same harness with a different planner. GPT-5.5 lands at rank 33 and DeepSeek-Flash at 28: the result is specific to this model, not to &ldquo;a frontier LLM.&rdquo; Score is mean process reward &times; 100; Average SR is the equal-weight mean of the five axes below, not the micro rate.</p>
+      <p class="table-footnote">The three L3 rows are the same harness with a different planner. GPT-5.5 lands at rank 35 and DeepSeek-Flash at 30: the result is specific to this model, not to &ldquo;a frontier LLM.&rdquo; Score is mean process reward &times; 100; Average SR is the equal-weight mean of the five axes below, not the micro rate.</p>
 
       <h3>Where the lead comes from</h3>
       <div class="chart-surface" data-chart="dimensions"></div>
@@ -114,8 +110,7 @@
     </section>
 
     <section class="astra-section" id="astra-hybrid" aria-labelledby="hybrid-title">
-      <p class="section-kicker">03 / Su et al.</p>
-      <h2 id="hybrid-title">Astra alone, versus Astra correcting a VLA</h2>
+      <h2 id="hybrid-title">Su et al.: alone vs correcting a VLA</h2>
       <div class="prose">
         <p>The most directly useful study on this page for anyone deciding how to build with the model. One team, one week, two architectures on one interface: Astra emitting bimanual end-effector targets itself, or Astra reviewing a 50-step &pi;<sub>0.5</sub> candidate and choosing to accept it or overwrite 1&ndash;5 steps. Episodes are paired instance by instance on task, scene, layout and seed.</p>
         <p class="table-note">This report was anonymised when first posted; it now carries named authors (Su, Zheng, Yan, Yi, Zhang, Wang) and a citation. A community index attributes it to a specific lab &mdash; the report itself states no affiliation, so we do not either.</p>
@@ -136,8 +131,7 @@
     </section>
 
     <section class="astra-section" id="astra-robocurve" aria-labelledby="robocurve-title">
-      <p class="section-kicker">04 / Robocurve</p>
-      <h2 id="robocurve-title">Two tasks, twenty trials each, a human grader</h2>
+      <h2 id="robocurve-title">Robocurve: 40 trials, human-graded</h2>
       <div class="prose">
         <p>The smallest quantitative source here and, for that reason, the cleanest. Two tasks on bimanual YAM arms, the same agent policy and rubric used for an earlier Fable comparison, and every trial graded 0&ndash;4 by a human on how far it got &mdash; so a failure still records where it stalled.</p>
       </div>
@@ -151,8 +145,7 @@
     </section>
 
     <section class="astra-section" id="astra-gpe" aria-labelledby="gpe-title">
-      <p class="section-kicker">05 / GPT-Policy</p>
-      <h2 id="gpe-title">Learning from context, on real hardware</h2>
+      <h2 id="gpe-title">GPT-Policy: learning from context</h2>
       <div class="prose">
         <p>The only source that systematically varies <em>what you put in the prompt</em> rather than what the model is: five families of context &mdash; human video, robot video with and without action labels, a goal image, the model's own interaction history, and live human gestures &mdash; across ten real-robot tasks, three trials per condition. No gradient updates anywhere.</p>
       </div>
@@ -164,8 +157,7 @@
     </section>
 
     <section class="astra-section" id="astra-innate" aria-labelledby="innate-title">
-      <p class="section-kicker">06 / Innate</p>
-      <h2 id="innate-title">One recorded episode as the entire context</h2>
+      <h2 id="innate-title">Innate: one episode as the context</h2>
       <div class="prose">
         <p>Two artefacts from the same team, which is why they sit in one section rather than two: a <a href="https://x.com/ax_pey/status/2098216469012283681" target="_blank" rel="noreferrer">20-second clip posted by Axel (@ax_pey)</a> on 2026-09-11, and the <a href="https://github.com/innate-inc/innate-os/pull/817" target="_blank" rel="noreferrer">pull request that implements it</a>.</p>
         <p>The skill, <code>imitate_demonstration</code>, records one episode &mdash; synchronised joint positions, forward-kinematics end-effector poses and camera frames &mdash; and makes it the model's whole context. No trained policy, no fitted trajectory, one bounded and validated decision per observation, with fresh telemetry re-read before any servo motion. Reasoning effort low.</p>
@@ -177,8 +169,7 @@
     </section>
 
     <section class="astra-section" id="astra-community" aria-labelledby="community-title">
-      <p class="section-kicker">07 / Community index</p>
-      <h2 id="community-title">Thirty-five cases in eleven days</h2>
+      <h2 id="community-title">Awesome-Astra: 35 community cases</h2>
       <div class="prose">
         <p><a href="https://github.com/zjwzcx/Awesome-Astra-Embodied-AI" target="_blank" rel="noreferrer">Awesome-Astra-Embodied-AI</a> is a discovery index, not a benchmark &mdash; it points at other people's demos rather than running anything. It earns a place here for shape rather than scores: it shows which uses people reached for first.</p>
       </div>
@@ -187,8 +178,7 @@
     </section>
 
     <section class="astra-section" id="astra-disagree" aria-labelledby="disagree-title">
-      <p class="section-kicker">08 / Reading them together</p>
-      <h2 id="disagree-title">Where the sources disagree</h2>
+      <h2 id="disagree-title">Where the six disagree</h2>
       <div class="prose">
         <p>The reason to gather six reports on one page is not to average them. It is to find the places where two careful groups ran the same model and got opposite answers &mdash; and then to work out which difference in protocol produced the gap.</p>
       </div>
@@ -201,14 +191,12 @@
     </section>
 
     <section class="astra-section" id="astra-gaps" aria-labelledby="gaps-title">
-      <p class="section-kicker">09 / Gaps</p>
       <h2 id="gaps-title">What nobody has published</h2>
       <ul class="astra-gap-list" data-gaps></ul>
     </section>
 
     <section class="astra-section astra-sources" id="astra-sources" aria-labelledby="sources-title">
-      <p class="section-kicker">Sources</p>
-      <h2 id="sources-title">Everything this page was built from</h2>
+      <h2 id="sources-title">Sources</h2>
       <ul class="source-list source-list--cards" data-source-cards></ul>
       <p class="table-footnote">Also read, and cited inline where used: the <a href="https://developers.openai.com/api/docs/models/gpt-6-astra" target="_blank" rel="noreferrer">gpt-6-astra model card</a> (1,050,000-token context, text and image in, effort levels low through max &mdash; the one clearly OpenAI-owned document in this list, and it says nothing about robots), the <a href="https://arxiv.org/abs/2607.04434" target="_blank" rel="noreferrer">RoboDojo benchmark paper</a>, and the <a href="https://arxiv.org/abs/2604.09860" target="_blank" rel="noreferrer">RoboLab benchmark paper</a>. Video clips are hot-linked from each source's own server and are the property of their authors; nothing is rehosted here.</p>
       <p class="provenance-stamp" data-retrieved></p>
@@ -216,9 +204,9 @@
 
   </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=3"></script>
-  <script src="charts.js?v=4"></script>
-  <script src="astra-data.js?v=1"></script>
-  <script src="astra-app.js?v=1"></script>
+  <script src="script.js?v=4"></script>
+  <script src="charts.js?v=5"></script>
+  <script src="astra-data.js?v=2"></script>
+  <script src="astra-app.js?v=2"></script>
 </body>
 </html>

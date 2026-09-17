@@ -19,6 +19,11 @@
   const MUTED = "#66707a";
   const LINE = "#dfe3e6";
   const GRID = "#eceff1";
+  /* Two accents that belong to the interface rather than to any source. DERIVED
+     is for quantities this site computes and nobody publishes - percentiles,
+     mostly - so they can never be mistaken for a number read off a board. */
+  const DERIVED = "#5b3fc4";
+  const HIGHLIGHT = "#0e7c86";
 
   function el(name, attrs, text) {
     const node = document.createElementNS(NS, name);
@@ -337,7 +342,11 @@
     const width = Math.max(container.clientWidth || 640, 320);
     const compact = width < 560;
     const labelWidth = Math.min(Math.max(width * (compact ? 0.42 : 0.3), 118), 215);
-    const valueWidth = compact ? 52 : 68;
+    /* Room to the right of the bars for the value label. A caller that appends a
+       suffix ("#3 of 45") needs more than a bare percentage does, so it can ask
+       for it - capped at a third of the chart so the bars never disappear. */
+    const baseValueWidth = compact ? 52 : 68;
+    const valueWidth = Math.min(Math.max(options.valueWidth || baseValueWidth, baseValueWidth), width * 0.34);
     const rowHeight = compact ? 24 : 26;
     const gap = 6;
     const top = 26;
@@ -753,6 +762,6 @@
     mount,
     resetMounts,
     formatValue,
-    colors: { ink: INK, muted: MUTED, line: LINE, grid: GRID }
+    colors: { ink: INK, muted: MUTED, line: LINE, grid: GRID, derived: DERIVED, highlight: HIGHLIGHT }
   };
 })();

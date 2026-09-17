@@ -7,14 +7,14 @@
   <title>PhAIL Notes</title>
   <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
   <header class="site-header" id="top">
     <div class="header-row">
       <a class="site-name" href="#top"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
       <nav aria-label="Primary navigation">
-        <a href="tasks.html">Tasks</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
+        <a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
       </nav>
     </div>
     <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
@@ -25,7 +25,7 @@
 
   <main class="home-page">
     <section class="section dashboard-section" id="tasks" aria-labelledby="tasks-title">
-      <div class="section-heading"><p class="section-kicker">01 / Tasks</p><h1 id="tasks-title">Task categories</h1></div>
+      <div class="section-heading"><h1 id="tasks-title">Task categories</h1></div>
       <div class="task-roadmap">
         <section class="roadmap-group" aria-labelledby="robotics-title">
           <div class="roadmap-label"><h2 id="robotics-title">Robotics</h2></div>
@@ -55,7 +55,7 @@
     </section>
 
     <section class="section dashboard-section" id="metrics" aria-labelledby="metrics-title">
-      <div class="section-heading"><p class="section-kicker">02 / Metrics</p><h2 id="metrics-title">Evaluation metrics</h2></div>
+      <div class="section-heading"><h2 id="metrics-title">Evaluation metrics</h2></div>
       <div class="data-table-wrap" tabindex="0" aria-label="Evaluation metrics table">
         <table class="data-table metrics-table"><thead><tr><th>Metric</th><th>Used in</th><th>Measures</th><th>Limitation</th></tr></thead><tbody>
           <tr><td>Binary success rate</td><td>Meta-World, RLBench, LIBERO, RoboTwin, ManiSkill3</td><td>Did the task complete?</td><td>Coarse - hides near-misses, smoothness, safety</td></tr>
@@ -73,7 +73,7 @@
     </section>
 
     <section class="section dashboard-section" id="models" aria-labelledby="models-title">
-      <div class="section-heading"><p class="section-kicker">03 / Models</p><h2 id="models-title">Model specifications</h2></div>
+      <div class="section-heading"><h2 id="models-title">Model specifications</h2></div>
       <div class="data-table-wrap" tabindex="0" aria-label="Model specifications table">
         <table class="data-table models-table"><thead><tr><th>Model</th><th>Maker</th><th>Open / Closed</th><th>Embodiment</th><th>Inference requirement</th><th>Control frequency</th><th>Best documented benchmark result</th><th>Reported by</th></tr></thead><tbody>
           <tr><td>GR00T N1.5 / N1.6 / N1.7</td><td>NVIDIA</td><td>Open weights</td><td>Humanoid manipulation, bimanual</td><td>NVIDIA GPU</td><td>-</td><td>N1.7: 96.99% LIBERO average (our mean of NVIDIA&#39;s four suite counts); 72.5% SimplerEnv Fractal; 70.8% RoboCasa</td><td><span class="source-tag">Self-reported</span><a href="https://github.com/NVIDIA/Isaac-GR00T/blob/main/examples/LIBERO/README.md" target="_blank" rel="noreferrer">Isaac-GR00T repo</a></td></tr>
@@ -95,7 +95,7 @@
     </section>
 
     <section class="section dashboard-section" id="benchmarks" aria-labelledby="benchmarks-title">
-      <div class="section-heading"><p class="section-kicker">04 / Benchmarks</p><h2 id="benchmarks-title">Benchmarks &amp; evaluation systems</h2></div>
+      <div class="section-heading"><h2 id="benchmarks-title">Benchmarks &amp; evaluation systems</h2></div>
       <div class="data-table-wrap" tabindex="0" aria-label="Benchmarks table">
         <table class="data-table benchmarks-table"><thead><tr><th>Benchmark</th><th>Year</th><th>Sim / Real</th><th>Scale</th><th>Embodiment</th><th>Scoring</th><th>Link</th></tr></thead><tbody>
           <tr><td>Meta-World</td><td>2019</td><td>Sim (MuJoCo)</td><td>50 tasks</td><td>Sawyer arm</td><td>Binary success rate</td><td><a href="https://meta-world.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
@@ -125,6 +125,6 @@
     </section>
   </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>

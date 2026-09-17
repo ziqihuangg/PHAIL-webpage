@@ -7,119 +7,101 @@
 <title>Charts - PhAIL</title>
 <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-<link rel="stylesheet" href="style.css?v=6" />
+<link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body data-page="charts">
-<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="tasks.html">Tasks</a><a href="charts.html" aria-current="page">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="metrics.html">Metrics</a><a href="models.html">Models</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
+<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="tasks.html">Ledger</a><a href="charts.html" aria-current="page">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
 
 <main class="charts-page">
 
   <section class="database-intro">
-    <p class="section-kicker">Charts / one board at a time</p>
-    <h1>What the boards actually say.</h1>
+    <h1>What the boards actually say</h1>
     <p>Each chart below plots exactly one published table. Columns are coloured by organisation, so every model out of one lab reads as one group; the badge under each column names the lab and the hover panel carries the full record, including who produced the number. There is no composite index on this page, because there is no shared harness to build one from yet.</p>
   </section>
 
   <section class="provenance-key" aria-labelledby="provenance-title">
-    <h2 id="provenance-title" class="provenance-title">Source classes - shown in every hover panel, and on the fill of chart 04</h2>
+    <h2 id="provenance-title" class="provenance-title">Source classes - shown in every hover panel, and on the fill of the LIBERO chart</h2>
     <ul class="provenance-legend" data-provenance-legend></ul>
     <p class="provenance-stamp" data-updated-stamp></p>
   </section>
 
   <nav class="chart-index" aria-label="Charts on this page">
-    <a href="#real-robot">Real-robot success</a>
-    <a href="#robustness">Robustness gap</a>
-    <a href="#dimensions">Capability dimensions</a>
-    <a href="#libero">LIBERO, by reporter</a>
-    <a href="#speed">Speed vs success</a>
-    <a href="#preference">Human preference</a>
-    <a href="#cross-board">The same model, two boards</a>
-    <a href="#ceiling">Distance to human</a>
+    <a href="#real-robot">RoboChallenge</a>
+    <a href="#robustness">RoboTwin</a>
+    <a href="#dimensions">RoboDojo</a>
+    <a href="#libero">LIBERO</a>
+    <a href="#speed">Stanford OFT</a>
+    <a href="#preference">RoboArena</a>
+    <a href="#cross-board">Two boards</a>
+    <a href="#gaps">Not charted</a>
   </nav>
 
   <section class="chart-block" id="real-robot" data-chart="realRobot">
-    <p class="section-kicker">01 / Real robots</p>
-    <h2>Success rate on real hardware, RoboChallenge Table30</h2>
+    <h2>RoboChallenge: real-robot success</h2>
     <p class="chart-standfirst">The clearest real-robot board we track: RoboChallenge runs every rollout on its own machines, so the numbers are not self-reported. The checkpoints, though, are submitted by outside teams.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
   <section class="chart-block" id="robustness" data-chart="robustness">
-    <p class="section-kicker">02 / Robustness</p>
-    <h2>Clean scenes vs domain-randomised scenes, RoboTwin 2.0</h2>
+    <h2>RoboTwin Team: clean scenes vs randomised</h2>
     <p class="chart-standfirst">Two bars per policy, same tasks, same robot. The upper bar is the clean evaluation and the lower one is the randomised evaluation. The distance between them is the part of a headline number that does not survive contact with a changed scene.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
   <section class="chart-block" id="robustness-scatter" data-chart="robustnessScatter">
-    <p class="section-kicker">02b / Robustness, plotted</p>
-    <h2>Every point below the diagonal loses something to randomisation</h2>
+    <h2>RoboTwin Team: the same runs, plotted</h2>
     <p class="chart-standfirst">The same RoboTwin 2.0 data as a scatter. A policy on the dashed line is as good under randomisation as on clean scenes. Nothing is on the line.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
   <section class="chart-block" id="dimensions" data-chart="dimensions">
-    <p class="section-kicker">03 / Capability breakdown</p>
-    <h2>RoboDojo simulation scores, split by capability</h2>
+    <h2>RoboDojo Team: five capability axes</h2>
     <p class="chart-standfirst">RoboDojo scores five things separately instead of collapsing them. Open-vocabulary instruction following is where nearly every policy is close to zero, and it is the column a single average would hide.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
   <section class="chart-block" id="libero" data-chart="libero">
-    <p class="section-kicker">04 / Who is doing the reporting</p>
-    <h2>LIBERO average success rate, grouped by who published it</h2>
+    <h2>LIBERO: six groups, no operator</h2>
     <p class="chart-standfirst">LIBERO is the most-reported benchmark in this ledger and nobody independently operates it - every number is published by a research group, about their own model or about a baseline they ran. The colour tells you which.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
   <section class="chart-block" id="speed" data-chart="speed">
-    <p class="section-kicker">05 / Speed vs success</p>
-    <h2>Action-generation throughput against task success</h2>
+    <h2>Stanford (OFT): speed against success</h2>
     <p class="chart-standfirst">The physical-AI version of a speed-vs-quality plot. It only works here because all three points come from one table, one harness, and one task suite. We do not have the data to draw this across models yet.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
   <section class="chart-block" id="preference" data-chart="preference">
-    <p class="section-kicker">06 / Human preference</p>
-    <h2>RoboArena pairwise-preference score</h2>
+    <h2>RoboArena: human preference</h2>
     <p class="chart-standfirst">No task list, no success rate - evaluators at eight institutions pick their own task and say which of two blinded policies did better. Whiskers are the reported standard deviation, and they overlap for most of the field.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
   <section class="chart-block" id="cross-board" data-chart="crossBoard">
-    <p class="section-kicker">07 / Why there is no index</p>
-    <h2>The same model, read off two different boards</h2>
+    <h2>Two boards, one model</h2>
     <p class="chart-standfirst">This is the chart that explains why the rest of this site refuses to compute a composite score. Each line joins one model's number on one board to its number on another. Both ends are cited. Neither is wrong.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
 
-  <section class="chart-block" id="ceiling" data-chart="ceiling">
-    <p class="section-kicker">08 / Distance to human</p>
-    <h2>RoboDojo real-robot track, against the teleoperation reference</h2>
-    <p class="chart-standfirst">RoboDojo reports a human teleoperator on the same tasks, same robots, same protocol - and the human clears every task. That reference is the only thing on this page that makes an absolute claim about how far along the field is.</p>
-    <div class="chart-surface" data-chart-mount></div>
-    <p class="chart-caption" data-chart-caption></p>
-  </section>
-
   <section class="chart-block" id="gaps">
-    <p class="section-kicker">09 / Not charted</p>
     <h2>What we could not plot</h2>
     <ul class="gap-list" data-gap-list></ul>
   </section>
 
 </main>
 <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-<script src="script.js?v=3"></script>
-<script src="charts.js?v=4"></script>
-<script src="tasks-data-new.js?v=5"></script>
-<script src="charts-page.js?v=3"></script>
+<script src="script.js?v=4"></script>
+<script src="charts.js?v=5"></script>
+<script src="tasks-data-new.js?v=6"></script>
+<script src="charts-page.js?v=4"></script>
 </body>
 </html>

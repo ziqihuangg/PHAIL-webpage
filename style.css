@@ -5,6 +5,24 @@
   --accent: #003b68;
   --paper: #fbfbfa;
   --measure: 1440px;
+
+  /* Two accents, and a rule about where they may go.
+
+     The data palette is already spoken for: navy, amber, green and grey mean
+     benchmark-run, self-reported, third-party and pending, and the organisation
+     colours mean a lab. Anything new put on a bar would read as a fifth claim
+     about where a number came from. So these two belong to the INTERFACE - the
+     active tab, the slider, a section rule, a figure worth remembering - with
+     one exception: --violet also fills the percentile bars, because a percentile
+     is the one quantity on this site that nobody published and we computed, and
+     it should not look like anything read off a board.
+
+     --teal   pairs with the navy without competing for the same job
+     --violet is the interactive colour: if it moves, it is violet          */
+  --violet: #5b3fc4;
+  --violet-soft: #efecfb;
+  --teal: #0e7c86;
+  --teal-soft: #e6f2f3;
 }
 
 * { box-sizing: border-box; }
@@ -23,14 +41,18 @@ body {
 a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 a:hover { color: var(--ink); }
 .site-header, main, .site-footer { width: min(var(--measure), calc(100% - 64px)); margin: 0 auto; }
-.site-header { padding: 28px 0 34px; border-top: 4px solid var(--ink); }
+/* The rule across the top of every page carries all three colours at once -
+   the only place on the site where they appear together. */
+.site-header { padding: 28px 0 34px; border-top: 4px solid var(--ink);
+  border-image: linear-gradient(90deg, var(--accent) 0 34%, var(--teal) 34% 67%, var(--violet) 67% 100%) 1; }
 .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; }
 .site-name { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-size: clamp(3rem, 7vw, 6rem); font-weight: 700; letter-spacing: -0.065em; line-height: .86; text-decoration: none; }
 .site-mark { width: .7em; height: .7em; flex: 0 0 auto; }
 .site-label { max-width: 560px; color: var(--muted); font-size: clamp(1.25rem, 2.4vw, 2.25rem); font-weight: 600; letter-spacing: -0.035em; line-height: 1.05; }
 nav { display: flex; flex-wrap: wrap; gap: 18px; justify-content: flex-end; }
 nav a { font-size: 16px; color: var(--muted); text-decoration: none; }
-nav a:hover { color: var(--accent); text-decoration: underline; }
+nav a:hover { color: var(--violet); text-decoration: underline; }
+nav a[aria-current="page"] { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--violet); }
 .site-expansion { display: block; margin: 18px 0 0; color: var(--ink); font-size: clamp(1.15rem, 2vw, 1.8rem); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
 .site-wordplay { max-width: 620px; margin: 9px 0 0; color: var(--muted); font-size: 16px; font-style: italic; }
 .site-deck { max-width: 760px; margin: 42px 0 0; font-size: 16px; line-height: 1.5; letter-spacing: 0; font-weight: 400; color: var(--muted); }
@@ -371,4 +393,102 @@ td:first-child { min-width: 170px; font-weight: 500; }
   .stat-strip { grid-template-columns: 1fr; }
   .claim-list li { grid-template-columns: 1fr; gap: 6px; }
   .disagreement-reading { padding: 12px 13px; }
+}
+
+/* =============================================================================
+   The sim / real switch, the faceted filters, and the size range
+   -----------------------------------------------------------------------------
+   The switch is not a filter and does not sit in the filter panel: it picks
+   which of two incomparable populations the page is about, so it goes above
+   them, styled as a pair of tabs rather than a dropdown.
+   ========================================================================== */
+
+.track-switch { display: inline-flex; gap: 4px; margin: 18px 0 0; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
+.track-switch button {
+  min-height: 34px; padding: 6px 20px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--muted);
+  font: inherit; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
+  transition: background-color .13s ease, color .13s ease;
+}
+.track-switch button:hover { color: var(--violet); }
+.track-switch button[aria-selected="true"] { background: var(--violet); color: #fff; }
+.track-switch button[aria-selected="true"]:hover { color: #fff; }
+.track-switch-note { max-width: 780px; margin: 10px 0 4px; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+
+.filter-panel select:focus-visible, .filter-panel input:focus-visible, .filter-reset:focus-visible, .track-switch button:focus-visible {
+  outline: 2px solid var(--violet); outline-offset: 1px;
+}
+.filter-panel select:disabled { color: var(--muted); background: #f5f6f7; }
+
+/* Model size. Two range inputs stacked on one rail: the track and the fill are
+   drawn by the container, and only the thumbs take pointer events, so either
+   handle can be grabbed anywhere along the bar. */
+.size-filter { grid-column: span 2; align-content: start; }
+.size-head { display: flex; align-items: baseline; gap: 8px; }
+.size-readout { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.size-range { position: relative; display: block; height: 36px; margin-top: 2px; }
+.size-range-rail { position: absolute; left: 8px; right: 8px; top: 16px; height: 4px; border-radius: 2px; background: var(--line); }
+.size-range-fill { position: absolute; top: 0; bottom: 0; border-radius: 2px; background: var(--violet); }
+.filter-panel .size-range input[type="range"] {
+  position: absolute; left: 0; top: 6px; width: 100%; height: 24px; min-height: 0; margin: 0; padding: 0;
+  -webkit-appearance: none; appearance: none; border: 0; background: transparent; pointer-events: none;
+}
+.size-range input[type="range"]::-webkit-slider-runnable-track { background: transparent; border: 0; }
+.size-range input[type="range"]::-moz-range-track { background: transparent; border: 0; }
+.size-range input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; pointer-events: auto; cursor: grab;
+  width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--violet); background: #fff;
+  box-shadow: 0 1px 3px rgba(20, 23, 27, .2);
+}
+.size-range input[type="range"]::-moz-range-thumb {
+  pointer-events: auto; cursor: grab;
+  width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--violet); background: #fff;
+}
+
+/* =============================================================================
+   Section rules
+   -----------------------------------------------------------------------------
+   The numbered grey kickers above every heading are gone. Something still has to
+   mark where one section stops and the next begins, so each heading carries a
+   short coloured rule instead - shorter to read than "03 / Capability breakdown"
+   and it does the same job.
+   ========================================================================== */
+
+.chart-block > h2::before,
+.astra-section > h2::before,
+.database-intro > h1::before,
+.charts-page .database-intro > h1::before,
+.section-page .section-heading h1::before,
+.section-page .section-heading h2::before {
+  content: ""; display: block; width: 34px; height: 3px; margin-bottom: 14px; background: var(--teal);
+}
+.astra-section > h1::before { content: ""; display: block; width: 34px; height: 3px; margin-bottom: 14px; background: var(--teal); }
+.section-secondary { margin-top: 12px; padding-top: 34px; border-top: 1px solid var(--line); }
+.section-secondary .section-heading h1, .section-secondary .section-heading h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+
+/* Without its kicker column the ledger intro is just a heading and a line. */
+.database-intro { display: block; }
+.database-intro p:last-child { grid-column: auto; max-width: 780px; }
+.section-heading { display: block; }
+
+/* =============================================================================
+   Colour, sparingly, on the things worth finding again
+   ========================================================================== */
+
+.recommendation { border-left-color: var(--teal); background: var(--teal-soft); }
+.task-database-table .rank-cell { color: var(--teal); }
+.chart-index a:hover { color: var(--violet); }
+.ledger-chart-title { color: var(--ink); }
+.ledger-chart-title::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--violet); vertical-align: middle; }
+.stat-value { color: var(--teal); }
+.disagreement-index { color: var(--violet); }
+.disagreement-reading { border-left-color: var(--violet); background: var(--violet-soft); }
+.callout-note { border-left-color: var(--teal); background: var(--teal-soft); }
+.definition-list li::before, .task-number, .notes-list time { color: var(--violet); }
+.filter-reset:hover { color: var(--violet); border-color: var(--violet); }
+
+@media (max-width: 620px) {
+  .track-switch { display: flex; width: 100%; }
+  .track-switch button { flex: 1; padding: 6px 8px; }
+  .size-filter { grid-column: span 1; }
 }

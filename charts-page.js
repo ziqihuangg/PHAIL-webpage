@@ -161,23 +161,24 @@ function unavailable(target, why) {
   if (!target) return;
   if (!source) return unavailable(target, "The RoboDojo simulation table is not in the current data file.");
 
-  const top = source.rows.filter((row) => !row.reference).slice(0, 12);
-  const human = source.rows.find((row) => row.reference);
-  const rows = [...top, human].filter(Boolean);
+  /* Top twelve only, and no teleoperation reference row. The reference used to
+     sit at the bottom of this grid at 80/100, which set the cell scale for
+     everything else and left the actual field as a row of slivers. The live
+     board no longer publishes it either. */
+  const rows = source.rows.filter((row) => !row.reference).slice(0, 12);
 
   charts.mount(target.mount, (container) => charts.dimensionGrid(container, {
     dims: source.dims,
-    max: 100,
+    max: 50,
     unit: "",
-    axisLabel: "Each cell is scored out of 100. Full-width would be a perfect score.",
+    axisLabel: "Cells are scaled to 50 of a possible 100 - no policy on this board is close to the top of the range.",
     rows: rows.map((row) => ({
       label: label(row),
       values: row.d,
-      color: row.reference ? charts.colors.muted : orgOf(row.model).color,
-      reference: row.reference === true
+      color: orgOf(row.model).color
     }))
   }));
-  target.caption.innerHTML = sourceLine(source) + ` The human row is a teleoperation reference, not a competitor - it is drawn faded for that reason.`;
+  target.caption.innerHTML = sourceLine(source) + ` GPT-6-Astra, a general language model with no robotics training, is third on this board and has the opposite profile to every policy around it: first on memory and open-vocabulary instructions, last-tier on precision.`;
 })();
 
 /* --- 04: LIBERO by reporter --------------------------------------------------- */
@@ -281,7 +282,7 @@ function unavailable(target, why) {
   /* panel A: two real-robot boards */
   const sharedReal = database.models
     .map((entry) => ({ id: entry.id, name: entry.name, left: bestSuccess(challenge, entry.id), right: bestSuccess(dojoReal, entry.id) }))
-    .filter((entry) => entry.left !== null && entry.right !== null && entry.id !== "human")
+    .filter((entry) => entry.left !== null && entry.right !== null)
     .sort((a, b) => b.left - a.left);
 
   /* panel B: LIBERO against RoboDojo sim */
@@ -295,7 +296,7 @@ function unavailable(target, why) {
         right: bestSuccess(dojoSim, entry.id)
       };
     })
-    .filter((entry) => entry.left !== null && entry.right !== null && entry.id !== "human")
+    .filter((entry) => entry.left !== null && entry.right !== null)
     .sort((a, b) => b.left - a.left);
 
   charts.mount(target.mount, (container) => {
@@ -334,25 +335,7 @@ function unavailable(target, why) {
     + `Averaging any of these into one index would produce a number that describes nothing.`;
 })();
 
-/* --- 08: distance to the human reference ---------------------------------------- */
-(function ceiling() {
-  const target = section("ceiling");
-  const source = group("robodojo-real");
-  if (!target) return;
-  if (!source) return unavailable(target, "The RoboDojo real table is not in the current data file.");
-
-  charts.mount(target.mount, (container) => charts.verticalBars(container, {
-    unit: "%", max: 100,
-    valueLabel: "overall success rate",
-    rows: source.rows.slice().sort((a, b) => b.success - a.success).map((row) => columnRow(source, row, {
-      value: row.success,
-      extraDetails: [["Score", String(row.score)]]
-    }))
-  }));
-  target.caption.innerHTML = sourceLine(source) + ` The best policy on this board completes 12.8% of trials. A teleoperator completes 100%.`;
-})();
-
-/* --- 09: what we could not chart -------------------------------------------------- */
+/* --- 08: what we could not chart -------------------------------------------------- */
 (function gaps() {
   const list = document.querySelector("[data-gap-list]");
   if (!list) return;

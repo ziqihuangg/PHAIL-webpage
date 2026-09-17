@@ -9,9 +9,10 @@ Open `index.html` directly or serve the folder with a local static server. No bu
 | Page | File | What it does |
 | --- | --- | --- |
 | Home / dashboard | `index.html` | Task categories, metrics table, model spec sheet, benchmark list |
-| Tasks | `tasks.html` | The filterable evaluation ledger - every cited record, with a chart of whichever board is in view |
+| Ledger | `tasks.html` | The filterable evaluation ledger - every cited record, with a chart of whichever board is in view. Nav label is "Ledger"; the filename stays `tasks.html` so old links keep working |
 | Charts | `charts.html` | One chart per published table, plus the cross-board comparison that explains why there is no composite index |
-| Metrics / Models / Benchmarks | `metrics.html`, `models.html`, `benchmarks.html` | Single sections cloned out of `index.html` by `section-page.js` |
+| Benchmarks | `benchmarks.html` | Two sections cloned out of `index.html` by `section-page.js`: the board list and the metric glossary |
+| Metrics / Models | `metrics.html`, `models.html` | Same mechanism, one section each. **No longer in the nav** - metrics moved under Benchmarks and the model specs are a slice of the ledger. The files stay so existing links resolve |
 | GPT-6 Astra | `gpt-6-astra.html` | Model spotlight: one model read across six published sources, with the clips and the questions they answer differently |
 | About | `about.html` | Project statement |
 
@@ -19,7 +20,7 @@ Open `index.html` directly or serve the folder with a local static server. No bu
 
 [`tasks-data-new.js`](tasks-data-new.js) holds the ledger database. Rendering never contains data and data never contains markup:
 
-- [`tasks-app.js`](tasks-app.js) - Tasks page: filters, ranking, table, in-view chart
+- [`tasks-app.js`](tasks-app.js) - Ledger page: the sim/real switch, faceted filters, ranking, table, in-view chart
 - [`charts-page.js`](charts-page.js) - Charts page: one function per chart
 - [`charts.js`](charts.js) - dependency-free SVG chart primitives (bars, paired bars, scatter, error bars, dimension grid, slope)
 - [`script.js`](script.js) - site name, nav, header
@@ -106,10 +107,25 @@ Rules that keep the site honest:
 
 - **No number without a `sourceUrl` you can open.** If a value exists only in a figure image, record it as `pending` with a note rather than eyeballing it.
 - **Anything we computed gets `derived: true`** and a row note saying what we did. (Example: GR00T's LIBERO average, which NVIDIA publishes only as four per-suite counts.)
-- **Never average across benchmarks.** Charts plot one `resultGroups` entry at a time. The single exception is the per-model profile on the Tasks page, where each bar is labelled with its own board and the caption says they are not comparable.
+- **Never average across benchmarks.** Charts plot one `resultGroups` entry at a time. The single exception is the per-model view on the Ledger page, and it does not plot values at all - see *Percentiles* below.
+- **Prefer a live official board to the paper it came from.** Where a benchmark runs its own leaderboard, cite the board, not the arXiv table: they diverge. RoboDojo's July paper lists 30 models with the teleoperation reference at the top; its live board lists 45, has re-scored MolmoAct2 from 1.02 to 8.99, and no longer publishes the reference row at all.
 - `maker: "Not confirmed"` is a valid, deliberate value for models whose only source is a leaderboard row.
 
-Optional row fields: `variant` (checkpoint or configuration), `submitter`, `note`, `reference: true` (human-teleoperation baselines - drawn as a dashed rule, excluded from ranking), `s: []` (per-suite breakdown, paired with a group-level `suites: []`), `d: []` (capability dimensions, paired with `dims: []`).
+Optional row fields: `variant` (checkpoint or configuration), `submitter`, `note`, `reference: true` (drawn as a dashed rule, excluded from ranking and from every chart), `s: []` (per-suite breakdown, paired with a group-level `suites: []`), `d: []` (capability dimensions, paired with `dims: []`).
+
+Optional model field: `sizeB`, a parameter count in **billions**, present only where the source states a single figure - not for ranges ("27M-93M"), not for backbone-plus-head sums, not where the size is undisclosed. It is what the size slider filters on, so a model without one drops out the moment the slider is narrowed, and the summary line says how many did.
+
+### Sim and real are two views, not one list
+
+The switch above the Ledger filters picks between `track: "Sim"` and `track: "Real"`. They are not two slices of one population - nobody has shown that a simulation ranking predicts a real-robot one, and [the cross-board chart](charts.html) is the evidence. Records whose source states no track are all `pending` gaps rather than scores, so they stay visible in both views instead of disappearing.
+
+### Filters are faceted
+
+Task is the primary key. Every dropdown is rebuilt on each render from the records that survive the *other* filters, so the interface can never offer a combination that returns an empty table. A chosen value that stops being reachable falls back to "all" rather than sticking.
+
+### Percentiles
+
+Selecting one model replaces the chart with its **position** on every board it appears on, not its scores. OpenVLA-OFT reports 97.1% on LIBERO and 0.02% on RoboDojo simulation; both are cited and drawing them as neighbouring bars would claim a comparison that does not exist. Percentile is pooled per benchmark across every source table that agrees on the metric field and unit, needs at least five entries to be drawn at all, and is filled in `--violet` because **this site computes it and no source publishes it**. The cited values stay in the table below, per row.
 
 ### Deep links
 
@@ -117,10 +133,10 @@ The Tasks page reads filters from the query string, so a model or a board can be
 
 ```
 tasks.html?model=pi05
-tasks.html?benchmark=robochallenge&provenance=benchmark
+tasks.html?benchmark=robochallenge&track=Real
 ```
 
-Accepted keys: `task`, `benchmark`, `model`, `provenance`, `openness`, `embodiment`, `size`, `track`, `metric`, `q`.
+Accepted keys: `task`, `benchmark`, `model`, `openness`, `embodiment`, and `track` (`Sim` or `Real`). A link to a model that only has records on the other track switches tracks to find it.
 
 ## Local preview
 
@@ -129,9 +145,19 @@ python -m http.server 4173 --bind 127.0.0.1
 ```
 
 - [Home](http://127.0.0.1:4173/)
-- [Tasks](http://127.0.0.1:4173/tasks.html)
+- [Ledger](http://127.0.0.1:4173/tasks.html)
 - [Charts](http://127.0.0.1:4173/charts.html)
-- [Metrics](http://127.0.0.1:4173/metrics.html)
-- [Models](http://127.0.0.1:4173/models.html)
+- [GPT-6 Astra](http://127.0.0.1:4173/gpt-6-astra.html)
 - [Benchmarks](http://127.0.0.1:4173/benchmarks.html)
 - [About](http://127.0.0.1:4173/about.html)
+
+## Colour
+
+Four colours mean *who produced a number* (`provenance`) and around forty mean *which lab built a model* (`organisations`). Both are data and neither is decoration. Two more belong to the interface and never appear on a bar - with one deliberate exception:
+
+| Token | Used for |
+| --- | --- |
+| `--teal` `#0e7c86` | The rule above every section heading, callouts, the "top of the table" strip, rank cells, the stat figures on the Astra page |
+| `--violet` `#5b3fc4` | Anything interactive: the selected tab, the size slider, focus rings, the current nav item. **Also the percentile bars**, because a percentile is the one quantity on this site that we computed rather than read off a board, and it should not look like anything cited |
+
+The rule across the top of every page carries navy, teal and violet together, and is the only place all three appear at once.
