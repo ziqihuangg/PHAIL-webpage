@@ -588,7 +588,11 @@
     const svg = svgRoot(width, height);
     dims.forEach((dim, index) => {
       const x = labelWidth + 10 + index * (cellWidth + cellGap);
-      svg.appendChild(el("text", { x: x, y: top - 24, class: "chart-tick chart-tick--head" }, truncate(dim, compact ? 8 : 16)));
+      /* Budget the header to the cell it sits over, not to a fixed character
+         count: on a narrow screen five columns leave ~40px each, and an 8-char
+         header spills past the right edge of the last one. */
+      const headLimit = Math.max(4, Math.floor(cellWidth / 6.8));
+      svg.appendChild(el("text", { x: x, y: top - 24, class: "chart-tick chart-tick--head" }, truncate(dim, Math.min(headLimit, compact ? 8 : 16))));
       svg.appendChild(el("line", { x1: x, y1: top - 16, x2: x + cellWidth, y2: top - 16, stroke: LINE }));
     });
 

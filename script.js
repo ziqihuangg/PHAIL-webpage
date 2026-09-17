@@ -26,7 +26,9 @@ if (header) {
       ? `<p class="site-deck">A research notebook, not a company.</p>`
       : pageKey === "charts"
         ? `<p class="site-deck">One chart per benchmark. Nothing averaged across boards.</p>`
-        : "";
+        : pageKey === "gpt-6-astra"
+          ? `<p class="site-deck">Six groups, one model, and the four questions they answer differently.</p>`
+          : "";
   header.outerHTML = `<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="${homeHref}"><span>${siteConfig.acronym}</span><img class="site-mark" src="physical-ai-mark.svg" alt="" /></a><nav aria-label="Primary navigation">${pageLinks.map(([label, href, key]) => `<a href="${href}"${pageKey === key ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav></div><p class="site-expansion">${siteConfig.fullName}</p><p class="site-wordplay">Pronounced like “fail” - because honest evaluation starts with what breaks.</p>${pageDescription}</header>`;
 }
 

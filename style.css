@@ -313,3 +313,62 @@ td:first-child { min-width: 170px; font-weight: 500; }
 /* Organisation logos in the hover panel and the colour legend */
 .chart-tooltip-logo { flex: 0 0 auto; width: 16px; height: 16px; object-fit: contain; align-self: center; }
 .chart-legend-logo { flex: 0 0 auto; width: 14px; height: 14px; object-fit: contain; }
+
+/* =============================================================================
+   GPT-6-Astra spotlight page
+   -----------------------------------------------------------------------------
+   The page reads as one long argument, so headings inside a section need to be
+   quieter than the section head, and the blocks that carry the argument (the
+   stat strip, the disagreements) need to sit apart from the ordinary prose.
+   ========================================================================== */
+
+.astra-page h3 { margin: 34px 0 0; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
+.astra-page .data-table-wrap { margin-top: 16px; }
+.astra-page .chart-index { margin-top: 30px; }
+.astra-intro .provenance-key { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); border-bottom: 0; }
+
+/* The four numbers worth remembering after closing the tab. */
+.stat-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; margin: 28px 0 0; background: var(--line); border: 1px solid var(--line); }
+.stat { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; background: var(--paper, #fbfbfa); }
+.stat-value { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.stat-label { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+/* Reference rows in a table: present for context, not part of the comparison. */
+.row-reference td { color: var(--muted); font-style: italic; }
+.row-reference td strong { font-weight: 400; }
+
+/* Videos: a poster frame is all that loads until someone presses play. The
+   clips come from five different servers at five different aspect ratios, so
+   normalise the box and letterbox inside it rather than letting one wide hero
+   shot set the row height for three portrait ones. */
+.astra-page .video-grid { margin-top: 22px; }
+.astra-page .video-grid video { aspect-ratio: 4 / 3; height: auto; object-fit: contain; }
+.video-grid figcaption a { display: inline-block; margin-left: 4px; white-space: nowrap; }
+
+/* The closing section - one block per open question. */
+.disagreement-list { margin-top: 26px; }
+.disagreement { padding: 26px 0; border-top: 1px solid var(--line); }
+.disagreement:last-child { border-bottom: 1px solid var(--line); }
+.disagreement-index { margin: 0; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .08em; }
+.disagreement h3 { margin: 6px 0 0; font-size: 1.15rem; font-weight: 600; }
+.disagreement-verdict { margin: 8px 0 0; color: #343b42; font-size: 14.5px; font-style: italic; }
+.claim-list { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+.claim-list li { display: grid; grid-template-columns: 148px 1fr; gap: 14px; align-items: start; }
+.claim-who { display: inline-block; padding: 2px 8px; border: 1px solid; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; justify-self: start; }
+.claim-list p { margin: 0; color: #343b42; font-size: 14px; line-height: 1.55; }
+.disagreement-reading { max-width: 820px; margin: 20px 0 0; padding: 14px 16px; background: #f1f3f3; border-left: 3px solid var(--accent); font-size: 14px; line-height: 1.6; }
+.disagreement-reading strong { color: var(--ink); }
+
+.astra-gap-list { margin: 22px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.astra-gap-list li { padding: 13px 0; border-bottom: 1px solid var(--line); color: #343b42; font-size: 14.5px; line-height: 1.5; }
+
+.source-list--cards li { padding: 20px 0; }
+.source-list--cards .source-meta { margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.source-list--cards .source-meta strong { color: #343b42; font-weight: 600; }
+
+@media (max-width: 620px) {
+  .astra-page h3 { margin-top: 28px; }
+  .stat-strip { grid-template-columns: 1fr; }
+  .claim-list li { grid-template-columns: 1fr; gap: 6px; }
+  .disagreement-reading { padding: 12px 13px; }
+}

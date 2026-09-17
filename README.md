@@ -12,17 +12,24 @@ Open `index.html` directly or serve the folder with a local static server. No bu
 | Tasks | `tasks.html` | The filterable evaluation ledger - every cited record, with a chart of whichever board is in view |
 | Charts | `charts.html` | One chart per published table, plus the cross-board comparison that explains why there is no composite index |
 | Metrics / Models / Benchmarks | `metrics.html`, `models.html`, `benchmarks.html` | Single sections cloned out of `index.html` by `section-page.js` |
-| GPT-6 Astra | `gpt-6-astra.html` | Model spotlight, hand-written |
+| GPT-6 Astra | `gpt-6-astra.html` | Model spotlight: one model read across six published sources, with the clips and the questions they answer differently |
 | About | `about.html` | Project statement |
 
-## Data lives in one file
+## Data lives apart from rendering
 
-[`tasks-data-new.js`](tasks-data-new.js) holds the whole database. Rendering never contains data and data never contains markup:
+[`tasks-data-new.js`](tasks-data-new.js) holds the ledger database. Rendering never contains data and data never contains markup:
 
 - [`tasks-app.js`](tasks-app.js) - Tasks page: filters, ranking, table, in-view chart
 - [`charts-page.js`](charts-page.js) - Charts page: one function per chart
 - [`charts.js`](charts.js) - dependency-free SVG chart primitives (bars, paired bars, scatter, error bars, dimension grid, slope)
 - [`script.js`](script.js) - site name, nav, header
+
+The GPT-6-Astra spotlight follows the same rule with its own pair, because it is the ledger's mirror image - one model read across many documents, rather than one document listing many models:
+
+- [`astra-data.js`](astra-data.js) - every number, citation, video URL and source class on that page
+- [`astra-app.js`](astra-app.js) - draws them, through the same `window.phailCharts` primitives
+
+It is deliberately *not* folded into `resultGroups`: most of its sources are not leaderboards (a safety-stopped diagnostic campaign, a piano-controller case study, a pull request), and giving them benchmark entries would invent structure the sources do not have. Its chart fills come from `astraData.classes`, a narrowed version of the ledger's provenance vocabulary. Videos are hot-linked from each source's own server with `preload="none"`, so the page loads no media until a clip is played.
 
 ### Source provenance
 
