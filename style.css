@@ -403,7 +403,7 @@ td:first-child { min-width: 170px; font-weight: 500; }
    them, styled as a pair of tabs rather than a dropdown.
    ========================================================================== */
 
-.track-switch { display: inline-flex; gap: 4px; margin: 18px 0 0; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
+.track-switch { display: inline-flex; gap: 4px; margin: 18px 0 4px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
 .track-switch button {
   min-height: 34px; padding: 6px 20px; border: 0; border-radius: 999px;
   background: transparent; color: var(--muted);
@@ -413,7 +413,6 @@ td:first-child { min-width: 170px; font-weight: 500; }
 .track-switch button:hover { color: var(--violet); }
 .track-switch button[aria-selected="true"] { background: var(--violet); color: #fff; }
 .track-switch button[aria-selected="true"]:hover { color: #fff; }
-.track-switch-note { max-width: 780px; margin: 10px 0 4px; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
 
 .filter-panel select:focus-visible, .filter-panel input:focus-visible, .filter-reset:focus-visible, .track-switch button:focus-visible {
   outline: 2px solid var(--violet); outline-offset: 1px;
@@ -493,9 +492,6 @@ td:first-child { min-width: 170px; font-weight: 500; }
   .size-filter { grid-column: span 1; }
 }
 
-/* What the filters declined to offer. Quiet, but present - the point of the
-   ledger is that an absence is a finding, so an option that was withheld says so
-   rather than simply not being there. */
-.filter-withheld { max-width: 1100px; margin: 12px 0 0; padding: 10px 14px; border-left: 3px solid var(--line); background: #f5f6f7; color: var(--muted); font-size: 13px; line-height: 1.55; }
-.filter-withheld:empty { display: none; }
-.filter-withheld strong { color: #343b42; font-weight: 600; }
+/* The leader of whichever table is in view. Everything else in this strip is
+   context for it, so it is the only part set at reading size. */
+.top-model { color: var(--ink); font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }

@@ -73,11 +73,6 @@ const chartTitle = document.querySelector("[data-ledger-chart-title]");
 const legendMount = document.querySelector("[data-provenance-legend]");
 const stampMount = document.querySelector("[data-updated-stamp]");
 const trackSwitch = document.querySelector("[data-track-switch]");
-const trackNote = document.querySelector("[data-track-note]");
-
-/* Options a dropdown declined to offer this render, per filter key, so they can
-   be named under the panel rather than vanishing. Rebuilt by refreshOptions. */
-let withheld = {};
 
 /* --- track: the view, not a filter ----------------------------------------- */
 let track = "Sim";
@@ -162,32 +157,27 @@ function matches(record, skip) {
    to exist, with nothing we can cite yet - and those records are deliberately
    kept in the table. But offering them in a dropdown is a different promise:
    picking "Autonomous driving" and landing on one row that says "leaderboard not
-   transcribed" reads as a broken filter, not as an honest gap.
+   transcribed" reads as a broken filter, not as an honest gap. So gaps stay in
+   the table and come out of the dropdowns.
 
-   So gaps stay in the table and come out of the dropdowns, and whatever was
-   withheld is named underneath the filters rather than disappearing quietly.
-   Nothing here is a list of exclusions anyone maintains: it is recomputed from
-   the data every render, so an option returns by itself the moment a citable
-   number for it lands.                                                        */
+   Nothing here is an exclusion list anyone maintains. Both tests run against the
+   data on every render, so an option returns by itself the moment one citable
+   number for it lands - there is no file to edit and nothing to undo. README
+   ("What the dropdowns withhold") carries the rule and a dated snapshot of what
+   is currently held back, which is the only place that set is written down.   */
 const isCitable = (record) => record.value !== null;
 
 function refreshOptions() {
-  withheld = {};
   FILTER_KEYS.forEach((key) => {
     const filter = FILTERS[key];
     if (!filter.node) return;
     const offered = new Map();
-    const gapsOnly = new Map();
     records.forEach((record) => {
-      if (!matches(record, key)) return;
+      if (!matches(record, key) || !isCitable(record)) return;
       const value = filter.get(record);
       if (!value || value === "-") return;
-      const label = filter.label(record);
-      if (isCitable(record)) { offered.set(value, label); gapsOnly.delete(value); }
-      else if (!offered.has(value)) gapsOnly.set(value, label);
+      if (!offered.has(value)) offered.set(value, filter.label(record));
     });
-    withheld[key] = [...gapsOnly.values()].sort((a, b) => a.localeCompare(b));
-
     const options = [...offered.entries()].sort((a, b) => a[1].localeCompare(b[1]));
     const current = filter.node.value;
     const stillThere = options.some(([value]) => value === current);
@@ -196,38 +186,6 @@ function refreshOptions() {
     filter.node.value = stillThere ? current : "";
     filter.node.disabled = options.length === 0;
   });
-}
-
-/* Task categories that carry no record at all, in either view. They are not a
-   filtering decision - they are the part of the taxonomy this ledger has not
-   reached yet, and they are named for the same reason the gaps are. */
-const unstartedTasks = database.tasks
-  .filter((task) => !records.some((record) => record.group.task === task.id))
-  .map((task) => task.name);
-
-function renderWithheld() {
-  const host = document.querySelector("[data-withheld]");
-  if (!host) return;
-  const groups = [
-    ["Tasks", withheld.task],
-    ["Benchmarks", withheld.benchmark],
-    ["Models", withheld.model],
-    ["Embodiments", withheld.embodiment]
-  ].filter(([, list]) => list && list.length)
-   .map(([name, list]) => `<strong>${name}:</strong> ${list.join(", ")}`);
-
-  if (!groups.length && !unstartedTasks.length) { host.innerHTML = ""; return; }
-
-  const parts = [];
-  if (groups.length) {
-    parts.push(`<strong>Held out of the filters above</strong>, because every record under them in this view is a `
-      + `documented gap rather than a number - they are still in the table under "all". ${groups.join(" &middot; ")}.`);
-  }
-  if (unstartedTasks.length) {
-    parts.push(`<strong>Not started:</strong> ${unstartedTasks.join(", ")} - in the task taxonomy, no record in the ledger yet.`);
-  }
-  parts.push(`This list is recomputed from the data, not maintained by hand: anything here reappears in the dropdowns on its own as soon as one citable number for it lands.`);
-  host.innerHTML = parts.join(" ");
 }
 
 if (stampMount) {
@@ -506,7 +464,6 @@ function renderChart(chosen) {
 /* --- main render ------------------------------------------------------------ */
 function render() {
   refreshOptions();
-  renderWithheld();
   paintSize();
 
   const visible = records.filter((record) => matches(record));
@@ -563,7 +520,8 @@ function render() {
 
   if (best) {
     recommendation.innerHTML = `<strong>Top of the table in view</strong>`
-      + `<span>${best.model.name}${best.row.variant ? ` (${best.row.variant})` : ""} · ${primaryDisplay(best)} on ${best.benchmark.name}</span>`
+      + `<span><span class="top-model">&#10024; ${best.model.name}${best.row.variant ? ` (${best.row.variant})` : ""}</span>`
+        + ` · ${primaryDisplay(best)} on ${best.benchmark.name}</span>`
       + provenanceTag(best)
       + `<a href="${best.group.sourceUrl}" target="_blank" rel="noreferrer">${best.group.source}</a>`;
   } else {
@@ -603,15 +561,6 @@ function paintTrack() {
   trackSwitch.querySelectorAll("[data-track]").forEach((button) => {
     button.setAttribute("aria-selected", String(button.dataset.track === track));
   });
-  if (trackNote) {
-    const untracked = records.filter((record) => !hasTrack(record)).length;
-    const shared = untracked
-      ? ` ${untracked} records state no track and stay visible in both views - every one of them is a documented gap rather than a score.`
-      : "";
-    trackNote.textContent = (track === "Sim"
-      ? "Simulated evaluations only. Cheap to run, easy to repeat, and no guarantee that any of it transfers."
-      : "Physical hardware only. Every number below cost somebody a robot, a rig, and a person watching it.") + shared;
-  }
 }
 
 if (trackSwitch) {

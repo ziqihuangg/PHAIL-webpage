@@ -136,14 +136,15 @@ offering them in a dropdown is a different promise: picking "Autonomous driving"
 and landing on a single row that reads *leaderboard not transcribed* looks like
 a broken filter, not like an honest gap.
 
-So gaps stay in the table and come out of the dropdowns, and the line under the
-filter panel names everything that was withheld, per view.
+So gaps stay in the table and come out of the dropdowns. **This file is the only
+place the withheld set is written down** - the page itself says nothing about it,
+by request, so the table below is what a future editor has to go on.
 
 **Nothing here is a maintained exclusion list.** It is recomputed from the data
-on every render, in `refreshOptions` and `renderWithheld`. Add one citable
-number for a withheld task, benchmark, model or embodiment and it reappears in
-its dropdown by itself, and drops off the withheld line by itself. There is no
-file to edit and nothing to remember to undo.
+on every render, in `refreshOptions`. Add one citable number for a withheld task,
+benchmark, model or embodiment and it reappears in its dropdown by itself. There
+is no file to edit and nothing to remember to undo - only the snapshot below to
+refresh, and it is a snapshot, not a switch.
 
 As of 2026-09-17 the withheld set is:
 
@@ -156,8 +157,7 @@ Separately, two entries in the task taxonomy carry **no record at all**, in
 either view - `mobile` (Mobile manipulation) and `locomotion` (Whole-body
 locomotion). They are not a filtering decision, they are the part of the map
 this ledger has not reached: BEHAVIOR-1K and ManiSkill3 would populate the
-first, HumanoidBench the second. They are named on the same line under the
-filters, as "not started".
+first, HumanoidBench the second.
 
 ### Percentiles
 

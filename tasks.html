@@ -7,7 +7,7 @@
 <title>Ledger - PhAIL</title>
 <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-<link rel="stylesheet" href="style.css?v=8" />
+<link rel="stylesheet" href="style.css?v=9" />
 </head>
 <body data-page="tasks">
 <header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="tasks.html" aria-current="page">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
@@ -15,7 +15,6 @@
 
   <section class="database-intro">
     <h1>The ledger</h1>
-    <p>Every cited evaluation record we hold, keyed on the task a model has to do. Pick a task first; everything below narrows to what actually has entries.</p>
   </section>
 
   <!-- Simulation or real hardware, before anything else. The two are not
@@ -24,7 +23,6 @@
     <button type="button" role="tab" data-track="Sim" aria-selected="true">Simulation</button>
     <button type="button" role="tab" data-track="Real" aria-selected="false">Real hardware</button>
   </div>
-  <p class="track-switch-note" data-track-note></p>
 
   <section class="filter-panel" aria-label="Filter evaluation records">
     <label>Task<select id="task-filter"></select></label>
@@ -41,8 +39,6 @@
     </label>
     <button class="filter-reset" type="button" data-reset-filters>Clear filters</button>
   </section>
-
-  <p class="filter-withheld" data-withheld></p>
 
   <div class="database-summary">
     <strong data-result-count>0 records</strong>
@@ -79,6 +75,6 @@
 <script src="script.js?v=4"></script>
 <script src="charts.js?v=5"></script>
 <script src="tasks-data-new.js?v=6"></script>
-<script src="tasks-app.js?v=12"></script>
+<script src="tasks-app.js?v=13"></script>
 </body>
 </html>
