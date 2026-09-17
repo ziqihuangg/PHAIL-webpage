@@ -314,6 +314,9 @@ function pickChartGroup(visible) {
    --------------------------------------------------------------------------- */
 /* Minimum size for a board to be worth a percentile. Below this, "top of the
    table" is a fact about how few people reported the benchmark. */
+/* Minimum size for a board to be worth a percentile. Below this, "top of the
+   table" is a fact about how few people reported the benchmark rather than about
+   the model, so those boards are named in the caption instead of drawn. */
 const MIN_BOARD = 5;
 
 function percentileRows(modelId) {
@@ -336,44 +339,63 @@ function percentileRows(modelId) {
     pools.set(key, pool);
   });
 
-  const out = [];
+  const ranked = [];
+  const tooSmall = [];
   pools.forEach((pool) => {
-    if (pool.rows.length < MIN_BOARD) return;
-    const ranked = pool.rows.slice().sort((a, b) => b.value - a.value);
-    const index = ranked.findIndex((row) => row.model === modelId);
+    const order = pool.rows.slice().sort((a, b) => b.value - a.value);
+    const index = order.findIndex((row) => row.model === modelId);
     if (index < 0) return;
-    const entry = ranked[index];
-    out.push({
-      label: byId(database.benchmarks, pool.benchmark).name,
-      value: ((ranked.length - 1 - index) / (ranked.length - 1)) * 100,
+    const name = byId(database.benchmarks, pool.benchmark).name;
+    if (order.length < MIN_BOARD) { tooSmall.push({ label: name, total: order.length }); return; }
+    ranked.push({
+      label: name,
+      value: ((order.length - 1 - index) / (order.length - 1)) * 100,
       rank: index + 1,
-      total: ranked.length,
+      total: order.length,
       sources: pool.groups.length,
-      group: entry.group
+      group: order[index].group
     });
   });
-  return out.sort((a, b) => b.value - a.value);
+  ranked.sort((a, b) => b.value - a.value);
+  return { ranked, tooSmall };
 }
 
+/* Always returns true. Once a single model is in view this is THE chart: falling
+   back to absolute values for the models that only appear on one board would
+   mean the same view answered a different question depending on how widely the
+   model happened to be evaluated. */
 function renderModelProfile() {
   const modelId = FILTERS.model.node.value;
-  const rows = percentileRows(modelId);
-  if (rows.length < 2) return false;
-
   const model = byId(database.models, modelId);
+  const { ranked, tooSmall } = percentileRows(modelId);
+
+  const aside = tooSmall.length
+    ? ` Also on ${tooSmall.map((item) => `${item.label} (${item.total} entr${item.total === 1 ? "y" : "ies"})`).join(", ")}, `
+      + `too few entries to rank against - the cited values are in the table below.`
+    : "";
+
   chartTitle.textContent = `${model.name} · where it sits on each board`;
+
+  if (!ranked.length) {
+    chartMount.innerHTML = `<p class="chart-missing">No board in the ${track === "Sim" ? "simulation" : "real-hardware"} view ranks enough entries to place ${model.name}.</p>`;
+    chartCaption.innerHTML = `A single model is always drawn as its position on each board rather than its score, and a position needs a field to hold it - `
+      + `at least ${MIN_BOARD} ranked entries.${aside || " Every record for this model in this view is a documented gap rather than a number."}`;
+    return true;
+  }
+
   chartCaption.innerHTML = `Each bar is one published table, and its length is the share of that table's entries this model beats - `
     + `100% is top of the board, 0% is bottom. <strong>We compute this; no source publishes it.</strong> `
-    + `Success rates are deliberately not drawn side by side here: `
+    + `Success rates are deliberately not drawn here: `
     + `<a href="charts.html#cross-board">the same model reads 97.1% on one board and 0.02% on another</a>, `
-    + `and plotting those as neighbouring bars would claim a comparison that does not exist. The cited values are in the table below, per row.`;
+    + `and a bar length that means one thing per board would claim a comparison that does not exist. The cited values are in the table below, per row.`
+    + aside;
 
   charts.mount(chartMount, (container) => charts.horizontalBars(container, {
     unit: "%",
     max: 100,
     valueWidth: 118,
     axisLabel: "Percentile within that board (computed by us)",
-    rows: rows.map((entry) => ({
+    rows: ranked.map((entry) => ({
       label: entry.label,
       value: entry.value,
       color: charts.colors.derived,
@@ -390,7 +412,8 @@ function renderChart(chosen) {
   charts.resetMounts();
   chartMount.innerHTML = "";
 
-  if (FILTERS.model.node && FILTERS.model.node.value && renderModelProfile()) return;
+  /* One model selected: the percentile view owns the chart, always. */
+  if (FILTERS.model.node && FILTERS.model.node.value) { renderModelProfile(); return; }
 
   if (!chosen) {
     chartTitle.textContent = "Nothing numeric to plot in this view";
