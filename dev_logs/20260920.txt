@@ -1,0 +1,12 @@
+Dev Log - 2026-09-20
+
+TODOs:
+
+1) Add a tab to detail the overall scope
+   Per Physical AI - Existing Benchmarks:
+   https://docs.google.com/spreadsheets/d/1hq5mqhdX22Cw1psrtahUDmRn-Fp7ZZZP2xuK3-QOjzI/edit?gid=0#gid=0
+
+2) Add a tab to host blog posts
+   (i) Introductory post to the PHAIL platform
+   (ii) The overall ranking mechanism, and the missing pieces in current evaluation & models
+   (iii) Our active TODOs
