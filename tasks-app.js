@@ -73,7 +73,6 @@ const chartTitle = document.querySelector("[data-ledger-chart-title]");
 const legendMount = document.querySelector("[data-provenance-legend]");
 const stampMount = document.querySelector("[data-updated-stamp]");
 const trackSwitch = document.querySelector("[data-track-switch]");
-const trackNote = document.querySelector("[data-track-note]");
 
 /* --- track: the view, not a filter ----------------------------------------- */
 let track = "Sim";
@@ -544,15 +543,6 @@ function paintTrack() {
   trackSwitch.querySelectorAll("[data-track]").forEach((button) => {
     button.setAttribute("aria-selected", String(button.dataset.track === track));
   });
-  if (trackNote) {
-    const untracked = records.filter((record) => !hasTrack(record)).length;
-    const shared = untracked
-      ? ` ${untracked} records state no track and stay visible in both views - every one of them is a documented gap rather than a score.`
-      : "";
-    trackNote.textContent = (track === "Sim"
-      ? "Simulated evaluations only. Cheap to run, easy to repeat, and no guarantee that any of it transfers."
-      : "Physical hardware only. Every number below cost somebody a robot, a rig, and a person watching it.") + shared;
-  }
 }
 
 if (trackSwitch) {
