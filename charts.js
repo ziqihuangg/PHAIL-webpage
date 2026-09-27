@@ -156,7 +156,10 @@
 
     const values = rows.map((row) => (typeof row.value === "number" ? row.value : 0));
     const errors = rows.map((row) => row.error || 0);
-    const max = options.max || niceMax(Math.max(...values.map((value, index) => value + errors[index]), 0.0001));
+    /* `range` is an asymmetric whisker [low, high] - the index uses it for the
+       spread under leave-one-board-out, which is rarely centred on the value. */
+    const tops = rows.map((row, index) => (row.range ? Math.max(row.range[1], values[index]) : values[index] + errors[index]));
+    const max = options.max || niceMax(Math.max(...tops, 0.0001));
     const min = options.min !== undefined ? options.min : 0;
     const scale = (value) => top + plotHeight - ((value - min) / (max - min)) * plotHeight;
 
@@ -211,11 +214,18 @@
           fill: color, "fill-opacity": 0.25, stroke: color, "stroke-dasharray": "3 3"
         }));
       } else {
-        svg.appendChild(el("rect", { x: centre - barWidth / 2, y: y, width: barWidth, height: barHeight, fill: color }));
+        svg.appendChild(el("rect", { x: centre - barWidth / 2, y: y, width: barWidth, height: barHeight, fill: color, "fill-opacity": row.faint ? 0.42 : 1 }));
       }
 
       let valueY = y - 7;
-      if (row.error) {
+      if (row.range) {
+        const high = scale(row.range[1]);
+        const low = scale(Math.max(row.range[0], min));
+        svg.appendChild(el("line", { x1: centre, y1: high, x2: centre, y2: low, stroke: INK, "stroke-width": 1 }));
+        svg.appendChild(el("line", { x1: centre - 4, y1: high, x2: centre + 4, y2: high, stroke: INK, "stroke-width": 1 }));
+        svg.appendChild(el("line", { x1: centre - 4, y1: low, x2: centre + 4, y2: low, stroke: INK, "stroke-width": 1 }));
+        valueY = Math.min(high, y) - 7;
+      } else if (row.error) {
         const high = scale(value + row.error);
         const low = scale(Math.max(value - row.error, min));
         svg.appendChild(el("line", { x1: centre, y1: high, x2: centre, y2: low, stroke: INK, "stroke-width": 1 }));
@@ -469,7 +479,7 @@
     const plotHeight = height - top - bottom;
 
     const xMax = options.xMax || niceMax(Math.max(...points.map((p) => p.x)));
-    const xMin = options.xMin || 0;
+    const xMin = options.xMin !== undefined ? options.xMin : 0;
     const yMax = options.yMax || niceMax(Math.max(...points.map((p) => p.y)));
     const yMin = options.yMin || 0;
     const scaleX = (value) => left + ((value - xMin) / (xMax - xMin)) * plotWidth;
@@ -481,11 +491,19 @@
       const y = scaleY(yValue);
       svg.appendChild(el("line", { x1: left, y1: y, x2: left + plotWidth, y2: y, stroke: i === 0 ? LINE : GRID }));
       svg.appendChild(el("text", { x: left - 8, y: y + 4, "text-anchor": "end", class: "chart-tick" }, formatValue(yValue, options.yUnit)));
+      if (options.xTicks) continue;
       const xValue = xMin + ((xMax - xMin) / 4) * i;
       const x = scaleX(xValue);
       svg.appendChild(el("line", { x1: x, y1: top, x2: x, y2: top + plotHeight, stroke: i === 0 ? LINE : GRID }));
       svg.appendChild(el("text", { x: x, y: top + plotHeight + 18, "text-anchor": "middle", class: "chart-tick" }, formatValue(xValue, options.xUnit)));
     }
+    /* Caller-placed x ticks, [value, label] - used for a log axis, where evenly
+       spaced numbers would be meaningless. */
+    (options.xTicks || []).forEach(([xValue, text]) => {
+      const x = scaleX(xValue);
+      svg.appendChild(el("line", { x1: x, y1: top, x2: x, y2: top + plotHeight, stroke: GRID }));
+      svg.appendChild(el("text", { x: x, y: top + plotHeight + 18, "text-anchor": "middle", class: "chart-tick" }, text));
+    });
 
     if (options.diagonal) {
       const limit = Math.min(xMax, yMax);

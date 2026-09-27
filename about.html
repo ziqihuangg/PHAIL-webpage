@@ -2,80 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="About PhAIL Notes, an independent research notebook on physical AI evaluation." />
-  <title>About - PhAIL Notes</title>
-  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
-  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <title>PhAIL</title>
+  <meta http-equiv="refresh" content="0; url=index.html#about" />
+  <link rel="canonical" href="index.html#about" />
 </head>
 <body>
-  <header class="site-header" id="top">
-    <div class="header-row">
-      <a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
-      <nav aria-label="Primary navigation">
-        <a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html" aria-current="page">About</a>
-      </nav>
-    </div>
-    <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
-    <p class="site-wordplay">Pronounced like “fail” - because honest evaluation starts with what breaks.</p>
-    <p class="site-deck">A research notebook, not a company.</p>
-  </header>
-
-  <main class="about-page">
-    <section class="section about-section" aria-labelledby="about-title">
-      <p class="section-kicker">About this project</p>
-      <h1 id="about-title">A small, honest piece of the missing picture.</h1>
-      <div class="prose">
-        <p>This is a research notebook, not a company.</p>
-        <p>Artificial Analysis has spent the last two years building an independent, quantitative answer to “which AI model is actually good?” - for language, image, video, and speech models. Physical AI - models that perceive, predict, or act in the physical world, from tabletop manipulation to full-body humanoid control to autonomous driving - doesn’t have an equivalent yet, and not by accident: you can’t call a robot the way you call an API.</p>
-        <p>This project is an attempt to build a small, honest piece of that missing picture: a map of what’s already being measured, by whom, and how well; a growing, transparently-sourced comparison of the models and benchmarks that matter; and, where something is clearly missing, some proposals of our own.</p>
-        <p>Run out of NTU / MMLab, updated irregularly, always a work in progress. If you think something here is wrong, incomplete, or missing, I’d genuinely like to hear about it.</p>
-      </div>
-    </section>
-
-    <section class="section about-section" aria-labelledby="scope-title">
-      <p class="section-kicker">Scope</p>
-      <h2 id="scope-title">What we mean by physical AI</h2>
-      <div class="prose">
-        <p>“Physical AI” gets used loosely. Before comparing anything, it helps to be explicit about what’s being compared:</p>
-        <ul class="definition-list">
-          <li><strong>Perceives the physical world, acts only in software.</strong> An assistant that sees through a camera but completes tasks via search, email, or app control - Project Astra is the clearest current example.</li>
-          <li><strong>Predicts or simulates the physical world, but doesn’t act.</strong> World models used for planning or generating training data.</li>
-          <li><strong>Directly drives physical actuators.</strong> Robot manipulation, humanoid whole-body control, autonomous driving, and drones.</li>
-        </ul>
-        <p>We mostly focus on the third category, and try to be explicit about which one we mean whenever it matters - mixing them into one ranking is, in our opinion, one of the more common ways this space misleads people.</p>
-      </div>
-    </section>
-
-    <section class="section about-section" aria-labelledby="sources-title">
-      <p class="section-kicker">Sources</p>
-      <h2 id="sources-title">Who produced the number</h2>
-      <div class="prose">
-        <p>Almost every number in physical AI comes with an unstated question attached: did the people who built the model also grade it? On this site that question is answered on every single row, because it changes how much a number is worth. We use four labels:</p>
-        <ul class="definition-list">
-          <li><strong>Benchmark-run.</strong> The benchmark operator ran the evaluation on their own hardware and published the result - RoboChallenge, RoboDojo, RoboTwin, RoboArena. This is the strongest evidence class we have. Where the checkpoint was submitted by an outside team, we say who submitted it, because the operator graded the run but did not build the policy.</li>
-          <li><strong>Self-reported.</strong> The model&#39;s own authors published it, on a harness they controlled and usually in a paper arguing that the model is good. That does not make it wrong - several self-reports here are reproducible from a published checkpoint - but it is a different kind of claim.</li>
-          <li><strong>Third-party.</strong> A group that did not build the model produced or re-tabulated the number, typically as a baseline column in a paper whose point is to beat it. Where we cannot confirm whether the authors re-ran a baseline or quoted its original report, we say so on the row rather than guessing.</li>
-          <li><strong>No citable number.</strong> An evaluation is claimed, expected, or in progress, and we have nothing we can cite. These rows stay visible. A blank is information; deleting it is not.</li>
-        </ul>
-        <p>Model affiliations are read off the paper’s own title block rather than the leaderboard row, because leaderboards usually carry only a name and a citation key. Where a paper lists several institutions we file it under the first, with the full list on the record; where we could not establish an affiliation at all, the row says “affiliation not confirmed” and the chart colours it grey. That grey is a finding, not a placeholder — on some 2026 boards it is a substantial share of the field. Organisation logos are each lab’s own site icon and remain their trademarks; they are here to say who published a number, nothing more.</p>
-        <p>Nothing here is graded by us. We have no robots. What this site does is read published tables, copy them without renormalising, and attach the citation and the protocol to every value - number of tasks, rollouts per task, robot platform, and the date we retrieved it. Where we have computed anything at all, such as an average over per-suite numbers the authors published individually, the row says so.</p>
-      </div>
-    </section>
-
-    <section class="section about-section" aria-labelledby="scoring-title">
-      <p class="section-kicker">Scoring</p>
-      <h2 id="scoring-title">Why there is no composite score yet</h2>
-      <div class="prose">
-        <p>Artificial Analysis can average different models into one Intelligence Index because every model is run on the exact same private test set. Most physical AI models are reported on different task sets, different rollout counts, and by different labs - the numbers are not comparable yet.</p>
-        <p>Rather than force a fake composite score, this site filters by task, embodiment, openness, and source class, and shows each reported number with its citation. A real composite score becomes honest once models are run through a shared harness, such as SIMPLE or XPolicyLab. That’s a later milestone, not a v0 feature.</p>
-        <p>If you want to see what the alternative would produce: OpenVLA-OFT reports a 97.1% average on LIBERO and scores 0.02% in RoboDojo’s simulation track. DM0 sits second on RoboChallenge’s real-robot board and last on RoboDojo’s. Every one of those numbers is cited, and every one is correct. An index that averaged them would describe nothing. The <a href="charts.html#cross-board">cross-board chart</a> plots it.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=4"></script>
+  <p>About now lives on the <a href="index.html#about">Scope tab</a>.</p>
 </body>
 </html>

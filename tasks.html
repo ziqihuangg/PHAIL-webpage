@@ -7,10 +7,10 @@
 <title>Ledger - PhAIL</title>
 <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-<link rel="stylesheet" href="style.css?v=7" />
+<link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body data-page="tasks">
-<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="tasks.html" aria-current="page">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
+<header class="site-header" id="top"><div class="header-row"><a class="site-name" href="index.html">PhAIL</a><nav aria-label="Primary navigation"><a href="index.html">Scope</a><a href="ranking.html">Ranking</a><a href="tasks.html" aria-current="page">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a></nav></div><p class="site-expansion">Physical AI Ledger</p></header>
 <main class="task-database-page">
 
   <section class="database-intro">
@@ -43,7 +43,7 @@
   <div class="database-summary">
     <strong data-result-count>0 records</strong>
     <span data-result-breakdown></span>
-    <span class="database-summary-note">Missing data stays visible as missing. No composite score is implied.</span>
+    <span class="database-summary-note">Missing data stays visible as missing. Values are exactly as published; the cross-board index is on <a href="ranking.html">Ranking</a>.</span>
   </div>
 
   <div class="recommendation" data-recommendation aria-live="polite"></div>
@@ -68,13 +68,18 @@
     </table>
   </div>
 
-  <p class="table-footnote">Rank is within one source table only. A model ranked #1 here and #30 on another board is not a contradiction - the two boards use different tasks, robots, and rollout counts. See <a href="charts.html#cross-board">Charts</a> for what that looks like plotted.</p>
+  <p class="table-footnote">Rank is within one source table only. A model ranked #1 here and #30 on another board is not a contradiction - the two boards use different tasks, robots, and rollout counts. See <a href="charts.html#cross-board">Charts</a> for what that looks like plotted, and <a href="ranking.html">Ranking</a> for how the index combines boards without adding their numbers.</p>
+
+
+  <section data-discussion="ledger"></section>
 
 </main>
 <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-<script src="script.js?v=4"></script>
-<script src="charts.js?v=5"></script>
-<script src="tasks-data-new.js?v=6"></script>
+<script src="script.js?v=5"></script>
+<script src="charts.js?v=6"></script>
+<script src="tasks-data-new.js?v=7"></script>
 <script src="tasks-app.js?v=11"></script>
+  <script src="discussion-data.js?v=1"></script>
+  <script src="discussion.js?v=1"></script>
 </body>
 </html>

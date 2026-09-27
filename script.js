@@ -7,15 +7,18 @@ const siteConfig = {
 
 const path = window.location.pathname.split("/").pop() || "index.html";
 const pageKey = path === "index.html" ? "home" : path.replace(".html", "");
-/* Metrics and Models no longer have tabs of their own: the metrics table now
-   sits under Benchmarks, which is where the question "what does this number
-   mean" actually gets asked, and the model specs are a slice of the ledger. */
+/* Left to right: what physical AI is (Scope, which also carries what used to be
+   About), how models rank across boards, then the evidence behind the ranking.
+   Metrics and Models have no tabs of their own: the metric glossary sits under
+   Benchmarks, and models are compared on Ranking. about.html and metrics.html
+   only redirect now. */
 const pageLinks = [
+  ["Scope", "index.html", "home"],
+  ["Ranking", "ranking.html", "ranking"],
   ["Ledger", "tasks.html", "tasks"],
   ["Charts", "charts.html", "charts"],
   ["GPT-6 Astra", "gpt-6-astra.html", "gpt-6-astra"],
-  ["Benchmarks", "benchmarks.html", "benchmarks"],
-  ["About", "about.html", "about"]
+  ["Benchmarks", "benchmarks.html", "benchmarks"]
 ];
 const header = document.querySelector("header.site-header");
 
@@ -24,8 +27,7 @@ if (header) {
   /* One deck line per page. A lookup rather than a ternary chain, because the
      chain stopped being readable at four pages. */
   const decks = {
-    home: `<p class="site-deck dashboard-deck">We map physical AI tasks, metrics, models, and benchmarks - and record who produced every number.</p><p class="header-link"><a href="tasks.html">Browse the ledger <span aria-hidden="true">-&gt;</span></a> <a href="charts.html">See the charts <span aria-hidden="true">-&gt;</span></a> <a href="about.html">About this project <span aria-hidden="true">-&gt;</span></a></p>`,
-    about: `<p class="site-deck">A research notebook, not a company.</p>`,
+    home: `<p class="site-deck dashboard-deck">What physical AI is, which boards measure it, how models rank across them - and who produced every number.</p>`,
     benchmarks: `<p class="site-deck">What each benchmark measures, and what its metric can and cannot tell you.</p>`
   };
   const pageDescription = decks[pageKey] || "";

@@ -1,11 +1,40 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Models - PhAIL Notes</title><link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
-  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" /><link rel="stylesheet" href="style.css?v=7" /></head>
-<body data-section="models">
-  <header class="site-header page-header" id="top"><div class="header-row"><a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a><nav aria-label="Primary navigation"><a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a></nav></div><p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p></header>
-  <main class="section-page" aria-busy="true"></main>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Model specifications - PhAIL</title>
+  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
+  <link rel="stylesheet" href="style.css?v=8" />
+</head>
+<body>
+  <header class="site-header" id="top"></header>
+  <main class="section-page">
+    <section class="section dashboard-section" id="models" aria-labelledby="models-title">
+      <div class="section-heading"><h1 id="models-title">Model specifications</h1></div>
+      <p class="page-lede">Kept so old links resolve. Models are now compared on <a href="ranking.html">Ranking</a>, and every record behind them is in the <a href="tasks.html">Ledger</a>.</p>
+      <div class="data-table-wrap" tabindex="0" aria-label="Model specifications table">
+        <table class="data-table models-table"><thead><tr><th>Model</th><th>Maker</th><th>Open / Closed</th><th>Embodiment</th><th>Inference requirement</th><th>Control frequency</th><th>Best documented benchmark result</th><th>Reported by</th></tr></thead><tbody>
+          <tr><td>GR00T N1.5 / N1.6 / N1.7</td><td>NVIDIA</td><td>Open weights</td><td>Humanoid manipulation, bimanual</td><td>NVIDIA GPU</td><td>-</td><td>N1.7: 96.99% LIBERO average (our mean of NVIDIA&#39;s four suite counts); 72.5% SimplerEnv Fractal; 70.8% RoboCasa</td><td><span class="source-tag">Self-reported</span><a href="https://github.com/NVIDIA/Isaac-GR00T/blob/main/examples/LIBERO/README.md" target="_blank" rel="noreferrer">Isaac-GR00T repo</a></td></tr>
+          <tr><td>Gemini Robotics 1.5</td><td>Google DeepMind</td><td>Closed (select partners)</td><td>Complex multi-step manipulation</td><td>Partner access</td><td>-</td><td>No public benchmark number for the acting model</td><td><span class="source-tag source-tag--soft">No citable number</span><a href="https://deepmind.google/discover/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" target="_blank" rel="noreferrer">DeepMind blog</a></td></tr>
+          <tr><td>Gemini Robotics-ER 1.5</td><td>Google DeepMind</td><td>Closed (Gemini API)</td><td>Reasoning only, no actuation</td><td>API</td><td>-</td><td>State of the art on 15 embodied-reasoning benchmarks; aggregate published only as a chart</td><td><span class="source-tag">Self-reported</span><a href="https://deepmind.google/discover/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" target="_blank" rel="noreferrer">DeepMind blog</a></td></tr>
+          <tr><td>&pi;0 / &pi;0-FAST / &pi;0.5</td><td>Physical Intelligence</td><td>Open (openpi)</td><td>Single/dual-arm, mobile manipulation</td><td>&gt;8GB VRAM</td><td>-</td><td>&pi;0.5: 96.85% LIBERO average (self-reported); 42.7% success / 61.8 progress on RoboChallenge Table30 (benchmark-run); 12.8% on RoboDojo real</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Benchmark-run</span><a href="tasks.html?model=pi05">4 cited sources</a></td></tr>
+          <tr><td>Helix</td><td>Figure AI</td><td>Closed</td><td>Humanoid upper-body</td><td>Embedded GPU</td><td>200Hz</td><td>None published</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
+          <tr><td>OpenVLA</td><td>Stanford / UC Berkeley / TRI</td><td>Open</td><td>Cross-embodiment manipulation</td><td>RTX 4090, 15GB bf16</td><td>~6 Hz</td><td>76.5% LIBERO average - the same figure appears in the authors&#39; README and as a baseline in the OpenVLA-OFT paper</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Third-party</span><a href="https://github.com/openvla/openvla" target="_blank" rel="noreferrer">OpenVLA README</a></td></tr>
+          <tr><td>OpenVLA-OFT</td><td>Stanford (Kim et al.)</td><td>Open</td><td>Cross-embodiment manipulation</td><td>Consumer GPU</td><td>71-110 Hz action generation</td><td>97.1% LIBERO average (self-reported) and 0.02% on RoboDojo simulation (benchmark-run). Both are cited; they measure different task sets</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Benchmark-run</span><a href="charts.html#cross-board">See the chart</a></td></tr>
+          <tr><td>Octo</td><td>UC Berkeley</td><td>Open</td><td>Tabletop manipulation</td><td>Consumer GPU</td><td>-</td><td>75.1% LIBERO average, reported as a baseline by other groups rather than by the Octo authors</td><td><span class="source-tag">Third-party</span><a href="https://arxiv.org/abs/2502.19645" target="_blank" rel="noreferrer">OpenVLA-OFT paper</a></td></tr>
+          <tr><td>SmolVLA</td><td>Hugging Face / LeRobot</td><td>Open</td><td>Tabletop, accessibility-focused</td><td>Consumer GPU or CPU</td><td>-</td><td>0.45B: 87.3% LIBERO average, 57.3% Meta-World, 78.3% on the authors&#39; own SO-100 suite</td><td><span class="source-tag">Self-reported</span><a href="https://arxiv.org/abs/2506.01844" target="_blank" rel="noreferrer">SmolVLA paper</a></td></tr>
+          <tr><td>AGIBOT BFM &amp; GCFM / GO-1</td><td>AgiBot (Shanghai)</td><td>Open weights (GO-1)</td><td>Commercial/household manipulation</td><td>-</td><td>-</td><td>GO-1: 0.99 score / 0.53% on RoboDojo simulation</td><td><span class="source-tag">Benchmark-run</span><a href="https://arxiv.org/abs/2607.04434" target="_blank" rel="noreferrer">RoboDojo paper</a></td></tr>
+          <tr><td>Psi-0 (&Psi;0)</td><td>USC PSI Lab + NVIDIA + WorldEngine</td><td>Open (GitHub)</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>8 long-horizon tasks x 10 rollouts on its own suite; aggregate not yet extracted</td><td><span class="source-tag source-tag--soft">No citable number</span><a href="https://github.com/physical-superintelligence-lab/Psi0" target="_blank" rel="noreferrer">Psi-0 repo</a></td></tr>
+          <tr><td>Omega-0 (&omega;-0)</td><td>Org TBD</td><td>-</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>None extracted</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
+          <tr><td>NVIDIA Cosmos / GR00T-Dreams</td><td>NVIDIA</td><td>Open weights</td><td>World model / synthetic data generation</td><td>GPU-hours</td><td>-</td><td>World-model boards (WorldArena, PAI-Bench) not yet transcribed</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
+        </tbody></table>
+      </div>
+      <p class="table-footnote">One representative result per model, with the source class attached. Scores from different benchmarks are not comparable - a model can lead one board and trail another without either number being wrong. The full record set, filterable by source class, is in the <a href="tasks.html">Ledger</a>; the same data plotted is on <a href="charts.html">Charts</a>.</p>
+    </section>
+  </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=4"></script><script type="module" src="section-page.js?v=4"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>

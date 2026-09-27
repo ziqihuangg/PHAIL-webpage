@@ -147,7 +147,7 @@ window.astraData = {
     },
     {
       label: "RoboDojo-Sim, 42 tasks", value: 22.48, src: "robodojo",
-      note: "Equal-weight mean of five capability axes, 2,100 trials, 1 seed. Rank 3 of 45 by Score (28.97) on the live board; rank 1 of 43 on the day the report was published."
+      note: "Equal-weight mean of five capability axes, 2,100 trials, 1 seed. Rank 4 of 48 by Score (28.97) on the live board at 2026-09-27; rank 1 of 43 on the day the report was published."
     },
     {
       label: "Robocurve, puzzle into groove", value: 10, src: "robocurve",
@@ -222,18 +222,20 @@ window.astraData = {
 
     /* Ranks are read off the LIVE board, not off the report. They are not the
        same any more: the report went up on 2026-09-16 with Astra at the top of
-       43 entries, and LiberAI landed two policies above it the next morning.
-       Nothing about Astra's run changed - the board it is measured against did. */
+       43 entries, LiberAI landed two policies above it the next morning, and
+       Simate-beta a third on 2026-09-23. Nothing about Astra's run changed - the
+       board it is measured against did. Re-read 2026-09-27, 48 entries.       */
     simBoard: {
       head: ["Rank", "Model", "Team", "Score", "Avg SR"],
       rows: [
-        ["1", "Liber-0 Preview", "LiberAI", "30.74", "25.52%", ""],
-        ["2", "Liber-0 Lite", "LiberAI", "29.24", "24.23%", ""],
-        ["3", "GPT-6-Astra", "OpenAI (L3 harness)", "28.97", "22.48%", "hi"],
-        ["4", "DM0.5", "Dexmal", "24.90", "19.34%", ""],
-        ["5", "GalaxeaVLA (G0.5)", "Galaxea AI", "20.23", "14.88%", ""],
-        ["30", "DeepSeek-Flash", "DeepSeek (L3 harness)", "2.99", "1.92%", "hi"],
-        ["35", "GPT-5.5", "OpenAI (L3 harness)", "1.13", "0.88%", "hi"]
+        ["1", "Simate-beta", "Simate", "33.95", "27.96%", ""],
+        ["2", "Liber-0 Preview", "LiberAI", "30.74", "25.52%", ""],
+        ["3", "Liber-0 Lite", "LiberAI", "29.24", "24.23%", ""],
+        ["4", "GPT-6-Astra", "OpenAI (L3 harness)", "28.97", "22.48%", "hi"],
+        ["5", "DM0.5", "Dexmal", "24.90", "19.34%", ""],
+        ["6", "GalaxeaVLA (G0.5)", "Galaxea AI", "20.23", "14.88%", ""],
+        ["33", "DeepSeek-Flash", "DeepSeek (L3 harness)", "2.99", "1.92%", "hi"],
+        ["38", "GPT-5.5", "OpenAI (L3 harness)", "1.13", "0.88%", "hi"]
       ]
     },
 

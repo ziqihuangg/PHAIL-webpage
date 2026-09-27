@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - Physical AI Ledger : evaluation database
    -----------------------------------------------------------------------------
-   Last updated: 2026-09-17
+   Last updated: 2026-09-27
 
    HOW TO EDIT THIS FILE
    ---------------------
@@ -34,8 +34,8 @@
 
 window.phailDatabase = {
   meta: {
-    updated: "2026-09-17",
-    note: "Numbers are copied from the cited table and not renormalised. Scores from different benchmarks are not comparable and are never averaged together on this site."
+    updated: "2026-09-27",
+    note: "Numbers are copied from the cited table and not renormalised. Scores from different benchmarks are not comparable and are never averaged together on this site; the Ranking index compares models within each board only."
   },
 
   /* --- provenance taxonomy -------------------------------------------------- */
@@ -114,6 +114,8 @@ window.phailDatabase = {
     liberai:       { name: "LiberAI", mark: "LB", color: "#a8471f", site: "" },
     meituan:       { name: "Meituan Robotics", mark: "MT", color: "#b8860b", site: "https://about.meituan.com/" },
     openwam:       { name: "OpenWAM Team", mark: "OW", color: "#4c6b8a", site: "" },
+    simate:        { name: "Simate", mark: "SM", color: "#8e44ad", site: "" },
+    hust:          { name: "Huazhong Univ. of Science and Technology", mark: "HU", color: "#1f5aa6", site: "https://www.hust.edu.cn/" },
     robochallenge: { name: "RoboChallenge", mark: "RC", color: "#46607a", site: "https://robochallenge.ai/", logo: "logos/robochallenge.png" },
     unconfirmed:   { name: "Affiliation not confirmed", mark: "?", color: "#8a949b" },
     reference:     { name: "Reference baseline", mark: "H", color: "#aeb7bd" }
@@ -245,6 +247,9 @@ window.phailDatabase = {
     { id: "liber0_lite", name: "Liber-0 Lite", maker: "LiberAI", org: "liberai", open: "Not reported", embodiment: "Not reported", size: "Not reported" },
     { id: "galaxea_g05", name: "GalaxeaVLA (G0.5)", maker: "Galaxea", org: "galaxea", open: "Open", embodiment: "Bi-arm", size: "Not reported" },
     { id: "xiaomi_r1", name: "Xiaomi-Robotics-1", maker: "Xiaomi", org: "xiaomi", open: "Not reported", embodiment: "Not reported", size: "Not reported" },
+    { id: "simate_beta", name: "Simate-beta", maker: "Simate", org: "simate", open: "Not reported", embodiment: "Not reported", size: "Withheld", note: "From a company founded in mid-2026. Scale and architecture are held back for a future technical report; press coverage of the result calls it self-reported, with no independent re-verification.", cite: "No paper yet. Company described in ByteWoops, 2026-09-24" },
+    { id: "kinrt", name: "KinRT", maker: "Tsinghua SIGS / Pengcheng Lab", org: "tsinghua", open: "Not reported", embodiment: "Not reported", size: "Not reported", cite: "Yang et al., arXiv:2607.26807 - kinematics-supervised expert routing in an MoE-augmented VLA. The board lists the submitter as IIGroup, Yujiu Yang's group at Tsinghua SIGS" },
+    { id: "simplememvla", name: "SimpleMemVLA", maker: "HUST / Tsinghua / ModelBest et al.", org: "hust", open: "Open", embodiment: "Not reported", size: "Qwen3.5-4B backbone + flow-matching action head", cite: "Yin et al., arXiv:2609.05533; code at github.com/OpenBMB/SimpleMemVLA. Filed under HUST, the first institution on the title block" },
     { id: "openwam_alpha", name: "OpenWAM-alpha", maker: "OpenWAM Team", org: "openwam", open: "Not reported", embodiment: "Not reported", size: "Not reported", cite: "No affiliation is stated on the leaderboard and we found none published, so the contributor name stands in for the lab." },
     { id: "meituan_r0", name: "Meituan-Robotics-0", maker: "Meituan Robotics", org: "meituan", open: "Not reported", embodiment: "Not reported", size: "Not reported" },
     { id: "internvla_a15", name: "InternVLA-A1.5", maker: "Shanghai AI Laboratory", org: "shanghai_ai_lab", open: "Open", embodiment: "Bi-arm", size: "Not reported" },
@@ -263,9 +268,11 @@ window.phailDatabase = {
 
     /* ====================== BENCHMARK-RUN: RoboDojo Sim =====================
        Read off the OFFICIAL LIVE BOARD, not the arXiv paper. The board has moved
-       well past the July table: 45 models instead of 30, MolmoAct2 re-scored from
-       1.02 to 8.99 after a full evaluation, and three frontier LLMs added in
-       September. Where the live board and the paper disagree, the board wins.
+       well past the July table: 48 models instead of 30, MolmoAct2 re-scored from
+       1.02 to 8.99 after a full evaluation, three frontier LLMs added in
+       September, and Simate-beta at the top from 2026-09-23. pi-0.5 was quietly
+       re-scored between our two reads (11.41 -> 11.44). Where the live board and
+       the paper disagree, the board wins.
        ---------------------------------------------------------------------- */
     {
       id: "robodojo-sim",
@@ -275,9 +282,9 @@ window.phailDatabase = {
       metric: "Capability score / Success rate",
       provenance: "benchmark",
       reporter: "RoboDojo Team",
-      source: "RoboDojo official leaderboard, RoboDojo-Sim board (45 models, board updated 2026-09-17)",
+      source: "RoboDojo official leaderboard, RoboDojo-Sim board (48 models, board updated 2026-09-23)",
       sourceUrl: "https://robodojo-benchmark.com/leaderboard",
-      retrieved: "2026-09-17",
+      retrieved: "2026-09-27",
       protocol: "42 tasks x 50 episodes x 3 seeds (2,100 episodes per policy); DeepSeek-Flash at 10 episodes per task",
       primary: "score",
       unit: "score",
@@ -286,6 +293,7 @@ window.phailDatabase = {
       dims: ["Generalization", "Precision", "Long-horizon", "Memory", "Open-vocab"],
       note: "Live board, so these values move. `submitter` is the contributor column: roughly half these entries were evaluated by the RoboDojo Team itself, the rest submitted by the model's own team. Open-vocabulary instruction following is where nearly every trained policy is close to zero.",
       rows: [
+        { model: "simate_beta", score: 33.95, success: 27.96, d: [35.09, 34.35, 57.84, 33.33, 9.12], submitter: "Simate", note: "Top of the board from 2026-09-23. Leads on long-horizon (57.84) by twelve points; generalization is the mean of 40.54 on standard and 29.63 on randomised layouts, the smallest standard-to-random drop of any trained policy here." },
         { model: "liber0_preview", score: 30.74, success: 25.52, d: [24.99, 38.28, 45.98, 37.77, 6.68], submitter: "LiberAI" },
         { model: "liber0_lite", score: 29.24, success: 24.23, d: [25.36, 36.6, 45.5, 35.68, 3.06], submitter: "LiberAI" },
         { model: "gpt6_astra", score: 28.97, success: 22.48, d: [33.36, 12.65, 21.45, 43.04, 34.36], submitter: "RoboDojo Team" },
@@ -295,8 +303,10 @@ window.phailDatabase = {
         { model: "openwam_alpha", score: 17.18, success: 11.92, d: [20.71, 18.45, 34.93, 10.41, 1.41], submitter: "OpenWAM Team" },
         { model: "meituan_r0", score: 14.95, success: 9.53, d: [13.75, 16.77, 29.61, 10.06, 4.54], submitter: "Meituan Robotics" },
         { model: "hy_embodied", score: 13.07, success: 8.8, d: [11.78, 13.81, 25.74, 13.37, 0.65], submitter: "Tencent Robotics X" },
+        { model: "kinrt", score: 13.02, success: 8.8, d: [14.02, 15.65, 26.4, 4.82, 4.23], submitter: "IIGroup" },
+        { model: "simplememvla", score: 12.58, success: 9.27, d: [6.36, 7.42, 14.58, 33.71, 0.85], submitter: "SimpleMemVLA Team", note: "A memory model, and it shows: 33.71 on the memory axis is third on the board, while precision is 7.42. Higher success rate than the two entries above it on Score." },
         { model: "spatial_forcing", score: 12.38, success: 8.04, d: [14.12, 17.32, 23.26, 5.43, 1.78], submitter: "OpenHelix Robotics" },
-        { model: "pi05", score: 11.41, success: 6.91, d: [13.38, 12.4, 23.54, 5.78, 1.98], submitter: "RoboDojo Team" },
+        { model: "pi05", score: 11.44, success: 6.93, d: [13.38, 12.4, 23.54, 5.89, 1.98], submitter: "RoboDojo Team", note: "Re-scored on the live board between 2026-09-17 (11.41 / 6.91%) and 2026-09-27; the memory axis moved from 5.78 to 5.89." },
         { model: "internvla_a15", score: 11.15, success: 7.14, d: [10.35, 15.23, 23.8, 4.93, 1.43], submitter: "InternVLA Team" },
         { model: "starvla_pi_v3", score: 10.81, success: 7.51, d: [11.22, 17.77, 18.46, 4.59, 2.03], submitter: "StarVLA Team" },
         { model: "vlact", score: 10.65, success: 7.58, d: [9.54, 20.57, 20.12, 0.66, 2.37], submitter: "StarVLA Team" },
@@ -346,9 +356,9 @@ window.phailDatabase = {
       metric: "Score / Success rate (overall average)",
       provenance: "benchmark",
       reporter: "RoboDojo Team",
-      source: "RoboDojo official leaderboard, RoboDojo-RealWorld board (11 models, board updated 2026-09-17)",
+      source: "RoboDojo official leaderboard, RoboDojo-RealWorld board (11 models, unchanged at the 2026-09-27 read)",
       sourceUrl: "https://robodojo-benchmark.com/leaderboard",
-      retrieved: "2026-09-17",
+      retrieved: "2026-09-27",
       protocol: "18 tasks x 10 trials across ARX X5, Piper, and Piper X (180 trials per policy)",
       primary: "score",
       unit: "score",
@@ -875,7 +885,7 @@ window.phailDatabase = {
       protocol: "Bin-to-bin picking on Franka FR3 + Robotiq 2F-85",
       primary: null,
       unit: "units/hr",
-      note: "The only board we track that reports economic metrics instead of success rate. We have not transcribed its numbers yet. Unrelated to this site despite the shared acronym - see About.",
+      note: "The only board we track that reports economic metrics instead of success rate. We have not transcribed its numbers yet. Unrelated to this site despite the shared acronym.",
       rows: [
         { model: "helix", display: "No published number; Figure reports 200 Hz control but no throughput or MTBF" },
         { model: "agibot", display: "No published number" }

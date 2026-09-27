@@ -212,7 +212,7 @@ function unavailable(target, why) {
   }));
   const sources = groups.map((source) => `<a href="${source.sourceUrl}" target="_blank" rel="noreferrer">${source.reporter}</a>`).join(", ");
   target.caption.innerHTML = `<strong>Bars on this chart are coloured by source class, not by organisation</strong> - it is the one place where who reported the number is the subject. The badge under each column still shows the lab. `
-    + `${groups.length} separate sources, all cited on the <a href="tasks.html?benchmark=libero">Tasks</a> page: ${sources}. `
+    + `${groups.length} separate sources, all cited in the <a href="tasks.html?benchmark=libero">Ledger</a>: ${sources}. `
     + `OpenVLA appears twice at the same 76.5% - once from its own README and once as a baseline in the OpenVLA-OFT paper - which is the rare case where a self-report and a third-party report agree exactly.`;
 })();
 

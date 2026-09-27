@@ -3,128 +3,117 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="A working map of physical AI tasks, benchmarks, models, and evaluation metrics." />
-  <title>PhAIL Notes</title>
+  <meta name="description" content="What counts as physical AI, which benchmarks measure it, and a draft cross-board ranking that records who produced every number." />
+  <title>PhAIL - Physical AI Ledger</title>
   <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <header class="site-header" id="top">
     <div class="header-row">
-      <a class="site-name" href="#top"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
-      <nav aria-label="Primary navigation">
-        <a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
-      </nav>
+      <a class="site-name" href="#top">PhAIL</a>
+      <nav aria-label="Primary navigation"><a href="index.html" aria-current="page">Scope</a><a href="ranking.html">Ranking</a><a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a></nav>
     </div>
-    <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
-    <p class="site-wordplay">Pronounced like “fail” - because honest evaluation starts with what breaks.</p>
-    <p class="site-deck dashboard-deck">We map physical AI tasks, metrics, models, and benchmarks - and record who produced every number.</p>
-    <p class="header-link"><a href="tasks.html">Browse the ledger <span aria-hidden="true">-&gt;</span></a> <a href="charts.html">See the charts <span aria-hidden="true">-&gt;</span></a> <a href="about.html">About this project <span aria-hidden="true">-&gt;</span></a></p>
+    <p class="site-expansion">Physical AI Ledger</p>
   </header>
 
-  <main class="home-page">
-    <section class="section dashboard-section" id="tasks" aria-labelledby="tasks-title">
-      <div class="section-heading"><h1 id="tasks-title">Task categories</h1></div>
-      <div class="task-roadmap">
-        <section class="roadmap-group" aria-labelledby="robotics-title">
-          <div class="roadmap-label"><h2 id="robotics-title">Robotics</h2></div>
-          <div class="roadmap-items">
-            <div class="roadmap-item"><strong>Tabletop / single-arm manipulation</strong><span>Pick-place, insertion, tool use on a fixed base</span><a href="benchmarks.html">LIBERO, RLBench, Meta-World, RoboCasa</a></div>
-            <div class="roadmap-item"><strong>Bimanual manipulation</strong><span>Coordinated two-arm tasks</span><a href="benchmarks.html">RoboTwin / RoboTwin 2.0, Dual-Arm Challenge</a></div>
-            <div class="roadmap-item"><strong>Mobile manipulation</strong><span>Manipulation combined with base movement</span><a href="benchmarks.html">BEHAVIOR-1K, ManiSkill3</a></div>
-            <div class="roadmap-item"><strong>Loco-manipulation</strong><span>Whole-body humanoid control while manipulating</span><a href="benchmarks.html">SIMPLE, Psi-0, Omega-0</a></div>
-            <div class="roadmap-item"><strong>Whole-body locomotion</strong><span>Balance, gait, and disturbance rejection</span><a href="benchmarks.html">HumanoidBench</a></div>
-            <div class="roadmap-item"><strong>Long-horizon household activities</strong><span>Multi-step, chained tasks</span><a href="benchmarks.html">BEHAVIOR-1K, CALVIN</a></div>
-            <div class="roadmap-item"><strong>Industrial / commercial tasks</strong><span>Bin-picking, sorting, assembly</span><a href="benchmarks.html">PhAIL</a></div>
-          </div>
-        </section>
-        <section class="roadmap-group" aria-labelledby="driving-title">
-          <div class="roadmap-label"><h2 id="driving-title">Autonomous driving</h2></div>
-          <div class="roadmap-items"><div class="roadmap-item"><strong>Perception, planning &amp; control</strong><span>Vehicles operating around dynamic agents, road rules, and uncertainty</span><span>No cross-company leaderboard we consider trustworthy yet</span></div></div>
-        </section>
-        <section class="roadmap-group" aria-labelledby="world-models-title">
-          <div class="roadmap-label"><h2 id="world-models-title">World models</h2></div>
-          <div class="roadmap-items"><div class="roadmap-item"><strong>Physical-world prediction</strong><span>Predicting or generating video of what happens next, without directly acting</span><a href="benchmarks.html">PAI-Bench, WorldArena</a></div></div>
-        </section>
-        <section class="roadmap-group" aria-labelledby="agents-title">
-          <div class="roadmap-label"><h2 id="agents-title">Environment-perceiving agents</h2></div>
-          <div class="roadmap-items"><div class="roadmap-item"><strong>Software-only action <em>(boundary case)</em></strong><span>Perceives through camera or mic, then acts through search, apps, or tool calls</span><span>Project Astra; tracked separately from physical actuation</span></div></div>
-        </section>
+  <main class="scope-page">
+    <section class="database-intro">
+      <h1>What counts as physical AI</h1>
+      <p>AI whose output is realised in the physical world, split by what that output is: an <em>action</em> carried out by a robot, a car or a drone (execution layer), or a <em>design</em> that gets manufactured - a part, an assembly, a circuit board (planning layer). Models that only perceive or predict sit on the boundary. Hover a board for what it measures; a dot marks a live leaderboard, <span class="st-chip-ledger st-chip-ledger--inline">L</span> a board whose numbers are in our ledger.</p>
+    </section>
+
+    <div class="scope-stats" data-scope-stats></div>
+    <div class="scope-tree" data-scope-tree aria-label="Taxonomy of physical AI benchmarks"></div>
+
+    <details class="scope-directory">
+      <summary data-scope-directory-summary>All benchmarks, with what each one measures</summary>
+      <div data-scope-directory></div>
+    </details>
+
+    <section class="scope-about" id="about" aria-label="About PhAIL">
+      <article class="scope-article">
+        <h2>Introducing PhAIL</h2>
+        <p>Artificial Analysis answers “which model is actually good?” for language, image, video and speech with one independent, quantitative index. Physical AI has nothing like it, and not by accident: you cannot call a robot the way you call an API, every board runs different tasks on different hardware, and most published numbers are graded by the people who built the model.</p>
+        <p>PhAIL - the Physical AI Ledger, pronounced like “fail”, because honest evaluation starts with what breaks - builds a small, honest piece of that picture in three layers: the <strong>map</strong> above of what is measured and where; a <a href="tasks.html">ledger</a> of published results that records who produced every number; and a <a href="ranking.html">draft cross-board ranking</a> that says how sure it is.</p>
+        <p>It is a research notebook run out of NTU / MMLab, not a company. We have no robots and grade nothing ourselves: we read published tables, copy them without renormalising, and attach the citation and protocol to every value. If something here is wrong or missing, we would like to hear about it.</p>
+      </article>
+
+      <article class="scope-article">
+        <h2>How the ranking works</h2>
+        <ol class="compact-steps">
+          <li><strong>Boards, not papers.</strong> Only tables where the benchmark operator ran every model on one harness feed the default index - six robotics boards today.</li>
+          <li><strong>Compare inside a board only.</strong> A raw 30 on one board and 60 on another are never added. Each board contributes “A beat B”, discounted when the gap is inside the board's own sampling noise.</li>
+          <li><strong>Pool the comparisons.</strong> A Bradley-Terry model, the same maths as Chatbot Arena, turns every pairwise result into one strength per model, even though no two models share the same boards.</li>
+          <li><strong>Weight by difficulty.</strong> A saturated board barely counts; a board where the best model is at 34% counts most. Boards from one operator share a weight.</li>
+          <li><strong>Show the doubt.</strong> Every model carries its board coverage and the range its index moves through when any one board is left out.</li>
+        </ol>
+        <p class="scope-more"><a href="ranking.html">Open the ranking, weights and checks &rarr;</a></p>
+      </article>
+    </section>
+
+    <section class="scope-missing" aria-labelledby="missing-title">
+      <h2 id="missing-title">What is still missing</h2>
+      <div class="scope-missing-grid">
+        <div>
+          <h3>In the evaluations</h3>
+          <ul class="tight-list">
+            <li>No shared harness: every board is its own task set, robot and rollout count, so models are compared on whatever boards they happened to enter.</li>
+            <li>No speed or cost: none of the six benchmark-run boards reports inference latency, control frequency or hardware.</li>
+            <li>One number per board: only RoboDojo scores capabilities (memory, precision, ...) separately.</li>
+            <li>Post-trained, not general: most boards test a policy fine-tuned on that board's own demonstrations; zero-shot transfer is rarely measured.</li>
+            <li>Small real-robot boards: 5 to 16 models each, and they do not always agree with each other.</li>
+            <li>Safety sits outside the ranking: refusal and incident boards (RoboHarm) cover a handful of models.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>In the models <span class="scope-asof">(ledger, 27 Sep 2026)</span></h3>
+          <ul class="tight-list">
+            <li>Open-ended instructions: 43 of 45 trained policies score below 5 on RoboDojo's open-vocabulary axis. GPT-6-Astra, driving the arm through a harness, scores 34.</li>
+            <li>Robustness: on RoboTwin, Fast-WAM goes from 77.8% on clean scenes to 1.9% under randomisation.</li>
+            <li>Embodiment: 10 of 11 policies on RoboDojo Real score lower on Piper X than on Piper; three score zero on at least one arm.</li>
+            <li>Memory: 5 of 45 trained policies clear 30 on RoboDojo's memory axis, 37 stay below 10.</li>
+            <li>Absolute level: the best simulated policy completes 28% of RoboDojo episodes; the best real-robot entry 24%.</li>
+          </ul>
+        </div>
       </div>
     </section>
 
-    <section class="section dashboard-section" id="metrics" aria-labelledby="metrics-title">
-      <div class="section-heading"><h2 id="metrics-title">Evaluation metrics</h2></div>
-      <div class="data-table-wrap" tabindex="0" aria-label="Evaluation metrics table">
-        <table class="data-table metrics-table"><thead><tr><th>Metric</th><th>Used in</th><th>Measures</th><th>Limitation</th></tr></thead><tbody>
-          <tr><td>Binary success rate</td><td>Meta-World, RLBench, LIBERO, RoboTwin, ManiSkill3</td><td>Did the task complete?</td><td>Coarse - hides near-misses, smoothness, safety</td></tr>
-          <tr><td>Chain / sequential success rate</td><td>CALVIN</td><td>Average consecutive subtasks completed (0-5)</td><td>Only for explicitly chained task designs</td></tr>
-          <tr><td>Partial-completion / progress score</td><td>RoboChallenge, BEHAVIOR-1K, RoboDojo</td><td>Credit for partial progress, not just pass/fail</td><td>Scoring rubric differs per benchmark</td></tr>
-          <tr><td>Success-rate drop under perturbation</td><td>The Colosseum</td><td>Robustness across 14 environment-perturbation axes</td><td>Measures robustness, not raw capability</td></tr>
-          <tr><td>Sim-real correlation (Pearson / MMRV)</td><td>SIMPLER</td><td>Whether sim ranking predicts real-robot ranking</td><td>Does not score capability directly</td></tr>
-          <tr><td>Pairwise preference / Elo</td><td>RoboArena</td><td>Head-to-head human preference across policies</td><td>Expensive, hard to scale, no absolute success number</td></tr>
-          <tr><td>Lifelong-learning transfer (FWT / NBT / AUC)</td><td>LIBERO</td><td>Transfer over a task sequence</td><td>Specific to continual-learning setups</td></tr>
-          <tr><td>Integration cost</td><td>XPolicyLab</td><td>Time to plug a new policy into an evaluation harness</td><td>Infrastructure metric, not model quality</td></tr>
-          <tr><td>Throughput (units/hour) + MTBF</td><td>PhAIL</td><td>Industrial productivity and reliability</td><td>Economic metrics remain rare in real-world evaluation</td></tr>
-        </tbody></table>
-      </div>
-      <p class="table-footnote">Not yet standardized: cost per successful rollout, longitudinal reliability drift, contamination auditing, safety incidents, and robustness to ambiguous instructions.</p>
+    <section class="scope-sources" aria-labelledby="sources-title">
+      <h2 id="sources-title">How every number is labelled</h2>
+      <ul class="source-classes">
+        <li><span class="provenance-swatch" style="background:#003b68"></span><div><strong>Benchmark-run.</strong> The operator ran the model on its own harness and published it - RoboChallenge, RoboDojo, RoboTwin, RoboArena. Strongest class; outside submitters are named.</div></li>
+        <li><span class="provenance-swatch" style="background:#a2560a"></span><div><strong>Self-reported.</strong> The model's authors, on a harness they controlled. Not wrong by default - several are reproducible from a released checkpoint - but a different kind of claim.</div></li>
+        <li><span class="provenance-swatch" style="background:#2f6b4f"></span><div><strong>Third-party.</strong> Someone else ran or re-tabulated it, usually as a baseline in a paper whose point is to beat it.</div></li>
+        <li><span class="provenance-swatch" style="background:#8a949b"></span><div><strong>No citable number.</strong> An evaluation is claimed or expected but nothing can be cited. Kept visible: a blank is information.</div></li>
+      </ul>
+      <p class="scope-fine">Anything we compute rather than copy - the index, percentiles, a mean over suites - is drawn in violet and marked as derived. Affiliations come from each paper's title block, first institution first; logos are each lab's own and remain their trademarks. Unrelated to Positronic's PhAIL industrial leaderboard despite the shared name.</p>
     </section>
 
-    <section class="section dashboard-section" id="models" aria-labelledby="models-title">
-      <div class="section-heading"><h2 id="models-title">Model specifications</h2></div>
-      <div class="data-table-wrap" tabindex="0" aria-label="Model specifications table">
-        <table class="data-table models-table"><thead><tr><th>Model</th><th>Maker</th><th>Open / Closed</th><th>Embodiment</th><th>Inference requirement</th><th>Control frequency</th><th>Best documented benchmark result</th><th>Reported by</th></tr></thead><tbody>
-          <tr><td>GR00T N1.5 / N1.6 / N1.7</td><td>NVIDIA</td><td>Open weights</td><td>Humanoid manipulation, bimanual</td><td>NVIDIA GPU</td><td>-</td><td>N1.7: 96.99% LIBERO average (our mean of NVIDIA&#39;s four suite counts); 72.5% SimplerEnv Fractal; 70.8% RoboCasa</td><td><span class="source-tag">Self-reported</span><a href="https://github.com/NVIDIA/Isaac-GR00T/blob/main/examples/LIBERO/README.md" target="_blank" rel="noreferrer">Isaac-GR00T repo</a></td></tr>
-          <tr><td>Gemini Robotics 1.5</td><td>Google DeepMind</td><td>Closed (select partners)</td><td>Complex multi-step manipulation</td><td>Partner access</td><td>-</td><td>No public benchmark number for the acting model</td><td><span class="source-tag source-tag--soft">No citable number</span><a href="https://deepmind.google/discover/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" target="_blank" rel="noreferrer">DeepMind blog</a></td></tr>
-          <tr><td>Gemini Robotics-ER 1.5</td><td>Google DeepMind</td><td>Closed (Gemini API)</td><td>Reasoning only, no actuation</td><td>API</td><td>-</td><td>State of the art on 15 embodied-reasoning benchmarks; aggregate published only as a chart</td><td><span class="source-tag">Self-reported</span><a href="https://deepmind.google/discover/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" target="_blank" rel="noreferrer">DeepMind blog</a></td></tr>
-          <tr><td>&pi;0 / &pi;0-FAST / &pi;0.5</td><td>Physical Intelligence</td><td>Open (openpi)</td><td>Single/dual-arm, mobile manipulation</td><td>&gt;8GB VRAM</td><td>-</td><td>&pi;0.5: 96.85% LIBERO average (self-reported); 42.7% success / 61.8 progress on RoboChallenge Table30 (benchmark-run); 12.8% on RoboDojo real</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Benchmark-run</span><a href="tasks.html?model=pi05">4 cited sources</a></td></tr>
-          <tr><td>Helix</td><td>Figure AI</td><td>Closed</td><td>Humanoid upper-body</td><td>Embedded GPU</td><td>200Hz</td><td>None published</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
-          <tr><td>OpenVLA</td><td>Stanford / UC Berkeley / TRI</td><td>Open</td><td>Cross-embodiment manipulation</td><td>RTX 4090, 15GB bf16</td><td>~6 Hz</td><td>76.5% LIBERO average - the same figure appears in the authors&#39; README and as a baseline in the OpenVLA-OFT paper</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Third-party</span><a href="https://github.com/openvla/openvla" target="_blank" rel="noreferrer">OpenVLA README</a></td></tr>
-          <tr><td>OpenVLA-OFT</td><td>Stanford (Kim et al.)</td><td>Open</td><td>Cross-embodiment manipulation</td><td>Consumer GPU</td><td>71-110 Hz action generation</td><td>97.1% LIBERO average (self-reported) and 0.02% on RoboDojo simulation (benchmark-run). Both are cited; they measure different task sets</td><td><span class="source-tag">Self-reported</span> <span class="source-tag">Benchmark-run</span><a href="charts.html#cross-board">See the chart</a></td></tr>
-          <tr><td>Octo</td><td>UC Berkeley</td><td>Open</td><td>Tabletop manipulation</td><td>Consumer GPU</td><td>-</td><td>75.1% LIBERO average, reported as a baseline by other groups rather than by the Octo authors</td><td><span class="source-tag">Third-party</span><a href="https://arxiv.org/abs/2502.19645" target="_blank" rel="noreferrer">OpenVLA-OFT paper</a></td></tr>
-          <tr><td>SmolVLA</td><td>Hugging Face / LeRobot</td><td>Open</td><td>Tabletop, accessibility-focused</td><td>Consumer GPU or CPU</td><td>-</td><td>0.45B: 87.3% LIBERO average, 57.3% Meta-World, 78.3% on the authors&#39; own SO-100 suite</td><td><span class="source-tag">Self-reported</span><a href="https://arxiv.org/abs/2506.01844" target="_blank" rel="noreferrer">SmolVLA paper</a></td></tr>
-          <tr><td>AGIBOT BFM &amp; GCFM / GO-1</td><td>AgiBot (Shanghai)</td><td>Open weights (GO-1)</td><td>Commercial/household manipulation</td><td>-</td><td>-</td><td>GO-1: 0.99 score / 0.53% on RoboDojo simulation</td><td><span class="source-tag">Benchmark-run</span><a href="https://arxiv.org/abs/2607.04434" target="_blank" rel="noreferrer">RoboDojo paper</a></td></tr>
-          <tr><td>Psi-0 (&Psi;0)</td><td>USC PSI Lab + NVIDIA + WorldEngine</td><td>Open (GitHub)</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>8 long-horizon tasks x 10 rollouts on its own suite; aggregate not yet extracted</td><td><span class="source-tag source-tag--soft">No citable number</span><a href="https://github.com/physical-superintelligence-lab/Psi0" target="_blank" rel="noreferrer">Psi-0 repo</a></td></tr>
-          <tr><td>Omega-0 (&omega;-0)</td><td>Org TBD</td><td>-</td><td>Humanoid loco-manipulation</td><td>-</td><td>-</td><td>None extracted</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
-          <tr><td>NVIDIA Cosmos / GR00T-Dreams</td><td>NVIDIA</td><td>Open weights</td><td>World model / synthetic data generation</td><td>GPU-hours</td><td>-</td><td>World-model boards (WorldArena, PAI-Bench) not yet transcribed</td><td><span class="source-tag source-tag--soft">No citable number</span></td></tr>
-        </tbody></table>
-      </div>
-      <p class="table-footnote">One representative result per model, with the source class attached. Scores from different benchmarks are not comparable - a model can lead one board and trail another without either number being wrong. The full record set, filterable by source class, is on <a href="tasks.html">Tasks</a>; the same data plotted is on <a href="charts.html">Charts</a>.</p>
+    <section class="scope-todo" aria-labelledby="todo-title">
+      <h2 id="todo-title">What we are working on</h2>
+      <ul class="todo-grid">
+        <li><strong>Keeping boards current.</strong> Automatic reads of live leaderboards, with a dated change log.</li>
+        <li><strong>New domains in the ledger.</strong> One board each for driving, drones and CAD design.</li>
+        <li><strong>Validating the index.</strong> Held-out boards, and blinded re-runs of the pairs the boards disagree on.</li>
+        <li><strong>Capability scores across boards.</strong> Tagging tasks on every board with the capabilities they test.</li>
+        <li><strong>Speed and cost.</strong> Asking operators to publish latency and hardware beside success.</li>
+        <li><strong>A design index.</strong> Frontier models on CAD and PCB boards, ranked the same way.</li>
+        <li><strong>A composite suite.</strong> A non-redundant sample of tasks from the open boards.</li>
+        <li><strong>A longer write-up.</strong> What physical AI can and cannot do yet, read off the ledger.</li>
+      </ul>
     </section>
 
-    <section class="section dashboard-section" id="benchmarks" aria-labelledby="benchmarks-title">
-      <div class="section-heading"><h2 id="benchmarks-title">Benchmarks &amp; evaluation systems</h2></div>
-      <div class="data-table-wrap" tabindex="0" aria-label="Benchmarks table">
-        <table class="data-table benchmarks-table"><thead><tr><th>Benchmark</th><th>Year</th><th>Sim / Real</th><th>Scale</th><th>Embodiment</th><th>Scoring</th><th>Link</th></tr></thead><tbody>
-          <tr><td>Meta-World</td><td>2019</td><td>Sim (MuJoCo)</td><td>50 tasks</td><td>Sawyer arm</td><td>Binary success rate</td><td><a href="https://meta-world.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>RLBench</td><td>2019</td><td>Sim (CoppeliaSim)</td><td>100+ tasks</td><td>Franka Panda</td><td>Success rate + few-shot curves</td><td><a href="https://sites.google.com/view/rlbench" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>CALVIN</td><td>2022</td><td>Sim (PyBullet)</td><td>Long-horizon chains, 4 envs</td><td>Franka Panda</td><td>Chain success rate (0-5)</td><td><a href="https://calvin-rl.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>LIBERO</td><td>2023</td><td>Sim (robosuite)</td><td>130 tasks / 4 suites</td><td>Franka Panda</td><td>Success rate + FWT/NBT/AUC</td><td><a href="https://libero-project.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>BEHAVIOR-1K</td><td>2023</td><td>Sim + small real transfer</td><td>1000 activities, 50 scenes</td><td>Mobile bi-arm</td><td>Binary + predicate-level Q-score</td><td><a href="https://behavior.stanford.edu/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>RoboCasa</td><td>2024</td><td>Sim (robosuite/MuJoCo)</td><td>100+ tasks, 150+ categories</td><td>Franka Panda</td><td>Success rate, scaling curves</td><td><a href="https://robocasa.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>The Colosseum</td><td>2024</td><td>Sim + real correlation</td><td>20 tasks, 14 perturbation axes</td><td>RLBench single arm</td><td>Success-rate drop</td><td><a href="https://github.com/robot-colosseum/robot-colosseum" target="_blank" rel="noreferrer">source</a></td></tr>
-          <tr><td>ManiSkill3</td><td>2024</td><td>Sim (SAPIEN, GPU-parallel)</td><td>Dozens of families</td><td>Multi-embodiment</td><td>Success + sim throughput</td><td><a href="https://maniskill.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>SIMPLER</td><td>2024</td><td>Sim-real paired</td><td>Google Robot and WidowX setups</td><td>Google Robot, WidowX</td><td>Sim-real correlation</td><td><a href="https://simpler-env.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>RoboTwin / 2.0</td><td>2024-2025</td><td>Sim + real alignment</td><td>50 dual-arm tasks, 5 platforms</td><td>Aloha, Piper</td><td>Success rate, Easy/Hard</td><td><a href="https://robotwin-benchmark.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>RoboTwin Dual-Arm Challenge</td><td>2025</td><td>Sim + real</td><td>17 dual-arm tasks</td><td>AgileX COBOT-Magic</td><td>Stage success ranking</td><td><a href="https://robotwin-benchmark.github.io/" target="_blank" rel="noreferrer">challenge</a></td></tr>
-          <tr><td>AutoEval</td><td>2025</td><td>Real only, unattended</td><td>Open task set</td><td>WidowX</td><td>Binary success rate</td><td><a href="https://auto-eval.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>RoboArena</td><td>2025</td><td>Real, crowdsourced</td><td>600+ head-to-head matches</td><td>DROID platform</td><td>Pairwise preference to Elo</td><td><a href="https://roboarena.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>RoboChallenge</td><td>2025</td><td>Real only, online</td><td>Table30 (30 tasks)</td><td>UR5, Franka, Aloha, ARX-5</td><td>Success + Progress Score</td><td><a href="https://robochallenge.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>RoboDojo</td><td>2026</td><td>Sim + real unified</td><td>42 sim + 18 real tasks</td><td>ARX X5, Piper</td><td>Success + average score</td><td><a href="https://robodojo.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>XPolicyLab</td><td>2026</td><td>Standardization layer</td><td>42 policies integrated</td><td>Embodiment-agnostic</td><td>Integration cost</td><td><a href="https://xpolicylab.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>SIMPLE</td><td>2026</td><td>Sim</td><td>-</td><td>Humanoid</td><td>Support for π0.5 / GR00T</td><td><a href="https://simple-robot.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>WorldArena / 2.0</td><td>2026</td><td>World-model evaluation</td><td>-</td><td>-</td><td>Perception &amp; functional utility</td><td><a href="https://world-arena.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>HumanoidBench</td><td>2024</td><td>Sim</td><td>Whole-body tasks</td><td>Humanoid</td><td>-</td><td><a href="https://humanoid-bench.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>M3Bench</td><td>2024</td><td>Sim</td><td>3D scene manipulation</td><td>Mobile / whole-body</td><td>-</td><td><a href="https://m3bench.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>PAI-Bench</td><td>2026</td><td>Video-based</td><td>AD, robotics, industrial, egocentric</td><td>-</td><td>Video generation / understanding</td><td><a href="https://pai-bench.github.io/" target="_blank" rel="noreferrer">site</a></td></tr>
-          <tr><td>PhAIL</td><td>2026</td><td>Real only</td><td>1 task, 4 models currently</td><td>Franka FR3 + Robotiq</td><td>Throughput + MTBF</td><td><a href="https://phail.ai/" target="_blank" rel="noreferrer">site</a></td></tr>
-        </tbody></table>
-      </div>
-    </section>
+    <section data-discussion="scope"></section>
   </main>
+
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=5"></script>
+  <script src="icons.js?v=1"></script>
+  <script src="scope-data.js?v=1"></script>
+  <script src="scope-app.js?v=1"></script>
+  <script src="discussion-data.js?v=1"></script>
+  <script src="discussion.js?v=1"></script>
 </body>
 </html>

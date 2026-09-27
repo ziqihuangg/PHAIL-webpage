@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A draft cross-board index for robot manipulation models, built only from within-board comparisons, with its weights, checks and open questions." />
+  <title>Ranking - PhAIL</title>
+  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
+  <link rel="stylesheet" href="style.css?v=8" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="header-row">
+      <a class="site-name" href="index.html">PhAIL</a>
+      <nav aria-label="Primary navigation"><a href="index.html">Scope</a><a href="ranking.html" aria-current="page">Ranking</a><a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a></nav>
+    </div>
+    <p class="site-expansion">Physical AI Ledger</p>
+  </header>
+
+  <main class="ranking-page">
+    <section class="database-intro">
+      <h1>Ranking</h1>
+      <p>A draft overall ranking for the execution layer, robotics only for now. No raw score from one board is ever added to a score from another: each board only says which model beat which, those comparisons are pooled, and every model carries how many boards it rests on and how far it moves when one is taken away. Driving and design boards are not in it yet.</p>
+    </section>
+
+    <div class="rank-controls" data-rank-controls></div>
+    <div class="database-summary" data-rank-summary></div>
+
+    <section class="ledger-chart" aria-label="Index chart">
+      <h2 class="ledger-chart-title" data-rank-chart-title></h2>
+      <div class="chart-surface" data-rank-chart></div>
+      <p class="chart-caption" data-rank-chart-caption></p>
+    </section>
+
+    <div class="data-table-wrap rank-table-wrap" data-rank-table tabindex="0" aria-label="Ranking table"></div>
+    <button type="button" class="filter-reset rank-more" data-rank-table-more hidden></button>
+    <p class="table-footnote">Ranks are over every fitted model, so a filtered view keeps the original numbers. Faded rows sit on one board only. A model's entry on a board is its best one there (specialist over generalist, best DROID variant), until boards publish versioned model ids.</p>
+
+    <section class="chart-block" id="boards">
+      <h2>Boards and weights</h2>
+      <p class="chart-standfirst">Weight = difficulty &times; family share &times; evidence. Difficulty is headroom, 1 &minus; best score / 100: a saturated board barely counts. Boards from one operator measuring one thing split a weight. Each board's weight is spread evenly over each model's opponents, so a 48-model board cannot outvote a 5-model one by size. Held-out accuracy: fit the index without the board, then check how many of the board's clearly-separated pairs it orders correctly (50% is a coin flip).</p>
+      <div class="data-table-wrap" data-rank-boards tabindex="0" aria-label="Boards and weights"></div>
+    </section>
+
+    <section class="chart-block" id="capabilities">
+      <h2>Capabilities, decoupled</h2>
+      <p class="chart-standfirst">The same fit, run once per capability over the sub-scores that measure it. Only RoboDojo scores capabilities separately for every model, so five of the seven columns rest on one board; a dot means the model was never measured on that capability. Read across a row for a profile, down a column for who leads on one skill.</p>
+      <div class="data-table-wrap" data-rank-capabilities tabindex="0" aria-label="Capability profile"></div>
+      <p class="rank-sources" data-rank-capability-sources></p>
+      <button type="button" class="filter-reset rank-more" data-rank-capabilities-more hidden></button>
+    </section>
+
+    <section class="chart-block" id="agreement">
+      <h2>Do the boards agree?</h2>
+      <p class="chart-standfirst">Kendall's &tau; between every two boards over the models they share (quoted from four shared models up). +1 means the two boards order their common models identically, &minus;1 exactly reversed. Where boards disagree, the index is a compromise between them, and the held-out column above says which board the others fail to predict.</p>
+      <div class="data-table-wrap" data-rank-agreement tabindex="0" aria-label="Board agreement"></div>
+    </section>
+
+    <section class="chart-block" id="efficiency">
+      <h2>Index against model size</h2>
+      <p class="chart-standfirst">Artificial Analysis puts speed or price on the x-axis. For robot policies neither is published, so the x-axis here is the stated parameter count.</p>
+      <div class="chart-surface" data-rank-size></div>
+      <p class="chart-caption" data-rank-size-caption></p>
+    </section>
+
+    <section class="chart-block" id="method">
+      <h2>How the index is computed</h2>
+      <ol class="method-steps">
+        <li><b>Boards.</b> One per benchmark-run table in the ledger (RoboDojo Sim and Real, RoboChallenge T30 and T30-v2, RoboTwin 2.0, RoboArena). With “+ paper tables”, self-reported and third-party tables join, pooled per benchmark, at half weight. Each model keeps its best entry per board.</li>
+        <li><b>Outcomes.</b> For every pair on a board, P(A beats B) = &Phi;(&Delta; / &sigma;), where &Delta; is the score gap and &sigma; the binomial standard error of that gap at the board's trial count (RoboArena: its published per-model sd). A gap inside the noise counts as roughly a tie instead of a win.</li>
+        <li><b>Weights.</b> w = difficulty &times; family share &times; evidence, divided by (models on the board &minus; 1) for each pair, so every model receives the board's full weight once, however crowded the board.</li>
+        <li><b>Fit.</b> Bradley-Terry strengths s by minorise-maximise iterations on the weighted, fractional wins, with a weak tie (weight 0.1) against a fixed reference so that a model that lost every comparison still gets a finite strength.</li>
+        <li><b>Index.</b> 100 &times; the mean over all other fitted models of s<sub>A</sub> / (s<sub>A</sub> + s<sub>B</sub>): the share of head-to-heads the model is expected to win against this field. Adding or removing models moves everyone's index; ranks move much less.</li>
+        <li><b>Checks.</b> Refit with each board left out: the spread gives the whisker and the rank range, and the left-out board's own pairs give its held-out accuracy.</li>
+      </ol>
+      <p class="chart-caption">The two alternative methods are there to be compared against, not used. Percentile mean averages each model's within-board percentile, ignoring how strong the field on each board was. Raw mean averages the published numbers themselves, which is the simplest weighted sum and the one the rest of this site argues against.</p>
+    </section>
+
+    <section class="chart-block" id="factors">
+      <h2>Beyond one number: what else a ranking could use</h2>
+      <p class="chart-standfirst">Factors raised in the 19 Sep review and since, and whether today's data can support them.</p>
+      <div class="data-table-wrap" data-rank-factors tabindex="0" aria-label="Ranking factors"></div>
+    </section>
+
+    <section data-discussion="ranking"></section>
+  </main>
+
+  <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
+  <script src="script.js?v=5"></script>
+  <script src="icons.js?v=1"></script>
+  <script src="charts.js?v=6"></script>
+  <script src="tasks-data-new.js?v=7"></script>
+  <script src="ranking-data.js?v=1"></script>
+  <script src="ranking-engine.js?v=1"></script>
+  <script src="ranking-app.js?v=1"></script>
+  <script src="discussion-data.js?v=1"></script>
+  <script src="discussion.js?v=1"></script>
+</body>
+</html>

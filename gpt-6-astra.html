@@ -7,15 +7,13 @@
   <title>GPT-6 Astra - PhAIL Notes</title>
   <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <header class="site-header" id="top">
     <div class="header-row">
       <a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
-      <nav aria-label="Primary navigation">
-        <a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html" aria-current="page">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a><a href="about.html">About</a>
-      </nav>
+      <nav aria-label="Primary navigation"><a href="index.html">Scope</a><a href="ranking.html">Ranking</a><a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html" aria-current="page">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a></nav>
     </div>
     <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
   </header>
@@ -56,7 +54,7 @@
       <p class="chart-caption">Hover any bar for the protocol behind it. The two Robocurve bars are the sharpest case: 95% and 10%, same rig, same session, same model, two tasks that differ only in how much precision the final placement needs.</p>
 
       <div class="stat-strip">
-        <div class="stat"><span class="stat-value">3rd / 45</span><span class="stat-label">RoboDojo-Sim Score. It was 1st of 43 when the report went up; LiberAI put two policies above it the next day</span></div>
+        <div class="stat"><span class="stat-value">4th / 48</span><span class="stat-label">RoboDojo-Sim Score. It was 1st of 43 when the report went up; LiberAI put two policies above it the next day, Simate-beta a third a week later</span></div>
         <div class="stat"><span class="stat-value">16 of 42</span><span class="stat-label">RoboDojo sim tasks where it scores exactly zero &mdash; ten others are above 50%</span></div>
         <div class="stat"><span class="stat-value">stopped</span><span class="stat-label">RoboDojo's real-robot campaign, halted for safety after hardware damage</span></div>
         <div class="stat"><span class="stat-value">6&times;</span><span class="stat-label">fewer output tokens than Fable 5.1 on the same Robocurve task, at 2.4&times; the completion rate</span></div>
@@ -82,7 +80,7 @@
 
       <h3>Sim leaderboard, official protocol</h3>
       <div class="data-table-wrap" data-table="simBoard"></div>
-      <p class="table-footnote">The three L3 rows are the same harness with a different planner. GPT-5.5 lands at rank 35 and DeepSeek-Flash at 30: the result is specific to this model, not to &ldquo;a frontier LLM.&rdquo; Score is mean process reward &times; 100; Average SR is the equal-weight mean of the five axes below, not the micro rate.</p>
+      <p class="table-footnote">The three L3 rows are the same harness with a different planner. GPT-5.5 lands at rank 38 and DeepSeek-Flash at 33: the result is specific to this model, not to &ldquo;a frontier LLM.&rdquo; Score is mean process reward &times; 100; Average SR is the equal-weight mean of the five axes below, not the micro rate.</p>
 
       <h3>Where the lead comes from</h3>
       <div class="chart-surface" data-chart="dimensions"></div>
@@ -202,11 +200,16 @@
       <p class="provenance-stamp" data-retrieved></p>
     </section>
 
+
+    <section data-discussion="astra"></section>
+
   </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=4"></script>
-  <script src="charts.js?v=5"></script>
-  <script src="astra-data.js?v=2"></script>
+  <script src="script.js?v=5"></script>
+  <script src="charts.js?v=6"></script>
+  <script src="astra-data.js?v=3"></script>
   <script src="astra-app.js?v=2"></script>
+  <script src="discussion-data.js?v=1"></script>
+  <script src="discussion.js?v=1"></script>
 </body>
 </html>
