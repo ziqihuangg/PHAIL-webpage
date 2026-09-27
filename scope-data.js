@@ -1,31 +1,37 @@
 /* =============================================================================
    PhAIL - scope of physical AI (data only; scope-app.js draws it)
    -----------------------------------------------------------------------------
-   Last updated: 2026-09-27
+   Last updated: 2026-09-28
 
-   Two layers, split by what the model's output IS once it leaves the model:
-     execution  an action carried out in the physical world (robot, car, drone)
-     planning   a design that gets manufactured (part, assembly, board, chip)
-   plus a boundary branch for capabilities that feed both but produce neither
-   (world models, embodied reasoning). The boundary branch is not ranked.
+   Placement rule - by what the benchmark SCORES:
+     execution  an action carried out in the world (robot, car, drone)
+     design     a design that gets manufactured (part, assembly, board, chip)
+     boundary   a prediction, generated video or answer about the physical
+                world (world models, embodied reasoning). Listed, not ranked.
+   So a driving world model (WorldLens) sits on the boundary even though its
+   domain is driving, and EmbodiedBench sits under Robotics even though it
+   tests general models: its agents act in a simulator.
 
-   Tree: layer > domain > task > benchmarks.
+   Tree: layer > domain > task > benchmarks. Every node has `define`, the
+   plain-language definition shown on hover.
 
    Benchmark fields
      url     the page hosting the live leaderboard where there is one; else the
              project page; arXiv / GitHub only when nothing else exists
-     mode    "Sim" | "Real" | "Sim + real" | "Offline" (no closed loop at all)
-     board   "live" (public leaderboard that takes new entries) | "challenge"
-             (time-boxed competition board) | "paper" (results live in papers)
-     tests   what can be entered: "policy" (a trained controller), "agent" (a
-             general model driving a harness), "both"
+     mode    "Sim" | "Real" | "Sim + real" | "Offline" (no closed loop)
+     board   "live" | "challenge" | "paper"   (scope-app.js explains each)
+     tests   "policy" | "agent" | "both"
+     plain   one plain-English sentence: what the robot / model has to do
+     tasks   size of the task set, as the authors count it
+     models  how many models the board or paper compares, when stated
+     usage   where it shows up, when that is useful to know
      ledger  benchmark id in tasks-data-new.js when we transcribe its numbers
      flag    "saturated" when the best published result is above ~95%
-     added   true when we added it to the team's first list (2026-09-19)
+     added   date we added it beyond the team's first list (2026-09-19)
    ========================================================================== */
 
 window.phailScope = {
-  updated: "2026-09-27",
+  updated: "2026-09-28",
 
   layers: [
     {
@@ -33,91 +39,173 @@ window.phailScope = {
       name: "Execution layer",
       icon: "zap",
       gloss: "Output is an action carried out in the physical world.",
+      define: "The model's output is an action in the world - an arm moving, a car steering, a drone flying. Scored on whether the job got done, and how well.",
       domains: [
         {
           id: "robotics",
           name: "Robotics",
           icon: "bot",
+          define: "Physical AI that moves a robot body - arms, hands, legs or wheels - to change things in the world. Split below by body type first, then by the single capability a board isolates.",
           tasks: [
             {
               id: "tabletop",
               name: "Table-top manipulation",
               icon: "box",
-              gloss: "Fixed-base arms, single or dual. Arm count changes the task list more than the difficulty, so the two sit together.",
+              define: "One or two robot arms fixed at a table: picking, placing, stacking, pouring, inserting. The most measured part of physical AI. Arm count changes the task list more than the difficulty, so single- and dual-arm sit together.",
               benchmarks: [
-                { name: "RoboDojo", url: "https://robodojo-benchmark.com/leaderboard", mode: "Sim + real", board: "live", tests: "both", ledger: "robodojo_sim", note: "42 sim + 18 real bimanual tasks; scores generalization, precision, long-horizon, memory and open-vocabulary separately. 48 sim / 11 real entries." },
-                { name: "RoboChallenge", url: "https://robochallenge.ai/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "robochallenge", note: "Online real-robot board (Dexmal / Hugging Face). Table30: 30 tasks on UR5, Franka, ARX5, ALOHA; Table30-v2 is markedly harder." },
-                { name: "RoboArena", url: "https://robo-arena.github.io/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "roboarena", note: "Double-blind pairwise A/B evaluations on DROID at 8 institutions, pooled into a Bradley-Terry ranking. No success rate by design." },
-                { name: "RoboTwin 2.0", url: "https://robotwin-platform.github.io/leaderboard", mode: "Sim", board: "live", tests: "policy", ledger: "robotwin", added: true, note: "50 dual-arm tasks; clean and domain-randomised scenes reported separately - the gap between them is the finding." },
-                { name: "LIBERO", url: "https://libero-project.github.io/", mode: "Sim", board: "paper", tests: "policy", ledger: "libero", flag: "saturated", note: "130 tasks in 4 suites (Spatial / Object / Goal / Long). Top reports sit above 97%." },
-                { name: "LIBERO-Pro", url: "https://zxy-mllab.github.io/LIBERO-PRO-Webpage/", mode: "Sim", board: "paper", tests: "policy", note: "Perturbs objects, positions, instructions and environments to test whether LIBERO scores survive small changes." },
-                { name: "LIBERO-Plus", url: "https://sylvestf.github.io/LIBERO-plus/", mode: "Sim", board: "paper", tests: "policy", note: "10,030 perturbed LIBERO tasks over 7 dimensions: camera, robot state, language, light, background, noise, layout." },
-                { name: "SimplerEnv", url: "https://simpler-env.github.io/", mode: "Sim", board: "paper", tests: "policy", ledger: "simpler_bridge", added: true, note: "Sim replicas of Google Robot and WidowX setups, built so sim rankings track real ones." },
-                { name: "CALVIN", url: "http://calvin.cs.uni-freiburg.de", mode: "Sim", board: "paper", tests: "policy", note: "34 tasks in 4 environments; scored on chains of 5 language instructions." },
-                { name: "RLBench", url: "https://sites.google.com/view/rlbench", mode: "Sim", board: "paper", tests: "policy", note: "100 hand-designed tasks for a Franka Panda in CoppeliaSim." },
-                { name: "Meta-World", url: "https://meta-world.github.io", mode: "Sim", board: "paper", tests: "policy", ledger: "metaworld", note: "50 tasks for a Sawyer arm in MuJoCo; multi-task and meta-RL." },
-                { name: "The Colosseum", url: "https://robot-colosseum.github.io/", mode: "Sim + real", board: "paper", tests: "policy", added: true, note: "20 RLBench tasks under 14 perturbation axes; reports how far success drops." },
-                { name: "ManiSkill3", url: "https://maniskill.ai/", mode: "Sim", board: "paper", tests: "policy", added: true, note: "GPU-parallel SAPIEN simulation; dozens of task families across many embodiments." },
-                { name: "AutoEval", url: "https://auto-eval.github.io/", mode: "Real", board: "live", tests: "policy", added: true, note: "Unattended real-robot evaluation on WidowX, with automatic resets and success detection." },
-                { name: "StationeryBench", url: "https://github.com/robocurve/stationerybench", mode: "Real", board: "paper", tests: "both", added: true, note: "Five bimanual desk tasks on I2RT YAM arms through Inspect Robots - VLAs and LLM agents on one harness." }
+                { name: "RoboDojo", url: "https://robodojo-benchmark.com/leaderboard", mode: "Sim + real", board: "live", tests: "both", ledger: "robodojo_sim",
+                  plain: "Two-armed robots do everyday table-top jobs, once in simulation and once on real arms, with five skills scored separately: generalization, precision, long-horizon, memory, open instructions.",
+                  tasks: "42 sim + 18 real", models: "48 sim, 11 real (Sep 2026)", usage: "The widest public VLA board in 2026; also ranks frontier LLMs through a harness." },
+                { name: "RoboChallenge", url: "https://robochallenge.ai/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "robochallenge",
+                  plain: "Teams upload a policy; the operator runs it on its own real robots (UR5, Franka, ARX5, ALOHA) and publishes success and progress scores.",
+                  tasks: "30 per table (Table30, Table30-v2)", models: "20 entries on Table30, 51 on Table30-v2 (Sep 2026)", usage: "The main real-robot board where outside teams submit." },
+                { name: "RoboArena", url: "https://robo-arena.github.io/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "roboarena",
+                  plain: "Evaluators at eight universities pick their own task, run two anonymous policies on a DROID robot and say which did better; the votes become a ranking.",
+                  tasks: "Open - evaluators choose", models: "9 policies on the public board", usage: "Crowd-sourced, like Chatbot Arena for robots; no success rate by design." },
+                { name: "RoboTwin 2.0", url: "https://robotwin-platform.github.io/leaderboard", mode: "Sim", board: "live", tests: "policy", ledger: "robotwin", added: "2026-09-27",
+                  plain: "Dual-arm tasks in simulation, tested on clean scenes and again on randomised ones; the drop between the two is the point.",
+                  tasks: "50", models: "20 on the board", usage: "Standard dual-arm board; listing needs public code and weights." },
+                { name: "LIBERO", url: "https://libero-project.github.io/", mode: "Sim", board: "paper", tests: "policy", ledger: "libero", flag: "saturated",
+                  plain: "A single simulated arm follows language instructions in kitchen and table scenes, grouped into four suites (spatial, object, goal, long).",
+                  tasks: "130 (four 10-task suites are standard)", usage: "Reported in almost every VLA paper; top scores now above 97%, so it no longer separates models." },
+                { name: "LIBERO-Pro", url: "https://zxy-mllab.github.io/LIBERO-PRO-Webpage/", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "LIBERO with objects, positions, instructions and scenes changed, to check whether high LIBERO scores survive small changes.",
+                  tasks: "LIBERO tasks with perturbations", usage: "Used to show LIBERO scores are memorised." },
+                { name: "LIBERO-Plus", url: "https://sylvestf.github.io/LIBERO-plus/", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "LIBERO under seven kinds of disturbance - camera angle, robot start pose, wording, lighting, background, sensor noise, layout.",
+                  tasks: "10,030 perturbed tasks", usage: "Robustness check for LIBERO-trained policies." },
+                { name: "SimplerEnv", url: "https://simpler-env.github.io/", mode: "Sim", board: "paper", tests: "policy", ledger: "simpler_bridge", added: "2026-09-27",
+                  plain: "Simulated copies of real Google Robot and WidowX setups, built so a policy's sim score tracks its real-robot score.",
+                  tasks: "~10 across two robots", usage: "Standard for policies trained on Open X-Embodiment data." },
+                { name: "CALVIN", url: "http://calvin.cs.uni-freiburg.de", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A simulated arm at a desk must complete five language instructions in a row; the score is how many it chains before failing.",
+                  tasks: "34 in 4 environments", usage: "Long-standing test for language-conditioned, multi-step policies." },
+                { name: "RLBench", url: "https://sites.google.com/view/rlbench", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A large set of hand-designed tasks for a simulated Franka arm, from opening drawers to stacking blocks.",
+                  tasks: "100", usage: "Common in 3D and keyframe-policy papers." },
+                { name: "Meta-World", url: "https://meta-world.github.io", mode: "Sim", board: "paper", tests: "policy", ledger: "metaworld",
+                  plain: "Simulated single-arm tasks such as pushing, reaching and opening, used to test learning many tasks at once.",
+                  tasks: "50", usage: "Standard in multi-task and meta-RL papers." },
+                { name: "ManiSkill3", url: "https://maniskill.ai/", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-27",
+                  plain: "Fast GPU simulation with many task families across many robot types, used both to train and to test.",
+                  tasks: "Dozens of families", usage: "Common for RL at scale." },
+                { name: "AutoEval", url: "https://auto-eval.github.io/", mode: "Real", board: "live", tests: "policy", added: "2026-09-27",
+                  plain: "Real WidowX robots that reset their own scenes and judge success automatically, so policies can be tested around the clock.",
+                  tasks: "A small set of fixed real tasks", usage: "Unattended real-robot testing." },
+                { name: "StationeryBench", url: "https://github.com/robocurve/stationerybench", mode: "Real", board: "paper", tests: "both", added: "2026-09-27",
+                  plain: "Two real arms handle desk stationery - uncap a marker, open a box, pour paper clips - with VLAs and LLM agents on the same harness.",
+                  tasks: "5", models: "2 (GPT-6-Astra, MolmoAct2)", usage: "Robocurve's head-to-head of an agent against a VLA." },
+                { name: "VLA-Arena", url: "https://vla-arena.github.io", mode: "Sim", board: "live", tests: "policy", added: "2026-09-28",
+                  plain: "Simulated manipulation at three difficulty levels along four axes: safety, distractors, extrapolation and long horizon.",
+                  tasks: "170", usage: "New (PKU, ICML 2026)." }
               ]
             },
             {
               id: "mobile",
               name: "Mobile manipulation",
-              icon: "house",
-              gloss: "A moving base plus arms, mostly in homes; long-horizon by construction.",
+              icon: "mobile-manipulator",
+              define: "A wheeled base with one or two arms that drives around a home and manipulates things on the way - navigation and manipulation in one task.",
               benchmarks: [
-                { name: "BEHAVIOR-1K", url: "https://behavior.stanford.edu/", mode: "Sim", board: "challenge", tests: "policy", note: "1,000 household activities, 50 interactive scenes, 10,000+ objects." },
-                { name: "RoboCasa", url: "https://robocasa.ai/", mode: "Sim", board: "paper", tests: "policy", ledger: "robocasa", added: true, note: "Large-scale kitchen tasks and scenes for a mobile manipulator." },
-                { name: "HomeRobot OVMM", url: "https://arxiv.org/abs/2407.06939", mode: "Sim + real", board: "challenge", tests: "policy", note: "Open-vocabulary pick-and-place across 50 scenes." },
-                { name: "Habitat 2.0 HAB", url: "https://aihabitat.org/docs/habitat2/", mode: "Sim", board: "paper", tests: "policy", note: "Three composite household tasks: Tidy House, Prepare Groceries, Set Table." },
-                { name: "ManiSkill-HAB", url: "https://maniskill.readthedocs.io/en/latest/tasks/external/", mode: "Sim", board: "paper", tests: "policy", note: "GPU-parallel re-implementation of the Habitat Home Assistant Benchmark." }
+                { name: "BEHAVIOR-1K", url: "https://behavior.stanford.edu/", mode: "Sim", board: "challenge", tests: "policy",
+                  plain: "Everyday household activities - cleaning, cooking, tidying - done by a simulated mobile robot in realistic homes.",
+                  tasks: "1,000 activities, 50 scenes", usage: "Stanford's household benchmark; runs a public challenge." },
+                { name: "RoboCasa", url: "https://robocasa.ai/", mode: "Sim", board: "paper", tests: "policy", ledger: "robocasa", added: "2026-09-27",
+                  plain: "A simulated mobile manipulator works in many generated kitchens: opening doors, moving food, using appliances.",
+                  tasks: "100", usage: "GR00T and other foundation policies report on a 24-task subset." },
+                { name: "HomeRobot OVMM", url: "https://arxiv.org/abs/2407.06939", mode: "Sim + real", board: "challenge", tests: "policy",
+                  plain: "Find any named object in an unfamiliar home, pick it up and put it somewhere else.",
+                  tasks: "Open-vocabulary pick-and-place, 50 scenes", usage: "Ran as a NeurIPS challenge." },
+                { name: "Habitat 2.0 HAB", url: "https://aihabitat.org/docs/habitat2/", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A simulated home robot tidies the house, puts away groceries and sets the table.",
+                  tasks: "3 composite tasks" },
+                { name: "ManiSkill-HAB", url: "https://maniskill.readthedocs.io/en/latest/tasks/external/", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "The same three Habitat home tasks re-built on fast GPU simulation.",
+                  tasks: "3 composite tasks" }
               ]
             },
             {
               id: "loco",
               name: "Loco-manipulation (humanoid)",
               icon: "person-standing",
-              gloss: "Whole-body control while manipulating: balance and contact matter as much as the grasp.",
+              define: "Humanoids that walk and use their hands at the same time - balance and contact matter as much as the grasp.",
               benchmarks: [
-                { name: "HumanoidBench", url: "https://humanoid-bench.github.io/", mode: "Sim", board: "paper", tests: "policy", note: "27 tasks: 12 locomotion, 15 whole-body manipulation." },
-                { name: "SIMPLE", url: "https://arxiv.org/abs/2606.08278", mode: "Sim", board: "paper", tests: "policy", note: "60 whole-body humanoid tasks, 50 indoor scenes, 1,000+ object assets." },
-                { name: "GRBench (GRUtopia)", url: "https://arxiv.org/abs/2407.10943", mode: "Sim", board: "paper", tests: "policy", note: "Loco-manipulation track of GRUtopia, alongside object and social loco-navigation." },
-                { name: "HumanoidMimicGen G1", url: "https://arxiv.org/abs/2605.27724", mode: "Sim", board: "paper", tests: "policy", note: "Nine industrial loco-manipulation tasks for the Unitree G1: lifting, pushing, shelving, obstacles." }
+                { name: "HumanoidBench", url: "https://humanoid-bench.github.io/", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A simulated humanoid walks, balances and uses both hands on whole-body tasks.",
+                  tasks: "27 (12 locomotion, 15 manipulation)" },
+                { name: "SIMPLE", url: "https://arxiv.org/abs/2606.08278", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "Whole-body humanoid tasks in indoor scenes, built to train and evaluate humanoid policies in simulation.",
+                  tasks: "60 in 50 scenes" },
+                { name: "GRBench (GRUtopia)", url: "https://arxiv.org/abs/2407.10943", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A humanoid walks to objects in large simulated city-scale scenes and manipulates them.",
+                  tasks: "Loco-manipulation track of three" },
+                { name: "HumanoidMimicGen G1", url: "https://arxiv.org/abs/2605.27724", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A Unitree G1 humanoid does factory-style jobs: lifting, pushing, shelving, walking around obstacles.",
+                  tasks: "9" }
               ]
             },
             {
               id: "dexterous",
               name: "Dexterous manipulation",
               icon: "hand",
-              gloss: "Multi-finger hands and contact-rich skills.",
+              define: "Multi-fingered hands doing fine, contact-rich work: turning objects in the hand, using tools, playing piano.",
               benchmarks: [
-                { name: "Bi-DexHands", url: "https://github.com/PKU-MARL/DexterousHands", mode: "Sim", board: "paper", tests: "policy", note: "20 bimanual task families with two Shadow Hands and 2,000+ objects." },
-                { name: "DexArt", url: "https://www.chenbao.tech/dexart/", mode: "Sim", board: "paper", tests: "policy", note: "Dexterous manipulation of articulated objects: bucket, faucet, laptop, toilet." },
-                { name: "Adroit / D4RL", url: "https://minari.farama.org/datasets/D4RL/index.html", mode: "Sim", board: "paper", tests: "policy", note: "Offline-RL standard with a 24-DoF hand." },
-                { name: "RoboPianist", url: "https://kzakka.com/robopianist/", mode: "Sim", board: "paper", tests: "both", added: true, note: "Two simulated Shadow hands playing piano, scored by note-onset F1. Frontier models now write controllers for it." },
-                { name: "EmbodiedSWE-Bench", url: "https://embodiedswe.github.io/", mode: "Sim", board: "live", tests: "agent", added: true, note: "Coding agents build controllers for 28 long-horizon dexterous tasks (assembly, cutting, knots) across 17 embodiments." }
+                { name: "Bi-DexHands", url: "https://github.com/PKU-MARL/DexterousHands", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "Two simulated Shadow hands cooperate on bimanual jobs like passing, opening and catching.",
+                  tasks: "20 task families" },
+                { name: "DexArt", url: "https://www.chenbao.tech/dexart/", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A dexterous hand operates hinged objects: buckets, faucets, laptops, toilet lids.",
+                  tasks: "4 categories" },
+                { name: "Adroit / D4RL", url: "https://minari.farama.org/datasets/D4RL/index.html", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "A 24-joint simulated hand spins a pen, opens a door, hammers a nail and moves a ball.",
+                  tasks: "4", usage: "Standard in offline-RL papers." },
+                { name: "RoboPianist", url: "https://kzakka.com/robopianist/", mode: "Sim", board: "paper", tests: "both", added: "2026-09-27",
+                  plain: "Two simulated Shadow hands play the piano; scored on hitting the right notes at the right time.",
+                  tasks: "Songs from a 150-piece repertoire", usage: "Frontier models now write controllers for it." },
+                { name: "EmbodiedSWE-Bench", url: "https://embodiedswe.github.io/", mode: "Sim", board: "live", tests: "agent", added: "2026-09-27",
+                  plain: "Coding agents write robot controllers for long, fiddly tasks - assembling furniture, tying knots, cutting - in simulation.",
+                  tasks: "28 across 17 embodiments", models: "6 agent set-ups in the first results" }
               ]
             },
             {
               id: "industrial",
               name: "Industrial pick and place",
               icon: "factory",
-              gloss: "Production-style tasks scored on throughput and reliability, not on a success rate.",
+              define: "Factory-style picking scored on throughput and reliability - units per hour, time between failures - not on a success rate.",
               benchmarks: [
-                { name: "PhAIL (Positronic)", url: "https://phail.ai/", mode: "Real", board: "live", tests: "policy", added: true, note: "Bin-to-bin picking on a Franka FR3; units per hour and mean time between failures. Unrelated to this site despite the name." }
+                { name: "PhAIL (Positronic)", url: "https://phail.ai/", mode: "Real", board: "live", tests: "policy", added: "2026-09-27",
+                  plain: "A real Franka arm moves items from bin to bin for as long as it can; scored like a production line. Unrelated to this site despite the name.",
+                  tasks: "1", models: "4" }
               ]
             },
             {
               id: "navigation",
               name: "Navigation",
               icon: "compass",
-              gloss: "Moving the robot itself to a goal, with little or no manipulation.",
+              define: "Moving the robot itself to a goal or along directions, with little or no manipulation.",
               benchmarks: [
-                { name: "Habitat", url: "https://ai.meta.com/research/publications/habitat-a-platform-for-embodied-ai-research/", mode: "Sim", board: "challenge", tests: "policy", note: "Point-goal and object-goal navigation, instruction following and QA in photorealistic scans." },
-                { name: "VLN-CE (R2R-CE)", url: "https://jacobkrantz.github.io/vlnce/", mode: "Sim", board: "live", tests: "both", added: true, note: "Language-guided navigation in continuous 3D environments." },
-                { name: "Butter-Bench", url: "https://andonlabs.com/evals/butter-bench", mode: "Real", board: "paper", tests: "agent", added: true, note: "LLMs orchestrate a real mobile robot through a delivery errand; checks practical intelligence, not low-level control." }
+                { name: "Habitat", url: "https://ai.meta.com/research/publications/habitat-a-platform-for-embodied-ai-research/", mode: "Sim", board: "challenge", tests: "policy",
+                  plain: "A simulated robot finds a point or a named object in scanned real homes.",
+                  tasks: "Point-goal and object-goal navigation", usage: "Annual Habitat challenge." },
+                { name: "VLN-CE (R2R-CE)", url: "https://jacobkrantz.github.io/vlnce/", mode: "Sim", board: "live", tests: "both", added: "2026-09-27",
+                  plain: "Follow spoken-style route directions (“go past the sofa, turn left…”) through 3D homes, moving freely rather than hopping between fixed points.",
+                  tasks: "Room-to-Room instructions in continuous space" },
+                { name: "Butter-Bench", url: "https://andonlabs.com/evals/butter-bench", mode: "Real", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "An LLM runs a real small robot through an office errand - find the butter, bring it over - testing judgement rather than motor control.",
+                  tasks: "One errand split into sub-tasks" }
+              ]
+            },
+            {
+              id: "agents",
+              name: "Embodied agent suites",
+              icon: "bot",
+              define: "General models (LLMs, VLMs) controlling a simulated robot in homes, from high-level steps down to low-level moves. They act, so they sit here, not with embodied reasoning.",
+              benchmarks: [
+                { name: "EmbodiedBench", url: "https://embodiedbench.github.io/", mode: "Sim", board: "live", tests: "agent", added: "2026-09-27",
+                  plain: "Multimodal LLMs act as the robot's brain in four simulated worlds: household planning, navigation and table-top manipulation.",
+                  tasks: "4 environments, high- and low-level" },
+                { name: "Embodied Agent Interface", url: "https://embodied-agent-interface.github.io/", mode: "Sim", board: "paper", tests: "agent", added: "2026-09-28",
+                  plain: "LLMs plan and execute household activities in BEHAVIOR and VirtualHome, with each step of decision-making scored separately.",
+                  tasks: "Household activities in two simulators" }
               ]
             },
             {
@@ -125,12 +213,86 @@ window.phailScope = {
               name: "Memory",
               icon: "history",
               kind: "capability",
-              gloss: "Capability board: tasks that fail unless the policy remembers earlier steps. Needs closed loop and long horizon.",
+              define: "Capability board: tasks that can only be solved by remembering earlier steps - where something was hidden, what was already done. Needs closed loop and long horizon.",
               benchmarks: [
-                { name: "RoboMME", url: "https://robomme.github.io", mode: "Sim", board: "paper", tests: "policy", note: "Memory benchmark for generalist policies; closed-loop, long-horizon tasks." },
-                { name: "MIKASA-Robo", url: "https://sites.google.com/view/memorybenchrobots/", mode: "Sim", board: "paper", tests: "policy", added: true, note: "90 language-conditioned tabletop tasks covering 10 memory types (ICLR 2026)." },
-                { name: "RoboMemArena", url: "https://github.com/OpenHelix-Team/RoboMemArena", mode: "Sim + real", board: "paper", tests: "policy", added: true, note: "26 tasks averaging 1,000+ steps; 69% of subtasks memory-dependent; paired real-robot evaluation." },
-                { name: "RMBench", url: "https://arxiv.org/abs/2603.01229", mode: "Sim", board: "paper", tests: "policy", added: true, note: "Memory-dependent manipulation tasks with an analysis of which policy designs help." }
+                { name: "RoboMME", url: "https://robomme.github.io", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "Closed-loop manipulation tasks that fail unless the policy remembers what it saw or did earlier.",
+                  tasks: "Memory tasks across several memory types" },
+                { name: "MIKASA-Robo", url: "https://sites.google.com/view/memorybenchrobots/", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-27",
+                  plain: "Table-top tasks built around specific memory types: remember a colour, a position, a count, an order.",
+                  tasks: "90 language-conditioned tasks, 10 memory types", usage: "ICLR 2026." },
+                { name: "RoboMemArena", url: "https://github.com/OpenHelix-Team/RoboMemArena", mode: "Sim + real", board: "paper", tests: "policy", added: "2026-09-27",
+                  plain: "Very long tasks (1,000+ steps) where most sub-tasks depend on memory, with matching real-robot versions.",
+                  tasks: "26" },
+                { name: "RMBench", url: "https://arxiv.org/abs/2603.01229", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-27",
+                  plain: "Memory-dependent manipulation tasks, used to compare which policy designs actually help memory.",
+                  tasks: "Memory-dependent task suite" },
+                { name: "MEMOBench", url: "https://github.com/Collab-Gen/MEMOBench", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Checks not just whether the task succeeded but whether the policy stored, updated and compressed the right memories along the way.",
+                  tasks: "30, with 4,200 checkpoints", usage: "Best VLAs average 31.9%." },
+                { name: "MemoryBench (SAM2Act)", url: "https://sam2act.github.io/", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Small spatial-memory tests: reopen the drawer that was open before, put the block back where it was.",
+                  tasks: "3" }
+              ]
+            },
+            {
+              id: "spatial-exec",
+              name: "Spatial",
+              icon: "axis-3d",
+              kind: "capability",
+              define: "Capability board: the robot must locate things precisely in 3D and act on it - not just answer questions about space (those are under Embodied reasoning).",
+              benchmarks: [
+                { name: "VABench", url: "https://arxiv.org/abs/2609.19554", mode: "Sim", board: "paper", tests: "agent", added: "2026-09-28",
+                  plain: "A model learns a task from a demonstration, moves the camera to find what it cannot see, then sends exact 3D arm commands, all in closed loop on RoboTwin.",
+                  tasks: "14 task families + long-horizon tracks", models: "12 model set-ups; best 53.9%", usage: "New (DUT / NTU, Sep 2026)." }
+              ]
+            },
+            {
+              id: "longhorizon",
+              name: "Long-horizon and reasoning",
+              icon: "route",
+              kind: "capability",
+              define: "Capability board: many chained steps and some reasoning about the plan, where one early mistake ruins the rest.",
+              benchmarks: [
+                { name: "RoboCerebra", url: "https://robocerebra.github.io/", mode: "Sim", board: "paper", tests: "both", added: "2026-09-28",
+                  plain: "Household manipulation tasks about six times longer than usual, testing whether a planner plus a policy can keep the plan on track.",
+                  tasks: "100 task variants, up to 3,000 steps each", usage: "NeurIPS 2025." },
+                { name: "VLABench", url: "https://vlabench.github.io/", mode: "Sim", board: "paper", tests: "both", added: "2026-09-28",
+                  plain: "Language-conditioned manipulation that needs world knowledge, implicit instructions and multi-step reasoning; tests VLAs and VLM workflows.",
+                  tasks: "100 task categories (60 primitive, 40 composite)" }
+              ]
+            },
+            {
+              id: "generalization",
+              name: "Generalization and robustness",
+              icon: "shuffle",
+              kind: "capability",
+              define: "Capability board: the same kinds of task under new object positions, lighting, cameras or objects never seen in training.",
+              benchmarks: [
+                { name: "The Colosseum", url: "https://robot-colosseum.github.io/", mode: "Sim + real", board: "paper", tests: "policy", added: "2026-09-27",
+                  plain: "Takes RLBench tasks and changes one thing at a time - colour, texture, lighting, camera, distractors - to measure how much success drops.",
+                  tasks: "20 tasks x 14 perturbation types" },
+                { name: "GemBench", url: "https://www.di.ens.fr/willow/research/gembench/", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Four levels of harder generalization: new placements, new rigid objects, new articulated objects, then new long tasks.",
+                  tasks: "Built from 7 action primitives" }
+              ]
+            },
+            {
+              id: "deformable",
+              name: "Deformable objects",
+              icon: "waves",
+              kind: "capability",
+              define: "Capability board: cloth, rope and soft objects whose shape changes as they are handled.",
+              benchmarks: [
+                { name: "GarmentLab", url: "https://garmentlab.github.io/", mode: "Sim + real", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Fold, hang, wash and dress with simulated garments, with some real-world checks.",
+                  tasks: "20 in 5 groups, 11 garment types", usage: "NeurIPS 2024." },
+                { name: "SoftGym", url: "https://sites.google.com/view/softgym", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Simulated rope, cloth and liquid tasks: straighten a rope, fold a cloth, pour water.",
+                  tasks: "10 environments", usage: "Classic deformable-object RL benchmark." },
+                { name: "RoboFolDeX", url: "https://arxiv.org/abs/2609.10243", mode: "Real", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Long, real-world tasks with deformable objects such as folding clothes, run on physical robots.",
+                  tasks: "Long-horizon deformable tasks" }
               ]
             },
             {
@@ -138,10 +300,23 @@ window.phailScope = {
               name: "Safety",
               icon: "shield-alert",
               kind: "capability",
-              gloss: "Capability board: does the system refuse, or avoid, harmful actions.",
+              define: "Capability board: does the robot avoid harm - refuse dangerous instructions, avoid collisions, not break or spill things - while still doing the job?",
               benchmarks: [
-                { name: "RoboHarm", url: "https://robocurve.org/roboharm/", mode: "Real", board: "paper", tests: "both", note: "Five harmful instructions on real bimanual arms; counts refusals and completed harms separately." },
-                { name: "ASIMOV", url: "https://asimov-benchmark.github.io", mode: "Offline", board: "paper", tests: "agent", added: true, note: "Semantic-safety datasets for robot foundation models: injury risk, embodiment constraints, video." }
+                { name: "RoboHarm", url: "https://robocurve.org/roboharm/", mode: "Real", board: "paper", tests: "both",
+                  plain: "Real bimanual arms receive five harmful instructions (a knife near a doll, a can near a burner...); counts refusals and completed harms separately.",
+                  tasks: "5 instructions, 20 trials each", models: "3 (GPT-6-Astra, Claude Fable 5.1, MolmoAct2)" },
+                { name: "SafeManip", url: "https://arxiv.org/abs/2605.12386", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Checks each robot rollout against safety rules over time - no collisions, stable grasps, nothing dropped or contaminated - in RoboCasa kitchens.",
+                  tasks: "50", models: "6 VLA policies (pi-0, pi-0.5, GR00T and variants)" },
+                { name: "MANIGUARD", url: "https://arxiv.org/abs/2608.17386", mode: "Sim + real", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Asks whether a VLA succeeded safely by its written specification, in simulation and on a real Franka.",
+                  tasks: "200 base tasks, 1,000 scenarios", usage: "23,000+ rollouts in the first release." },
+                { name: "IS-Bench", url: "https://arxiv.org/abs/2506.16402", mode: "Sim", board: "paper", tests: "agent", added: "2026-09-28",
+                  plain: "VLM-driven household agents must notice risks that appear mid-task and take the right safety step at the right time.",
+                  tasks: "161 scenarios, 388 risks", usage: "AAAI 2026." },
+                { name: "SafeAgentBench", url: "https://github.com/shengyin1224/SafeAgentBench", mode: "Sim", board: "paper", tests: "agent", added: "2026-09-28",
+                  plain: "Embodied LLM agents get household tasks, some of them hazardous, and are scored on refusing or planning safely while executing in simulation.",
+                  tasks: "750 across 10 hazard types", models: "9 agent baselines" }
               ]
             },
             {
@@ -149,9 +324,23 @@ window.phailScope = {
               name: "Visuo-tactile",
               icon: "fingerprint",
               kind: "capability",
-              gloss: "Capability board: contact-rich skills that need touch as well as vision.",
+              define: "Capability board: contact-rich skills that need touch as well as vision - insertion, screwing, gentle grasping.",
               benchmarks: [
-                { name: "ManiSkill-ViTac", url: "https://ai-workshops.github.io/maniskill-vitac-challenge-2025/", mode: "Sim + real", board: "challenge", tests: "policy", added: true, note: "Tactile manipulation, tactile-vision fusion and sensor-design tracks." }
+                { name: "ManiSkill-ViTac", url: "https://ai-workshops.github.io/maniskill-vitac-challenge-2025/", mode: "Sim + real", board: "challenge", tests: "policy",
+                  plain: "A competition on manipulation with touch sensors: tactile-only, touch plus vision, and even designing the sensor.",
+                  tasks: "3 tracks" },
+                { name: "ManiFeel", url: "https://zhengtongxu.github.io/manifeel-website/", mode: "Sim + real", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Compares vision-only and vision-plus-touch policies on exploring, inserting and screwing, then transfers to a real robot.",
+                  tasks: "9 sim + 3 real" },
+                { name: "UniVTAC", url: "https://arxiv.org/abs/2602.10093", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "A simulation platform for three common touch sensors, with a benchmark of contact-heavy manipulation tasks.",
+                  tasks: "8" },
+                { name: "TacO", url: "https://arxiv.org/abs/2605.21976", mode: "Real", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Compares four kinds of touch sensor by how well a real robot policy using each one performs.",
+                  tasks: "3 (unknown-mass pick-and-place, reorientation, plug insertion)" },
+                { name: "SoftVTBench", url: "https://arxiv.org/abs/2608.18701", mode: "Real", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Handle soft objects without squashing them: success only counts if deformation stays within tolerance.",
+                  tasks: "50+ object assets", models: "3 (Diffusion Policy, pi-0.5, Fast-WAM)" }
               ]
             }
           ]
@@ -160,18 +349,29 @@ window.phailScope = {
           id: "driving",
           name: "Autonomous driving",
           icon: "car",
+          define: "Driving a car: perceive the road, plan a path, and control steering and speed around other road users.",
           tasks: [
             {
               id: "e2e",
               name: "End-to-end driving",
               icon: "route",
-              gloss: "Sensors in, trajectory or controls out; scored in closed-loop simulation or on replayed logs.",
+              define: "Camera and sensor input in, trajectory or controls out, scored in closed-loop simulation or on replayed real driving logs.",
               benchmarks: [
-                { name: "CARLA Leaderboard", url: "https://leaderboard.carla.org/leaderboard/", mode: "Sim", board: "live", tests: "policy", note: "Closed-loop CARLA driving; SENSORS and MAP tracks; driving score, route completion, infractions." },
-                { name: "Bench2Drive", url: "https://thinklab-sjtu.github.io/Bench2Drive/", mode: "Sim", board: "paper", tests: "policy", note: "220 routes over 44 interactive scenarios in CARLA." },
-                { name: "NAVSIM", url: "https://huggingface.co/spaces/AGC2025/e2e-driving-navhard", mode: "Sim", board: "live", tests: "policy", added: true, note: "Pseudo-simulation on real driving logs; server-side scoring on an official leaderboard." },
-                { name: "nuPlan", url: "https://www.nuscenes.org/nuplan", mode: "Sim", board: "challenge", tests: "policy", added: true, note: "Planning benchmark on 1,200 hours of real driving logs, open- and closed-loop." },
-                { name: "Waymo Open Dataset challenges", url: "https://waymo.com/open/challenges/", mode: "Offline", board: "challenge", tests: "policy", added: true, note: "Annual challenges including vision-based end-to-end driving on Waymo's logs." }
+                { name: "CARLA Leaderboard", url: "https://leaderboard.carla.org/leaderboard/", mode: "Sim", board: "live", tests: "policy",
+                  plain: "Drive routes in the CARLA simulator with traffic and incidents; scored on route completed minus penalties for infractions.",
+                  tasks: "Routes with scripted scenarios", usage: "The long-running public driving leaderboard." },
+                { name: "Bench2Drive", url: "https://thinklab-sjtu.github.io/Bench2Drive/", mode: "Sim", board: "paper", tests: "policy",
+                  plain: "Short CARLA routes, each built around one tricky situation, so skills can be scored one by one.",
+                  tasks: "220 routes, 44 scenarios" },
+                { name: "NAVSIM", url: "https://huggingface.co/spaces/AGC2025/e2e-driving-navhard", mode: "Sim", board: "live", tests: "policy", added: "2026-09-27",
+                  plain: "Replays real driving logs and scores the planned trajectory with simulation-based metrics, graded on the operator's server.",
+                  tasks: "navtest / navhard splits", usage: "Official leaderboards on Hugging Face." },
+                { name: "nuPlan", url: "https://www.nuscenes.org/nuplan", mode: "Sim", board: "challenge", tests: "policy", added: "2026-09-27",
+                  plain: "A planning benchmark on 1,200 hours of real driving logs, scored open-loop and closed-loop.",
+                  tasks: "Scenario-based planning" },
+                { name: "Waymo Open Dataset challenges", url: "https://waymo.com/open/challenges/", mode: "Offline", board: "challenge", tests: "policy", added: "2026-09-27",
+                  plain: "Yearly challenges on Waymo's logs, including vision-based end-to-end driving.",
+                  tasks: "Several tracks per year" }
               ]
             },
             {
@@ -179,9 +379,11 @@ window.phailScope = {
               name: "OOD generalisation",
               icon: "shuffle",
               kind: "capability",
-              gloss: "Capability board: paired in- and out-of-distribution scenarios.",
+              define: "Capability board: the same driving model on paired familiar and unfamiliar scenarios.",
               benchmarks: [
-                { name: "Fail2Drive", url: "https://simonger.github.io/fail2drive/", mode: "Sim", board: "live", tests: "policy", note: "100 paired ID / OOD scenarios over 17 unseen classes in CARLA." }
+                { name: "Fail2Drive", url: "https://simonger.github.io/fail2drive/", mode: "Sim", board: "live", tests: "policy",
+                  plain: "Pairs each normal CARLA scenario with an unfamiliar twin to see how much driving breaks outside the training distribution.",
+                  tasks: "200 routes, 17 unseen scenario classes" }
               ]
             },
             {
@@ -189,18 +391,22 @@ window.phailScope = {
               name: "Safety-critical driving",
               icon: "shield-alert",
               kind: "capability",
-              gloss: "Capability board: adversarial and near-miss scenarios.",
+              define: "Capability board: adversarial and near-miss traffic scenarios.",
               benchmarks: [
-                { name: "SafeBench", url: "https://safebench.github.io/", mode: "Sim", board: "live", tests: "policy", note: "100 routes over 8 safety-critical scenario templates in CARLA (CMU / UIUC)." }
+                { name: "SafeBench", url: "https://safebench.github.io/", mode: "Sim", board: "live", tests: "policy",
+                  plain: "Throws dangerous situations at the driving model in CARLA - cut-ins, sudden pedestrians - and scores safety and driving together.",
+                  tasks: "100 routes, 8 scenario types" }
               ]
             },
             {
               id: "realcar",
               name: "Real vehicle",
               icon: "car",
-              gloss: "A real car on a closed course.",
+              define: "A real car on a closed course.",
               benchmarks: [
-                { name: "DrivingBench", url: "https://drivingbench.com/", mode: "Real", board: "paper", tests: "agent", added: true, note: "Frontier LLMs steer a real Toyota Corolla through a cone course via openpilot and MCP tools; scored on progress." }
+                { name: "DrivingBench", url: "https://drivingbench.com/", mode: "Real", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Frontier LLMs steer a real Toyota Corolla around a cone course, one command at a time, with a human ready to brake.",
+                  tasks: "1 course", models: "4 (GPT-6-Astra finished; the rest did not)" }
               ]
             }
           ]
@@ -209,14 +415,17 @@ window.phailScope = {
           id: "aerial",
           name: "Aerial",
           icon: "plane",
+          define: "Flying robots, mostly small drones, mapping, navigating and tracking targets.",
           tasks: [
             {
               id: "drones",
               name: "Drones",
               icon: "plane",
-              gloss: "Small drones indoors.",
+              define: "Small indoor drones: build a map, locate themselves, navigate, follow a person.",
               benchmarks: [
-                { name: "Drone-Bench", url: "https://andonlabs.com/evals/drone-bench", mode: "Sim + real", board: "live", tests: "agent", added: true, note: "Models write code that flies a real Tello drone to find and follow a person; scored against a human baseline." }
+                { name: "Drone-Bench", url: "https://andonlabs.com/evals/drone-bench", mode: "Sim + real", board: "live", tests: "agent", added: "2026-09-27",
+                  plain: "Models write the code that flies a real Tello drone to find and follow a person in an office, scored against a human engineer.",
+                  tasks: "5 (reconstruct, localise, navigate, detect, follow)" }
               ]
             }
           ]
@@ -225,39 +434,59 @@ window.phailScope = {
     },
 
     {
-      id: "planning",
-      name: "Planning layer",
+      id: "design",
+      name: "Design layer",
       icon: "pencil-ruler",
       gloss: "Output is a design that gets manufactured.",
+      define: "The model's output is a design that will be manufactured - a CAD part, a circuit board, a chip. Scored on whether the design is valid, editable and meets the spec.",
       domains: [
         {
           id: "mechanical",
           name: "Mechanical design",
           icon: "drafting-compass",
+          define: "Parts and assemblies described in CAD, to be machined, printed or moulded.",
           tasks: [
             {
               id: "cad",
               name: "CAD generation and editing",
               icon: "box",
-              gloss: "Text, drawings or images in; parametric CAD out, checked by executing it.",
+              define: "Text, drawings or images in; a parametric CAD model out, checked by actually building it in a CAD kernel.",
               benchmarks: [
-                { name: "BenchCAD", url: "https://benchcad.com/", mode: "Offline", board: "live", tests: "agent", note: "Programmatic CAD generation, QA and editing: 17,900 CadQuery parts in 106 families; execution-based grading." },
-                { name: "Parametric CAD Bench", url: "https://cadbench.ai/", mode: "Offline", board: "live", tests: "agent", note: "100 held-out FreeCAD part tasks; isolated geometry and spec verification." },
-                { name: "CAD Arena", url: "https://normal.ai/leaderboard/cad-arena", mode: "Offline", board: "live", tests: "agent", note: "Native CAD agents across 5 CAD platforms on 18 real engineering drawings; geometry and editability." },
-                { name: "neuralCAD-Edit", url: "https://autodeskailab.github.io/neuralCAD-Edit/", mode: "Offline", board: "live", tests: "agent", note: "192 multimodal CAD editing requests with 384 expert edits (Autodesk Research)." },
-                { name: "CADBench", url: "https://anniedoris.github.io/CADBench/", mode: "Offline", board: "live", tests: "agent", note: "18,000 CAD reconstruction samples over 6 families and 5 input modalities (MIT)." },
-                { name: "CadQueryEval", url: "https://github.com/danwahl/cadqueryeval", mode: "Offline", board: "live", tests: "agent", added: true, note: "25 natural-language CAD tasks; generated CadQuery is run and checked against reference STLs." },
-                { name: "Text2CAD", url: "https://sadilkhan.github.io/text2cad-project/", mode: "Offline", board: "paper", tests: "policy", added: true, note: "Parametric CAD sequences from beginner- to expert-level text prompts." }
+                { name: "BenchCAD", url: "https://benchcad.com/", mode: "Offline", board: "live", tests: "agent",
+                  plain: "Models write CAD code for industrial parts, answer questions about them and edit them; the generated part is built and compared to the reference.",
+                  tasks: "17,900 parts in 106 families; 4 leaderboard tasks", usage: "OpenAI and Anthropic quote it in model launches." },
+                { name: "Parametric CAD Bench", url: "https://cadbench.ai/", mode: "Offline", board: "live", tests: "agent",
+                  plain: "Build a specified part in FreeCAD; geometry and every stated dimension are checked separately.",
+                  tasks: "100 held-out tasks (v2)" },
+                { name: "CAD Arena", url: "https://normal.ai/leaderboard/cad-arena", mode: "Offline", board: "live", tests: "agent",
+                  plain: "Agents rebuild real engineering drawings natively in five commercial CAD tools; scored on geometry and on whether the model stays editable.",
+                  tasks: "18 drawings x 5 CAD platforms", models: "12 (Sep 2026)" },
+                { name: "neuralCAD-Edit", url: "https://autodeskailab.github.io/neuralCAD-Edit/", mode: "Offline", board: "live", tests: "agent",
+                  plain: "Carry out designers' edit requests on existing CAD models, judged against edits made by experts (Autodesk Research).",
+                  tasks: "192 requests, 384 expert edits" },
+                { name: "CADBench", url: "https://anniedoris.github.io/CADBench/", mode: "Offline", board: "live", tests: "agent",
+                  plain: "Rebuild CAD models from different kinds of input - images, point clouds, text - at large scale (MIT).",
+                  tasks: "18,000 samples, 6 families, 5 input types" },
+                { name: "CadQueryEval", url: "https://github.com/danwahl/cadqueryeval", mode: "Offline", board: "live", tests: "agent", added: "2026-09-27",
+                  plain: "Turn a plain-language description into CadQuery code; the part is built and checked against a reference mesh.",
+                  tasks: "25", models: "90" },
+                { name: "Text2CAD", url: "https://sadilkhan.github.io/text2cad-project/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-27",
+                  plain: "Generate a CAD construction sequence from text written at four levels, from beginner to expert.",
+                  tasks: "Large text-to-CAD dataset", usage: "NeurIPS 2024." }
               ]
             },
             {
               id: "engineering",
               name: "Constrained engineering design",
               icon: "cog",
-              gloss: "The design has to work, not just look right: constraints, assemblies, physics.",
+              define: "The design has to work, not just look right: constraints, assemblies and physics.",
               benchmarks: [
-                { name: "Bike-Bench", url: "https://decode.mit.edu/projects/bikebench/", mode: "Offline", board: "paper", tests: "both", note: "Parametric bicycle design scored on validity, engineering objectives and constraint satisfaction (MIT)." },
-                { name: "CADEngBench", url: "https://arxiv.org/abs/2608.09296", mode: "Offline", board: "paper", tests: "agent", added: true, note: "Checks whether generated CAD works: parametric design, assembly reasoning and physics simulation." }
+                { name: "Bike-Bench", url: "https://decode.mit.edu/projects/bikebench/", mode: "Offline", board: "paper", tests: "both",
+                  plain: "Design a bicycle frame that is valid, meets engineering targets and satisfies the constraints (MIT).",
+                  tasks: "Parametric bike design" },
+                { name: "CADEngBench", url: "https://arxiv.org/abs/2608.09296", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Asks whether generated CAD actually works: parametric design, assembly reasoning and a physics simulation of the result.",
+                  tasks: "Design, assembly and simulation tasks" }
               ]
             }
           ]
@@ -266,25 +495,34 @@ window.phailScope = {
           id: "electronics",
           name: "Electronics design",
           icon: "circuit-board",
+          define: "Circuit boards and chips: placing components, routing wires, writing hardware description code.",
           tasks: [
             {
               id: "pcb",
               name: "Printed circuit boards",
               icon: "circuit-board",
-              gloss: "Placement and routing that pass design-rule checks.",
+              define: "Placing components and routing traces so the board passes design-rule checks.",
               benchmarks: [
-                { name: "OmniLayout", url: "https://www.omnieda.com/", mode: "Offline", board: "live", tests: "both", note: "PCB component placement: 1,681 layouts, 77K placement instances; geometry, routability, connectivity." },
-                { name: "OmniRouting", url: "https://www.omnieda.com/routing/", mode: "Offline", board: "live", tests: "both", note: "Trace and via routing on 1,681 designs; DRC-clean connectivity, wirelength, runtime; one-shot and agentic." }
+                { name: "OmniLayout", url: "https://www.omnieda.com/", mode: "Offline", board: "live", tests: "both",
+                  plain: "Place the components on a circuit board so it can be wired well; scored on geometry, routability and connections.",
+                  tasks: "1,681 layouts, 77K placements" },
+                { name: "OmniRouting", url: "https://www.omnieda.com/routing/", mode: "Offline", board: "live", tests: "both",
+                  plain: "Draw the wires and vias between components so the board passes design-rule checks, in one shot or step by step.",
+                  tasks: "1,681 designs" }
               ]
             },
             {
               id: "rtl",
               name: "Chip design (RTL)",
               icon: "cpu",
-              gloss: "Hardware description code that simulates, synthesises and meets spec.",
+              define: "Writing hardware description code (Verilog) that simulates correctly and meets the spec.",
               benchmarks: [
-                { name: "VerilogEval", url: "https://github.com/NVlabs/verilog-eval", mode: "Offline", board: "paper", tests: "agent", added: true, note: "Natural-language spec to Verilog, checked by simulation (NVIDIA)." },
-                { name: "RTLLM", url: "https://github.com/hkust-zhiyao/RTLLM", mode: "Offline", board: "paper", tests: "agent", added: true, note: "RTL generation from design descriptions; syntax, function and PPA (HKUST)." }
+                { name: "VerilogEval", url: "https://github.com/NVlabs/verilog-eval", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Write Verilog from a plain-language description; checked by simulation (NVIDIA).",
+                  tasks: "Spec-to-RTL problems" },
+                { name: "RTLLM", url: "https://github.com/hkust-zhiyao/RTLLM", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Generate RTL for complete designs; checked for syntax, function and power-performance-area (HKUST).",
+                  tasks: "Design-level RTL tasks" }
               ]
             }
           ]
@@ -298,22 +536,41 @@ window.phailScope = {
       icon: "eye",
       boundary: true,
       gloss: "Perceive, reason about or predict the physical world, without acting or producing. Not ranked.",
+      define: "Models that see, reason about or predict the physical world but neither act nor produce anything. Useful diagnostics for the two layers above; not ranked.",
       domains: [
         {
           id: "reasoning",
           name: "Embodied reasoning",
           icon: "brain",
+          define: "Answering questions about 3D scenes, physics and safety from images or video. No action is taken - which is exactly why these boards sit here and not under Robotics.",
           tasks: [
             {
               id: "spatial",
-              name: "Spatial and physical reasoning",
+              name: "Spatial, physical and safety QA",
               icon: "axis-3d",
-              gloss: "Question answering, pointing and planning about 3D scenes; no actuation.",
+              define: "Question answering and pointing about space, physics and risk. The model answers; nothing moves.",
               benchmarks: [
-                { name: "ERQA", url: "https://github.com/embodiedreasoning/ERQA", mode: "Offline", board: "paper", tests: "agent", added: true, note: "Embodied-reasoning QA released with Gemini Robotics." },
-                { name: "RoboSpatial", url: "https://chanh.ee/RoboSpatial/", mode: "Offline", board: "paper", tests: "agent", added: true, note: "Spatial relations from a robot's viewpoint: configuration, context, compatibility." },
-                { name: "VSI-Bench", url: "https://vision-x-nyu.github.io/thinking-in-space.github.io/", mode: "Offline", board: "paper", tests: "agent", added: true, note: "Visual-spatial intelligence from egocentric video." },
-                { name: "EmbodiedBench", url: "https://embodiedbench.github.io/", mode: "Sim", board: "live", tests: "agent", added: true, note: "MLLMs as embodied agents, from high-level planning down to low-level manipulation." }
+                { name: "ERQA", url: "https://github.com/embodiedreasoning/ERQA", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Multiple-choice questions about robot scenes - where things are, what will happen, what to grasp - released with Gemini Robotics.",
+                  tasks: "Embodied-reasoning question set" },
+                { name: "RoboSpatial", url: "https://chanh.ee/RoboSpatial/", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Questions about spatial relations from a robot's viewpoint: left of, in front of, fits in, can be placed on.",
+                  tasks: "Large-scale spatial QA from images and 3D scans" },
+                { name: "VSI-Bench", url: "https://vision-x-nyu.github.io/thinking-in-space.github.io/", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Watch a video walk-through of a room, then answer questions about distances, sizes and layout.",
+                  tasks: "Video-based spatial QA" },
+                { name: "MV-RoboBench", url: "https://arxiv.org/abs/2510.19400", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-28",
+                  plain: "Combine several camera views of a robot scene to answer spatial questions.",
+                  tasks: "1.7K questions, 8 sub-tasks" },
+                { name: "Embodied3DBench", url: "https://arxiv.org/abs/2605.29074", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-28",
+                  plain: "Questions about 3D structure and where to interact - grasp points, motion paths - answered in text.",
+                  tasks: "21K QA pairs, 12 sub-categories" },
+                { name: "PhysBench", url: "https://physbench.github.io/", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-28",
+                  plain: "Questions on physical properties, relations and dynamics from images and video.",
+                  tasks: "10,002 entries" },
+                { name: "ASIMOV", url: "https://asimov-benchmark.github.io", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                  plain: "Would this action hurt someone? Safety questions for robot foundation models from images, text and video (Google DeepMind). The model answers; it does not act.",
+                  tasks: "Injury, constraint and video subsets" }
               ]
             }
           ]
@@ -322,16 +579,72 @@ window.phailScope = {
           id: "world",
           name: "World models",
           icon: "globe",
+          define: "Models that generate or predict how the world will look next - video, 3D scenes, driving scenes - judged on realism, physics, or usefulness to a robot.",
           tasks: [
             {
-              id: "prediction",
-              name: "Physical-world prediction",
+              id: "videophysics",
+              name: "Video generation and physics",
               icon: "activity",
-              gloss: "Generate or predict what happens next, judged on physics and usefulness downstream.",
+              define: "Generated video judged for quality and for obeying physics.",
               benchmarks: [
-                { name: "WorldArena", url: "https://github.com/tsinghua-fib-lab/WorldArena", mode: "Offline", board: "live", tests: "policy", note: "Perception quality and functional utility of embodied world models." },
-                { name: "PAI-Bench", url: "https://huggingface.co/spaces/shi-labs/physical-ai-bench-leaderboard", mode: "Offline", board: "live", tests: "policy", note: "Video generation and understanding across driving, robotics, industrial and egocentric domains." },
-                { name: "WorldScore", url: "https://haoyi-duan.github.io/WorldScore/", mode: "Offline", board: "live", tests: "policy", added: true, note: "Unified evaluation of world generation: controllability, quality, dynamics." }
+                { name: "VBench / VBench-2.0", url: "https://huggingface.co/spaces/Vchitect/VBench_Leaderboard", mode: "Offline", board: "live", tests: "policy", added: "2026-09-28",
+                  plain: "Breaks video-generation quality into separate dimensions; VBench-2.0 adds intrinsic faithfulness such as physics, commonsense and controllability.",
+                  tasks: "16 dimensions (VBench), 18 (VBench-2.0)", usage: "The standard evaluation suite for video generation models." },
+                { name: "Physics-IQ", url: "https://physics-iq.github.io/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Given the start of a real physics video, does the model predict what really happens next - in mechanics, fluids, optics, heat and magnetism?",
+                  tasks: "5 physics domains", usage: "Google DeepMind and INSAIT." },
+                { name: "VideoPhy-2", url: "https://videophy2.github.io/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Generated videos of everyday actions, judged on whether they follow physical commonsense.",
+                  tasks: "Action-centric prompts" },
+                { name: "PhyGenBench", url: "https://phygenbench123.github.io/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Text prompts that each test one physical law, to see whether text-to-video models get the physics right.",
+                  tasks: "Prompts over 27 physical laws, 4 domains" },
+                { name: "WorldModelBench", url: "https://worldmodelbench.github.io/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Judges video models as world models across application domains, checking instruction following and five physical laws.",
+                  tasks: "7 domains" },
+                { name: "WM-ABench", url: "https://wm-abench.maitrix.org/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Atomic tests of world-model abilities using controlled counterfactual simulations.",
+                  tasks: "Atomic perception and prediction tests" },
+                { name: "WorldScore", url: "https://haoyi-duan.github.io/WorldScore/", mode: "Offline", board: "live", tests: "policy", added: "2026-09-27",
+                  plain: "Scores 3D, 4D and video world generation on the same next-scene tasks: controllability, quality, dynamics (Stanford).",
+                  tasks: "Next-scene generation sequences" },
+                { name: "PAI-Bench", url: "https://huggingface.co/spaces/shi-labs/physical-ai-bench-leaderboard", mode: "Offline", board: "live", tests: "policy",
+                  plain: "Video generation and understanding for physical-AI domains: driving, robotics, industrial and egocentric scenes.",
+                  tasks: "4 domains" }
+              ]
+            },
+            {
+              id: "interactive",
+              name: "Interactive and embodied world models",
+              icon: "bot",
+              define: "Predicting what a camera or robot will see next as actions come in - judged on realism, controllability, or on whether a robot can plan with it.",
+              benchmarks: [
+                { name: "WorldArena", url: "https://github.com/tsinghua-fib-lab/WorldArena", mode: "Offline", board: "live", tests: "policy",
+                  plain: "Embodied world models judged both on how real their predictions look and on how useful they are for downstream robot tasks.",
+                  tasks: "Perception and functional-utility tests" },
+                { name: "World-in-World", url: "https://world-in-world.github.io/", mode: "Sim", board: "live", tests: "policy", added: "2026-09-28",
+                  plain: "Plugs a world model into an agent's planning loop and scores it by whether the agent completes the task - not by how nice the video looks.",
+                  tasks: "4 closed-loop tasks" },
+                { name: "EWMBench", url: "https://github.com/AgibotTech/EWMBench", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Robot-manipulation videos generated from language, scored on scene consistency, motion correctness and matching the instruction (AgiBot).",
+                  tasks: "Robot manipulation video prompts" },
+                { name: "1X World Model Challenge", url: "https://github.com/1x-technologies/1xgpt", mode: "Offline", board: "challenge", tests: "policy", added: "2026-09-28",
+                  plain: "Predict what 1X's EVE humanoid will see next from its own logged data.",
+                  tasks: "Future-frame prediction" },
+                { name: "WBench", url: "https://github.com/meituan-longcat/WBench", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-28",
+                  plain: "Multi-turn interaction with a video world model - move, act, edit events, switch view - scored on quality, following the input, consistency and physics.",
+                  tasks: "289 cases, 1,058 turns", models: "20" }
+              ]
+            },
+            {
+              id: "drivingworld",
+              name: "Driving world models",
+              icon: "car",
+              define: "Generated driving scenes, scored for realism, geometry, physics and usefulness downstream - not for driving. What is scored is video, so it sits here, not under Autonomous driving.",
+              benchmarks: [
+                { name: "WorldLens", url: "https://worldbench.github.io/worldlens", mode: "Offline", board: "live", tests: "policy", added: "2026-09-28",
+                  plain: "Driving world models scored on generation, 3D reconstruction, following actions, usefulness for downstream driving tasks and human preference.",
+                  tasks: "5 evaluation aspects", models: "10 in the paper; open leaderboard", usage: "CVPR 2026 oral." }
               ]
             }
           ]

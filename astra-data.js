@@ -478,7 +478,7 @@ window.astraData = {
      The part of this page that cannot be got from any single source.          */
   disagreements: [
     {
-      q: "Does putting a demonstration in the prompt help?",
+      q: "Effect of a demonstration in the prompt",
       verdict: "Contested - and the two sides are not testing the same thing.",
       rows: [
         { who: "RoboDojo", src: "robodojo", says: "No. Across 340 layout-matched episodes an image demonstration scores 17.9% and a text demonstration 12.9%, against 22.9% zero-shot. On tasks that are already 0/10 zero-shot, image demonstrations recover 2 of 150 episodes." },
@@ -488,7 +488,7 @@ window.astraData = {
       reading: "RoboDojo's demonstration comes from a <em>different layout of the same task</em>, which its authors argue misleads a model that already understood the goal. GPT-Policy's demonstration is of the <em>same scene</em> the robot is about to act in, and its tasks are ones the model fails outright without help. Both can be true: a demonstration transfers geometry, not intent, and is only worth its prompt space when the geometry is the thing you are missing. RoboDojo's own conclusion is that the in-context learning that works here is self-repair against the model's own action history - it recovers from negated axes (4/8) and mirrored cameras (6/8) mid-episode without being told anything changed."
     },
     {
-      q: "Is Astra better alone, or driving a learned policy?",
+      q: "Astra alone versus Astra driving a learned policy",
       verdict: "It depends on whether the learned policy was trained on the task.",
       rows: [
         { who: "Su et al., on RoboDojo", src: "hybrid", says: "Hybrid wins clearly: 48% vs 26% success, Score 62.60 vs 37.81 - while Astra rewrites only 14.4% of executed control steps and the run costs 44.8% fewer tokens." },
@@ -497,7 +497,7 @@ window.astraData = {
       reading: "The RoboDojo runs use pi-0.5 weights fine-tuned on those tasks; the RoboLab runs use DROID weights zero-shot, where pi-0.5 alone manages 36%. A student worth correcting helps; a student that is wrong most of the time mostly creates work. The report says this itself, and it is the single most useful caveat on this page for anyone planning to build a hybrid stack."
     },
     {
-      q: "What is the bottleneck?",
+      q: "The bottleneck",
       verdict: "Unanimous: contact, not cognition.",
       rows: [
         { who: "RoboDojo", src: "robodojo", says: "Precision is the worst of the five axes at 4.00% SR, against 38.67% on memory. Sixteen of 42 tasks sit at exactly zero while ten are at or above 50%." },
@@ -508,7 +508,7 @@ window.astraData = {
       reading: "Every source that ran a precision task reports the same split, and RoboDojo names it: semantic understanding is in place, spatial understanding is in place, physical commonsense - contact dynamics, force, collision geometry - is not. The practical consequence shows up in RoboDojo's real campaign, which was stopped after the model issued unsafe actions that damaged hardware."
     },
     {
-      q: "How independent are these evaluations, really?",
+      q: "Independence of the evaluations",
       verdict: "Less than the count of sources suggests.",
       rows: [
         { who: "RoboDojo", src: "robodojo", says: "Its L3 harness is an Inspect Robots agent; Inspect Robots is cited to Robocurve." },

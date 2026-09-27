@@ -5,11 +5,11 @@
    switches live in the URL (?track=Real&method=naive), so a particular view can
    be linked in a meeting and reloads the same.
 
-   Colour, following the site rule that anything computed here is violet:
-     violet        the index (derived; nobody publishes it)
-     faded violet  a model that sits on one board only - its index is that
-                   board's order, re-expressed; nothing cross-checks it
-     teal          a general model driving the robot through a harness (agent)
+   Colour: each lab's own colour, exactly as in the Ledger and Charts, so a
+   model reads the same everywhere. Faded = the model sits on one board only
+   (its index is that board's order, re-expressed; nothing cross-checks it).
+   Agents are named "(agent)". Violet is kept for scales that are ours alone:
+   the capability heat map and the board-weight bars.
    ========================================================================== */
 
 (function () {
@@ -21,7 +21,7 @@
   if (!db || !cfg || !engine || !charts) return;
 
   const VIOLET = charts.colors.derived;
-  const TEAL = charts.colors.highlight;
+  const labColor = (id) => orgOf(id).color || "#8a949b";
 
   const escape = (text) => String(text === undefined || text === null ? "" : text)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -100,11 +100,11 @@
     charts.resetMounts();
     charts.mount(chartMount, (container) => charts.verticalBars(container, {
       rows: shown.map((entry) => ({
-        label: nameOf(entry.id),
+        label: nameOf(entry.id) + (entry.agent ? " (agent)" : ""),
         value: Number(entry.index.toFixed(1)),
         range: naive ? null : entry.range,
         org: orgOf(entry.id),
-        color: entry.agent ? TEAL : VIOLET,
+        color: labColor(entry.id),
         faint: entry.coverage === 1,
         href: "tasks.html?model=" + entry.id,
         details: [
@@ -115,13 +115,13 @@
         ]
       })),
       max: naive ? undefined : 100,
-      valueLabel: naive ? "mean of raw scores" : "index, 0-100",
-      legend: false,
+      valueLabel: naive ? "mean of raw scores" : "index, 0-100 (computed by PhAIL)",
+      legendNote: "Colour = lab, as in the Ledger. Faded bar = on one board only.",
       nameLimit: 22
     }));
     document.querySelector("[data-rank-chart-caption]").innerHTML = naive
       ? "Each model's raw primary scores averaged across the boards it happens to be on, weighted as below. RoboArena's Elo cannot be averaged with percentages and is left out. Compare the order with the pairwise index: models entered on easy boards climb, models entered on hard ones sink."
-      : `Index = expected share of head-to-head comparisons won against every other fitted model, from within-board results only. Whiskers: lowest and highest index when any one board is left out. <span class="legend-inline"><span class="swatch" style="background:${VIOLET}"></span>index (derived by us)</span> <span class="legend-inline"><span class="swatch" style="background:${VIOLET};opacity:.42"></span>on one board only - nothing cross-checks it</span> <span class="legend-inline"><span class="swatch" style="background:${TEAL}"></span>general model through a harness (agent)</span> Click a column for its records in the ledger.`;
+      : "Whiskers: range when any one board is dropped. Faded bars: on one board only.";
 
     drawTable(result, shown, naive);
     drawBoards(result, naive);
@@ -146,7 +146,7 @@
       return `<tr class="${entry.coverage === 1 ? "row-single" : ""}">`
         + `<td class="rank-cell">${entry.rank}</td>`
         + `<td><span class="rank-model">${badge}<a href="tasks.html?model=${escape(entry.id)}">${escape(model.name || entry.id)}</a>${entry.agent ? '<span class="rank-tag rank-tag--agent">agent</span>' : ""}</span><small>${escape(model.maker || "")}</small></td>`
-        + `<td class="num"><span class="rank-bar"><span style="width:${width}%;background:${entry.agent ? TEAL : VIOLET}"></span></span>${fixed(entry.index)}</td>`
+        + `<td class="num"><span class="rank-bar"><span style="width:${width}%;background:${labColor(entry.id)}"></span></span>${fixed(entry.index)}</td>`
         + `<td class="num">${naive ? "-" : `${fixed(entry.range[0])}-${fixed(entry.range[1])}`}</td>`
         + `<td class="num">${naive ? "-" : `${entry.rankRange[0]}-${entry.rankRange[1]}`}</td>`
         + `<td class="num">${entry.coverage}</td>`
@@ -238,7 +238,7 @@
           x: Math.log10(model.sizeB),
           y: entry.index,
           label: model.name,
-          color: entry.agent ? TEAL : VIOLET,
+          color: labColor(entry.id),
           title: `${model.name}: ${model.size}; index ${fixed(entry.index)} (${entry.coverage} board${entry.coverage === 1 ? "" : "s"})`
         };
       });
@@ -258,7 +258,7 @@
       }));
     }
     document.querySelector("[data-rank-size-caption]").textContent =
-      `${points.length} of the ${shown.length} models shown state a single parameter count. None of the boards in the index publishes latency, control frequency or hardware, so this is the closest thing to the speed axis we can draw today.`;
+      `${points.length} of the ${shown.length} models shown state a parameter count.`;
   }
 
   /* --- factors (static for the page, from the config) ------------------------------------------ */

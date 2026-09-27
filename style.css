@@ -43,7 +43,7 @@ a:hover { color: var(--ink); }
 .site-header, main, .site-footer { width: min(var(--measure), calc(100% - 64px)); margin: 0 auto; }
 /* The rule across the top of every page carries all three colours at once -
    the only place on the site where they appear together. */
-.site-header { padding: 28px 0 34px; border-top: 4px solid var(--ink);
+.site-header { padding: 22px 0 20px; border-top: 4px solid var(--ink);
   border-image: linear-gradient(90deg, var(--accent) 0 34%, var(--teal) 34% 67%, var(--violet) 67% 100%) 1; }
 .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; }
 .site-name { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-size: clamp(3rem, 7vw, 6rem); font-weight: 700; letter-spacing: -0.065em; line-height: .86; text-decoration: none; }
@@ -53,8 +53,9 @@ nav { display: flex; flex-wrap: wrap; gap: 18px; justify-content: flex-end; }
 nav a { font-size: 16px; color: var(--muted); text-decoration: none; }
 nav a:hover { color: var(--violet); text-decoration: underline; }
 nav a[aria-current="page"] { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--violet); }
-.site-expansion { display: block; margin: 18px 0 0; color: var(--ink); font-size: clamp(1.15rem, 2vw, 1.8rem); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
-.site-wordplay { max-width: 620px; margin: 9px 0 0; color: var(--muted); font-size: 16px; font-style: italic; }
+/* Name and pronunciation share one line, so the masthead costs one row, not three. */
+.site-expansion { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 12px 0 0; color: var(--ink); font-size: clamp(1.1rem, 1.7vw, 1.45rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+.site-wordplay { color: var(--muted); font-size: 14px; font-weight: 400; font-style: italic; letter-spacing: 0; }
 .site-deck { max-width: 760px; margin: 42px 0 0; font-size: 16px; line-height: 1.5; letter-spacing: 0; font-weight: 400; color: var(--muted); }
 .dashboard-deck { max-width: 900px; }
 .header-link { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 22px 0 0; font-size: 14px; }
@@ -189,7 +190,7 @@ td:first-child { min-width: 170px; font-weight: 500; }
 
 @media (max-width: 620px) {
   .site-header, main, .site-footer { width: min(var(--measure), calc(100% - 36px)); }
-  .site-header { padding-top: 28px; padding-bottom: 52px; }
+  .site-header { padding-top: 22px; padding-bottom: 18px; }
   .header-row { display: block; }
   nav { justify-content: flex-start; gap: 8px 15px; margin-top: 22px; }
   .site-name { font-size: clamp(3.5rem, 18vw, 6rem); }
@@ -498,7 +499,7 @@ td:first-child { min-width: 170px; font-weight: 500; }
    -----------------------------------------------------------------------------
    The tree borrows Artificial Analysis's card language - white cards, 8px
    corners, hairline borders, a line icon on a tinted tile - and keeps this
-   site's colours: navy for the execution layer, teal for the planning layer,
+   site's colours: navy for the execution layer, teal for the design layer,
    grey and dashed for the boundary that is listed but not ranked.
    ========================================================================== */
 
@@ -540,9 +541,9 @@ td:first-child { min-width: 170px; font-weight: 500; }
 .st-node--layer .st-name { font-size: 14px; font-weight: 650; }
 .st-layer-execution { border-color: #b7c7d8; }
 .st-layer-execution .st-icon { background: #e6edf4; color: var(--accent); }
-.st-layer-planning { border-color: #a9cfd3; }
-.st-layer-planning .st-icon { background: var(--teal-soft); color: var(--teal); }
-.st-node--domain { width: 160px; }
+.st-layer-design { border-color: #a9cfd3; }
+.st-layer-design .st-icon { background: var(--teal-soft); color: var(--teal); }
+.st-node--domain { width: 184px; }
 .st-node--task { width: 212px; }
 .st-node--task .st-icon { width: 22px; height: 22px; }
 .st-node--capability { border-style: dashed; }
@@ -593,24 +594,36 @@ td:first-child { min-width: 170px; font-weight: 500; }
 .todo-grid li { padding-top: 8px; border-top: 2px solid #e6edf4; }
 
 /* =============================================================================
-   "Things to discuss" - the same block at the foot of every tab
+   "Things to discuss" and meeting notes - the foot of every tab
+   -----------------------------------------------------------------------------
+   One narrow column read like slides: a numbered short title, a line or two of
+   detail, and the decision it needs. Narrow on purpose - it is read aloud.
    ========================================================================== */
 
-.discussion { margin-top: 36px; padding-top: 18px; border-top: 2px solid var(--ink); }
-.discussion-title { margin: 0 0 10px; font-size: 1.3rem; letter-spacing: -0.015em; }
-.discussion-title span { color: var(--muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }
-.discussion .data-table-wrap { border-top: 1px solid var(--line); }
-.discussion-table { min-width: 960px; table-layout: fixed; font-size: 13.5px; line-height: 1.45; }
-.discussion-table col.col-num { width: 34px; }
-.discussion-table col.col-issue { width: 38%; }
-.discussion-table col.col-proposal { width: 38%; }
-.discussion-table th { font-size: 12px; }
-.discussion-table td:first-child { min-width: 0; }
-.discussion-num { color: var(--violet); font-weight: 600; }
-.discussion-topic { display: block; margin-bottom: 2px; font-weight: 600; }
-.discussion-issue { color: #343b42; }
-.discussion-decide { color: #3d2a91; }
-.section-page > [data-discussion] { margin-top: 12px; }
+.talk { max-width: 780px; margin-top: 40px; padding-top: 18px; border-top: 2px solid var(--ink); }
+.talk-title { margin: 0 0 6px; font-size: 1.45rem; letter-spacing: -0.015em; }
+.talk-title span { margin-left: 8px; color: var(--muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }
+.talk-list { margin: 0; padding: 0; list-style: none; counter-reset: talk; }
+.talk-list li { position: relative; counter-increment: talk; padding: 14px 0 14px 40px; border-bottom: 1px solid var(--line); }
+.talk-list li::before { content: counter(talk); position: absolute; left: 0; top: 13px; width: 26px; height: 26px; border-radius: 50%; background: var(--violet-soft); color: var(--violet); font-size: 14px; font-weight: 650; line-height: 26px; text-align: center; }
+.talk-list h3 { margin: 0; font-size: 1.1rem; font-weight: 650; letter-spacing: -0.01em; line-height: 1.3; }
+.talk-list p { margin: 5px 0 0; color: #2b3137; font-size: 15px; line-height: 1.5; }
+.talk-decide { display: flex; gap: 10px; align-items: baseline; }
+.talk-decide span { flex: none; padding: 0 7px; border-radius: 3px; background: var(--violet); color: #fff; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; line-height: 1.7; }
+
+.notes { max-width: 780px; margin-top: 20px; }
+.talk .notes { margin-top: 18px; }
+.notes-title { margin: 0 0 6px; font-size: 1rem; font-weight: 650; }
+.notes-list { margin: 0 0 8px; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.notes-list li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
+.notes-time { flex: none; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.notes-page { flex: none; padding: 0 6px; border-radius: 3px; background: var(--teal-soft); color: var(--teal); font-size: 11.5px; }
+.notes-text { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.notes-delete { flex: none; padding: 0 6px; border: 0; background: transparent; color: #9aa3aa; font-size: 17px; line-height: 1; cursor: pointer; }
+.notes-delete:hover { color: #b04a5a; }
+.notes-input { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid #cfd5d9; border-radius: 8px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; }
+.notes-input:focus { outline: 2px solid var(--violet); outline-offset: 0; border-color: var(--violet); }
+.notes-status { min-height: 1em; margin: 4px 0 0; color: #b04a5a; font-size: 12.5px; }
 
 /* =============================================================================
    Ranking tab
@@ -697,3 +710,95 @@ td:first-child { min-width: 170px; font-weight: 500; }
   .rank-controls .track-switch--small { width: auto; display: inline-flex; }
   .track-switch--small button { flex: none; padding: 3px 10px; }
 }
+
+/* Scope tree: depth switch, legend, open / closed nodes */
+.scope-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin: 4px 0 6px; }
+.scope-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0; color: var(--muted); font-size: 12px; }
+.scope-legend > span { display: inline-flex; align-items: center; gap: 5px; }
+.scope-legend .st-live { display: inline-block; }
+.legend-dash { display: inline-block; width: 16px; height: 10px; border: 1px dashed #9aa3aa; border-radius: 3px; }
+.st-node[data-toggle] { cursor: pointer; user-select: none; }
+.st-node[data-toggle]:hover { border-color: var(--violet); }
+.st-node[data-toggle]:focus-visible { outline: 2px solid var(--violet); outline-offset: 1px; }
+.st-caret { flex: none; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 5px solid #9aa3aa; transform: rotate(90deg); transition: transform .12s ease; }
+.st-branch.is-collapsed > .st-node .st-caret { transform: none; }
+.st-branch.is-collapsed > .st-kids { display: none; }
+.st-branch.is-collapsed > .st-node::after { display: none; }
+.st-branch.is-collapsed > .st-node { background: #fafbfb; }
+
+/* Ranking tab: explanations read like slides - large type, narrow column */
+.slide { max-width: 800px; padding: 30px 0 30px; border-bottom: 1px solid var(--line); }
+.slide h2, .ranking-page .chart-block h2 { font-size: clamp(1.35rem, 2.2vw, 1.7rem); }
+.slide h2::before, .ranking-page .chart-block > h2::before { content: ""; display: block; width: 34px; height: 3px; margin-bottom: 12px; background: var(--teal); }
+.slide-steps { margin: 16px 0 0; padding: 0; list-style: none; counter-reset: step; }
+.slide-steps li { position: relative; counter-increment: step; padding: 10px 0 10px 44px; border-top: 1px solid #eceff1; }
+.slide-steps li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; border-radius: 50%; background: var(--violet); color: #fff; font-size: 14px; font-weight: 650; line-height: 28px; text-align: center; }
+.slide-steps b { display: block; font-size: 18px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.3; }
+.slide-steps span { display: block; margin-top: 3px; color: #343b42; font-size: 15.5px; line-height: 1.5; }
+.slide-aside { margin: 14px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.slide-points { max-width: 800px; margin: 12px 0 14px; padding-left: 20px; font-size: 16px; line-height: 1.5; color: #2b3137; }
+.slide-points li { margin: 4px 0; }
+.slide-points b { font-weight: 650; }
+
+/* =============================================================================
+   Related work and TODO tabs
+   ========================================================================== */
+.h1-tag { margin-left: 10px; padding: 2px 8px; border-radius: 4px; background: #f1f3f4; color: var(--muted); font-size: 13px; font-weight: 500; letter-spacing: 0; vertical-align: middle; }
+.related-page, .todo-page { padding-bottom: 56px; }
+.related-entry { max-width: 860px; padding: 18px 0 30px; border-bottom: 1px solid var(--line); }
+.related-index { margin: 0; color: var(--violet); font-size: 13px; font-weight: 650; }
+.related-entry h2 { margin: 4px 0 0; font-size: 1.4rem; line-height: 1.25; }
+.related-entry h2 a { color: var(--ink); text-decoration: none; }
+.related-entry h2 a:hover { color: var(--violet); }
+.related-entry h3 { margin: 26px 0 6px; font-size: 1.1rem; font-weight: 650; }
+.related-meta { margin: 6px 0 0; color: var(--muted); font-size: 13.5px; }
+.related-summary { margin: 12px 0 0; font-size: 16px; line-height: 1.55; color: #2b3137; }
+.related-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 16px 0 0; }
+.related-facts div { padding: 9px 12px; border: 1px solid #e6e8ea; border-radius: 8px; background: #fff; }
+.related-facts dt { color: var(--muted); font-size: 12px; font-weight: 600; }
+.related-facts dd { margin: 2px 0 0; font-size: 14px; line-height: 1.45; }
+.related-compare { min-width: 680px; font-size: 14px; }
+.related-compare td:first-child { min-width: 130px; font-weight: 600; }
+.related-overlap { margin: 12px 0 0; color: #343b42; font-size: 14px; line-height: 1.5; }
+.related-overlap b { font-weight: 600; }
+
+.todo-grid-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 40px; max-width: 1200px; }
+.todo-group h2 { margin: 18px 0 6px; font-size: 1.2rem; }
+.todo-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
+.todo-item { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.todo-item h3 { margin: 0; font-size: 16px; font-weight: 650; line-height: 1.35; }
+.todo-item p { margin: 3px 0 0; color: #343b42; font-size: 14.5px; line-height: 1.5; }
+.todo-status { align-self: start; margin-top: 2px; padding: 1px 0; border-radius: 999px; font-size: 11.5px; font-weight: 600; text-align: center; }
+.todo-item--doing .todo-status { background: var(--violet); color: #fff; }
+.todo-item--next .todo-status { background: var(--violet-soft); color: var(--violet); }
+.todo-item--later .todo-status { background: #f1f3f4; color: var(--muted); }
+.todo-new { margin-left: 6px; padding: 0 6px; border-radius: 3px; background: var(--teal-soft); color: var(--teal); font-size: 11px; font-weight: 500; vertical-align: 2px; }
+
+@media (max-width: 800px) {
+  .related-facts, .todo-grid-groups { grid-template-columns: 1fr; }
+}
+
+/* Scope: hover explanations and their on/off switch */
+.explain-switch { display: inline-flex; align-items: center; gap: 7px; color: #343b42; font-size: 13px; cursor: pointer; user-select: none; }
+.explain-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.explain-switch-track { position: relative; width: 30px; height: 17px; border-radius: 999px; background: #cfd5d9; transition: background .15s ease; }
+.explain-switch-track::after { content: ""; position: absolute; left: 2px; top: 2px; width: 13px; height: 13px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .2); transition: transform .15s ease; }
+.explain-switch input:checked + .explain-switch-track { background: var(--violet); }
+.explain-switch input:checked + .explain-switch-track::after { transform: translateX(13px); }
+.explain-switch input:focus-visible + .explain-switch-track { outline: 2px solid var(--violet); outline-offset: 2px; }
+
+.explain-pop { position: fixed; z-index: 20; width: 340px; max-width: calc(100vw - 16px); padding: 11px 14px 12px; border: 1px solid #e3e6e8; border-radius: 10px; background: #fff; box-shadow: 0 10px 28px rgba(20, 23, 27, .16); font-size: 13.5px; line-height: 1.45; color: var(--ink); pointer-events: none; }
+.explain-pop[hidden] { display: none; }
+.explain-kicker { margin: 0; color: var(--muted); font-size: 11.5px; }
+.explain-pop h4 { margin: 2px 0 0; font-size: 15px; font-weight: 650; letter-spacing: -0.01em; }
+.explain-count { margin-left: 6px; color: var(--muted); font-size: 12px; font-weight: 400; }
+.explain-pop p { margin: 6px 0 0; }
+.explain-plain { font-size: 14px; }
+.explain-note { color: var(--muted); font-size: 12.5px; }
+.explain-facts { display: grid; gap: 3px; margin: 8px 0 0; padding: 7px 0 0; border-top: 1px solid #eef0f2; }
+.explain-facts div { display: grid; grid-template-columns: 62px 1fr; gap: 8px; }
+.explain-facts dt { color: var(--muted); font-size: 12px; }
+.explain-facts dd { margin: 0; font-size: 13px; }
+.explain-labels { margin: 8px 0 0; padding: 7px 0 0; border-top: 1px solid #eef0f2; list-style: none; color: #4c555d; font-size: 12.5px; }
+.explain-labels li { margin: 2px 0; }
+.explain-labels b { display: inline-block; min-width: 62px; margin-right: 6px; color: var(--ink); font-weight: 600; }

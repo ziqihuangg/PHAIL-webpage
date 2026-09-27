@@ -7,24 +7,22 @@
   <title>PhAIL - Physical AI Ledger</title>
   <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
-  <header class="site-header" id="top">
-    <div class="header-row">
-      <a class="site-name" href="#top">PhAIL</a>
-      <nav aria-label="Primary navigation"><a href="index.html" aria-current="page">Scope</a><a href="ranking.html">Ranking</a><a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a></nav>
-    </div>
-    <p class="site-expansion">Physical AI Ledger</p>
-  </header>
+  <header class="site-header" id="top"></header>
 
   <main class="scope-page">
     <section class="database-intro">
-      <h1>What counts as physical AI</h1>
-      <p>AI whose output is realised in the physical world, split by what that output is: an <em>action</em> carried out by a robot, a car or a drone (execution layer), or a <em>design</em> that gets manufactured - a part, an assembly, a circuit board (planning layer). Models that only perceive or predict sit on the boundary. Hover a board for what it measures; a dot marks a live leaderboard, <span class="st-chip-ledger st-chip-ledger--inline">L</span> a board whose numbers are in our ledger.</p>
+      <h1>Scope of Physical AI</h1>
     </section>
 
     <div class="scope-stats" data-scope-stats></div>
+    <div class="scope-toolbar">
+      <div class="track-switch track-switch--small" role="tablist" aria-label="How deep to open the tree" data-scope-depth></div>
+      <label class="explain-switch"><input type="checkbox" data-explain-toggle checked /><span class="explain-switch-track" aria-hidden="true"></span>Explain on hover</label>
+      <p class="scope-legend"><span><span class="st-live"></span> live leaderboard</span><span><span class="st-chip-ledger">L</span> numbers in our ledger</span><span><span class="legend-dash"></span> capability board</span><span>Placed by what is scored: an action &rarr; Execution, a manufactured design &rarr; Design, a prediction or answer &rarr; boundary</span></p>
+    </div>
     <div class="scope-tree" data-scope-tree aria-label="Taxonomy of physical AI benchmarks"></div>
 
     <details class="scope-directory">
@@ -36,12 +34,12 @@
       <article class="scope-article">
         <h2>Introducing PhAIL</h2>
         <p>Artificial Analysis answers “which model is actually good?” for language, image, video and speech with one independent, quantitative index. Physical AI has nothing like it, and not by accident: you cannot call a robot the way you call an API, every board runs different tasks on different hardware, and most published numbers are graded by the people who built the model.</p>
-        <p>PhAIL - the Physical AI Ledger, pronounced like “fail”, because honest evaluation starts with what breaks - builds a small, honest piece of that picture in three layers: the <strong>map</strong> above of what is measured and where; a <a href="tasks.html">ledger</a> of published results that records who produced every number; and a <a href="ranking.html">draft cross-board ranking</a> that says how sure it is.</p>
+        <p>PhAIL - the Physical AI Ledger, pronounced “fail” - builds a small, honest piece of that picture in three layers: the <strong>map</strong> above of what is measured and where; a <a href="tasks.html">ledger</a> of published results that records who produced every number; and a <a href="ranking.html">draft cross-board ranking</a> that says how sure it is.</p>
         <p>It is a research notebook run out of NTU / MMLab, not a company. We have no robots and grade nothing ourselves: we read published tables, copy them without renormalising, and attach the citation and protocol to every value. If something here is wrong or missing, we would like to hear about it.</p>
       </article>
 
       <article class="scope-article">
-        <h2>How the ranking works</h2>
+        <h2>Ranking method</h2>
         <ol class="compact-steps">
           <li><strong>Boards, not papers.</strong> Only tables where the benchmark operator ran every model on one harness feed the default index - six robotics boards today.</li>
           <li><strong>Compare inside a board only.</strong> A raw 30 on one board and 60 on another are never added. Each board contributes “A beat B”, discounted when the gap is inside the board's own sampling noise.</li>
@@ -54,10 +52,10 @@
     </section>
 
     <section class="scope-missing" aria-labelledby="missing-title">
-      <h2 id="missing-title">What is still missing</h2>
+      <h2 id="missing-title">Missing pieces</h2>
       <div class="scope-missing-grid">
         <div>
-          <h3>In the evaluations</h3>
+          <h3>Evaluation gaps</h3>
           <ul class="tight-list">
             <li>No shared harness: every board is its own task set, robot and rollout count, so models are compared on whatever boards they happened to enter.</li>
             <li>No speed or cost: none of the six benchmark-run boards reports inference latency, control frequency or hardware.</li>
@@ -68,7 +66,7 @@
           </ul>
         </div>
         <div>
-          <h3>In the models <span class="scope-asof">(ledger, 27 Sep 2026)</span></h3>
+          <h3>Model gaps <span class="scope-asof">(ledger, 27 Sep 2026)</span></h3>
           <ul class="tight-list">
             <li>Open-ended instructions: 43 of 45 trained policies score below 5 on RoboDojo's open-vocabulary axis. GPT-6-Astra, driving the arm through a harness, scores 34.</li>
             <li>Robustness: on RoboTwin, Fast-WAM goes from 77.8% on clean scenes to 1.9% under randomisation.</li>
@@ -81,7 +79,7 @@
     </section>
 
     <section class="scope-sources" aria-labelledby="sources-title">
-      <h2 id="sources-title">How every number is labelled</h2>
+      <h2 id="sources-title">Provenance labels</h2>
       <ul class="source-classes">
         <li><span class="provenance-swatch" style="background:#003b68"></span><div><strong>Benchmark-run.</strong> The operator ran the model on its own harness and published it - RoboChallenge, RoboDojo, RoboTwin, RoboArena. Strongest class; outside submitters are named.</div></li>
         <li><span class="provenance-swatch" style="background:#a2560a"></span><div><strong>Self-reported.</strong> The model's authors, on a harness they controlled. Not wrong by default - several are reproducible from a released checkpoint - but a different kind of claim.</div></li>
@@ -91,29 +89,17 @@
       <p class="scope-fine">Anything we compute rather than copy - the index, percentiles, a mean over suites - is drawn in violet and marked as derived. Affiliations come from each paper's title block, first institution first; logos are each lab's own and remain their trademarks. Unrelated to Positronic's PhAIL industrial leaderboard despite the shared name.</p>
     </section>
 
-    <section class="scope-todo" aria-labelledby="todo-title">
-      <h2 id="todo-title">What we are working on</h2>
-      <ul class="todo-grid">
-        <li><strong>Keeping boards current.</strong> Automatic reads of live leaderboards, with a dated change log.</li>
-        <li><strong>New domains in the ledger.</strong> One board each for driving, drones and CAD design.</li>
-        <li><strong>Validating the index.</strong> Held-out boards, and blinded re-runs of the pairs the boards disagree on.</li>
-        <li><strong>Capability scores across boards.</strong> Tagging tasks on every board with the capabilities they test.</li>
-        <li><strong>Speed and cost.</strong> Asking operators to publish latency and hardware beside success.</li>
-        <li><strong>A design index.</strong> Frontier models on CAD and PCB boards, ranked the same way.</li>
-        <li><strong>A composite suite.</strong> A non-redundant sample of tasks from the open boards.</li>
-        <li><strong>A longer write-up.</strong> What physical AI can and cannot do yet, read off the ledger.</li>
-      </ul>
-    </section>
-
     <section data-discussion="scope"></section>
   </main>
 
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=5"></script>
-  <script src="icons.js?v=1"></script>
-  <script src="scope-data.js?v=1"></script>
-  <script src="scope-app.js?v=1"></script>
-  <script src="discussion-data.js?v=1"></script>
-  <script src="discussion.js?v=1"></script>
+  <script src="script.js?v=7"></script>
+  <script src="icons.js?v=2"></script>
+  <script src="scope-data.js?v=3"></script>
+  <script src="scope-app.js?v=3"></script>
+  <script src="discussion-data.js?v=3"></script>
+  <script src="discussion.js?v=2"></script>
+  <script src="notes-data.js?v=1"></script>
+  <script src="notes.js?v=1"></script>
 </body>
 </html>

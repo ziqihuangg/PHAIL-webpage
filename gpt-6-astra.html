@@ -7,27 +7,20 @@
   <title>GPT-6 Astra - PhAIL Notes</title>
   <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
-  <header class="site-header" id="top">
-    <div class="header-row">
-      <a class="site-name" href="index.html"><span data-acronym>PhAIL</span><span class="site-label">Notes</span></a>
-      <nav aria-label="Primary navigation"><a href="index.html">Scope</a><a href="ranking.html">Ranking</a><a href="tasks.html">Ledger</a><a href="charts.html">Charts</a><a href="gpt-6-astra.html" aria-current="page">GPT-6 Astra</a><a href="benchmarks.html">Benchmarks</a></nav>
-    </div>
-    <p class="site-expansion"><span data-full-name>Physical AI Ledger</span></p>
-  </header>
+  <header class="site-header" id="top"></header>
 
   <main class="astra-page">
 
     <section class="astra-section astra-intro" aria-labelledby="astra-title">
       <h1 id="astra-title">GPT-6-Astra as an embodied policy</h1>
       <div class="prose">
-        <p><code>gpt-6-astra</code> is OpenAI's general flagship model, with no robotics-specific training and no motor outputs of its own. In the three weeks since it shipped, six groups have wired it to a robot through their own harness and published what happened. This page holds all of it in one place: what each group ran, the clips, and &mdash; at the bottom &mdash; the four questions they do not agree on.</p>
-        <p><strong>Naming note:</strong> this &ldquo;Astra&rdquo; is OpenAI's. Unrelated to Google DeepMind's Project Astra, which this site files separately, under environment-perceiving agents rather than physical actuation.</p>
+        <p class="astra-naming">OpenAI's <code>gpt-6-astra</code>; unrelated to Google DeepMind's Project Astra.</p>
       </div>
       <div class="provenance-key">
-        <h2 class="provenance-title">Who produced the number &mdash; the fill colour of every bar below</h2>
+        <h2 class="provenance-title">Provenance &mdash; the fill colour of every bar below</h2>
         <ul class="provenance-legend" data-class-key></ul>
         <p class="provenance-stamp" data-retrieved></p>
       </div>
@@ -35,14 +28,14 @@
 
     <nav class="chart-index" aria-label="Sections on this page">
       <a href="#astra-spread">The spread</a>
-      <a href="#astra-glance">Who ran what</a>
+      <a href="#astra-glance">Sources and harnesses</a>
       <a href="#astra-robodojo">RoboDojo</a>
       <a href="#astra-hybrid">Hybrid vs direct</a>
       <a href="#astra-robocurve">Robocurve</a>
       <a href="#astra-gpe">GPT-Policy</a>
       <a href="#astra-innate">Innate</a>
       <a href="#astra-community">Community index</a>
-      <a href="#astra-disagree">Where they disagree</a>
+      <a href="#astra-disagree">Disagreements</a>
     </nav>
 
     <section class="astra-section" id="astra-spread" aria-labelledby="spread-title">
@@ -62,7 +55,7 @@
     </section>
 
     <section class="astra-section" id="astra-glance" aria-labelledby="glance-title">
-      <h2 id="glance-title">Who ran what</h2>
+      <h2 id="glance-title">Sources and harnesses</h2>
       <div class="prose">
         <p>RoboDojo's report defines <strong>RoboProbe</strong>, a three-level taxonomy for &ldquo;what occupies the action path.&rdquo; We reuse its vocabulary because it is the clearest way to say what is actually comparable. <strong>L1</strong>: a trained policy acts, no language model anywhere. <strong>L2 / Hybrid</strong>: the model directs a separately-trained policy, which still emits every action. <strong>L3 / Direct</strong>: the model's own output drives the robot through a fixed, non-learned harness &mdash; no trained checkpoint in the loop. Where a source does not state its level or reasoning effort, the cell says &ldquo;not stated&rdquo; rather than guessing.</p>
       </div>
@@ -82,7 +75,7 @@
       <div class="data-table-wrap" data-table="simBoard"></div>
       <p class="table-footnote">The three L3 rows are the same harness with a different planner. GPT-5.5 lands at rank 38 and DeepSeek-Flash at 33: the result is specific to this model, not to &ldquo;a frontier LLM.&rdquo; Score is mean process reward &times; 100; Average SR is the equal-weight mean of the five axes below, not the micro rate.</p>
 
-      <h3>Where the lead comes from</h3>
+      <h3>Source of the lead</h3>
       <div class="chart-surface" data-chart="dimensions"></div>
       <p class="chart-caption">Success rate per axis on the official 42-task protocol. RoboDojo scores five things separately instead of collapsing them, and the profile is the opposite shape to a trained policy's. Astra leads on memory and open-ended instruction following &mdash; the axis where nearly every VLA is near zero &mdash; and is last-tier on precision at 4.00%.</p>
 
@@ -97,7 +90,7 @@
       <p class="table-footnote">One full success in 33 trials. The zero-score clips are not blank: they generally show approach, grasp or transport attempts that never meet the terminal predicate.</p>
       <div class="video-grid" data-videos="robodojoReal"></div>
 
-      <h3>What survives an unannounced change mid-episode</h3>
+      <h3>Robustness to unannounced mid-episode changes</h3>
       <div class="chart-surface" data-chart="robustness"></div>
       <p class="chart-caption">One episode per layout across eight <code>general_pickup</code> layouts, same L3 harness, 100 planner calls unless noted. The harness silently perturbs the world and does not tell the model. It recovers from a negated action space and mirrored cameras by comparing what it asked for against what happened. It does not recover from missing global vision or 10&nbsp;cm of control jitter, because searching and re-grasping consume the episode budget.</p>
       <div class="video-grid" data-videos="robodojoAdapt"></div>
@@ -120,7 +113,7 @@
       <div class="data-table-wrap" data-table="cost"></div>
       <p class="table-footnote">The efficiency result is the counter-intuitive one: the hybrid is both better <em>and</em> cheaper. Astra rewrites 14.4% of executed control steps and the run costs 44.8% fewer tokens, because it no longer has to construct low-level motion segment by segment. Physical duration excludes model-response latency, which the report names as the unresolved obstacle to real-time deployment.</p>
 
-      <h3>And then the ordering reverses</h3>
+      <h3>Ordering reversal</h3>
       <div class="data-table-wrap" data-table="robolab"></div>
       <p class="table-footnote">Same authors, same week, a different benchmark &mdash; <a href="https://arxiv.org/abs/2604.09860" target="_blank" rel="noreferrer">RoboLab</a> on a single-arm Franka &mdash; and direct control wins, 98% to 92%. The reason is in the small print: the RoboDojo runs use &pi;<sub>0.5</sub> weights fine-tuned on those tasks, while the RoboLab baselines are DROID weights transferred zero-shot, where &pi;<sub>0.5</sub> alone manages 36%. A student worth correcting helps; a student that is wrong two times in three mostly creates work.</p>
 
@@ -176,12 +169,12 @@
     </section>
 
     <section class="astra-section" id="astra-disagree" aria-labelledby="disagree-title">
-      <h2 id="disagree-title">Where the six disagree</h2>
+      <h2 id="disagree-title">Disagreements among the six sources</h2>
       <div class="prose">
         <p>The reason to gather six reports on one page is not to average them. It is to find the places where two careful groups ran the same model and got opposite answers &mdash; and then to work out which difference in protocol produced the gap.</p>
       </div>
 
-      <h3>The sharpest one, plotted</h3>
+      <h3>Sharpest disagreement, plotted</h3>
       <div class="chart-surface" data-chart="icl"></div>
       <p class="chart-caption">Does showing the model a demonstration help? The dark blue rows are RoboDojo's 340-episode matched study, where every demonstration condition lands <em>below</em> zero-shot. The green rows are GPT-Policy's real-robot trials, where the same intervention takes tasks from 0/3 to 2/3 and 3/3. Both are correct; they are not the same experiment. The difference is worked out in question 01 below.</p>
 
@@ -189,7 +182,7 @@
     </section>
 
     <section class="astra-section" id="astra-gaps" aria-labelledby="gaps-title">
-      <h2 id="gaps-title">What nobody has published</h2>
+      <h2 id="gaps-title">Unpublished evidence</h2>
       <ul class="astra-gap-list" data-gaps></ul>
     </section>
 
@@ -205,11 +198,13 @@
 
   </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=7"></script>
   <script src="charts.js?v=6"></script>
-  <script src="astra-data.js?v=3"></script>
+  <script src="astra-data.js?v=4"></script>
   <script src="astra-app.js?v=2"></script>
-  <script src="discussion-data.js?v=1"></script>
-  <script src="discussion.js?v=1"></script>
+  <script src="discussion-data.js?v=3"></script>
+  <script src="discussion.js?v=2"></script>
+  <script src="notes-data.js?v=1"></script>
+  <script src="notes.js?v=1"></script>
 </body>
 </html>

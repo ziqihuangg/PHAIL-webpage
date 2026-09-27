@@ -13,9 +13,10 @@ if [ -z "$PY" ]; then
 fi
 
 if command -v lsof >/dev/null 2>&1 && lsof -i ":$PORT" >/dev/null 2>&1; then
-  echo "Port $PORT is already in use - preview is likely already running at http://127.0.0.1:$PORT/"
+  echo "Port $PORT is already in use. If it is an old 'python3 -m http.server', stop it and rerun this script: that one caches pages and cannot save meeting notes."
   exit 0
 fi
 
-echo "Starting preview server at http://127.0.0.1:$PORT/ (Ctrl+C to stop)"
-"$PY" -m http.server "$PORT" --bind 127.0.0.1
+# preview_server.py = http.server with caching off, plus the meeting-notes API
+# that writes notes-data.js. Needs Python 3.7+.
+"$PY" preview_server.py "$PORT"
