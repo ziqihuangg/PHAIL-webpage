@@ -54,20 +54,15 @@
     both: "Tests both trained policies and general models through a harness."
   };
 
-  /* --- counts ---------------------------------------------------------------- */
+  /* --- counts: one line, three numbers -------------------------------------- */
   const statsMount = document.querySelector("[data-scope-stats]");
   if (statsMount) {
     const ranked = scope.layers.filter((layer) => !layer.boundary);
     const inScope = all.filter((entry) => !entry.layer.boundary);
-    const stats = [
-      [inScope.length, "benchmarks in scope", `${all.length - inScope.length} more on the boundary`],
-      [ranked.reduce((sum, layer) => sum + layer.domains.length, 0), "domains", ranked.map((layer) => layer.domains.map((d) => d.name).join(", ")).join(" · ")],
-      [all.filter((entry) => entry.benchmark.board === "live").length, "live leaderboards", "take new entries; the rest publish through papers or challenges"],
-      [all.filter((entry) => entry.benchmark.tests !== "policy").length, "accept general models", "a frontier model driving a harness, not a trained policy"],
-      [all.filter((entry) => entry.benchmark.ledger).length, "transcribed in the ledger", "with every number cited"]
-    ];
-    statsMount.innerHTML = stats.map(([value, label, note]) =>
-      `<div class="scope-stat"><span class="scope-stat-value">${value}</span><span class="scope-stat-label">${escape(label)}</span><span class="scope-stat-note">${escape(note)}</span></div>`).join("");
+    const domains = [].concat(...ranked.map((layer) => layer.domains.map((domain) => domain.name)));
+    statsMount.innerHTML = `<span><b>${inScope.length}</b> benchmarks</span>`
+      + `<span><b>${domains.length}</b> domains: ${escape(domains.join(", "))}</span>`
+      + `<span><b>${inScope.filter((entry) => entry.benchmark.board === "live").length}</b> live leaderboards</span>`;
   }
 
   /* --- hover cards ------------------------------------------------------------- */

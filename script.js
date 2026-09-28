@@ -2,7 +2,6 @@ const siteConfig = {
   name: "PhAIL",
   acronym: "PhAIL",
   fullName: "Physical AI Ledger",
-  pronunciation: "pronounced “fail”: physical-AI failures have physical consequences. We track what these systems cannot do yet, and design evaluations that push the field forward.",
   personalSite: "https://ziqihuangg.github.io/"
 };
 
@@ -30,9 +29,8 @@ const header = document.querySelector("header.site-header");
 if (header) {
   const homeHref = pageKey === "home" ? "#top" : "index.html";
   header.outerHTML = `<header class="site-header" id="top"><div class="header-row">`
-    + `<a class="site-name" href="${homeHref}"><span>${siteConfig.acronym}</span><img class="site-mark" src="physical-ai-mark.svg" alt="" /></a>`
-    + `<nav aria-label="Primary navigation">${pageLinks.map(([label, href, key]) => `<a href="${href}"${pageKey === key ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav></div>`
-    + `<p class="site-expansion">${siteConfig.fullName} <span class="site-wordplay">${siteConfig.pronunciation}</span></p></header>`;
+    + `<a class="site-name" href="${homeHref}" title="${siteConfig.fullName}"><img class="site-mark" src="physical-ai-mark.svg" alt="" /><span>${siteConfig.acronym}</span></a>`
+    + `<nav aria-label="Primary navigation">${pageLinks.map(([label, href, key]) => `<a href="${href}"${pageKey === key ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav></div></header>`;
 }
 
 document.querySelectorAll("[data-personal-link]").forEach((element) => {

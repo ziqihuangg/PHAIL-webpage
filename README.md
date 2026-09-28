@@ -56,7 +56,7 @@ Key conventions the data follows:
 
 - **Provenance over authorship.** Every record's `provenance` field (`benchmark` / `model` / `thirdParty` / `pending`) records who ran the evaluation, not who built the model - and drives the colour of every bar on the site.
 - **One `resultGroups` entry is one table in one document.** Nothing is averaged across benchmarks; each chart plots exactly one published table.
-- **One colour per lab, everywhere.** `organisations[*].color` follows the lab's logo; Ledger, Charts and Ranking all read it.
+- **One colour per lab, everywhere.** `organisations[*].color` (chosen to stay distinct, not copied from logos) is read by the Ledger, Charts and Ranking, with no transparency.
 - **Scope boards explain themselves.** Each board in `scope-data.js` carries `plain` / `tasks` / `models` / `usage`, each node a `define`; the Scope tab shows them on hover (switchable).
 - **The index compares, it never adds.** `ranking-engine.js` turns each board into within-board pairwise outcomes (discounted by the board's sampling noise) and pools them with Bradley-Terry. Raw numbers from two boards are never summed; the "Raw mean" switch exists only to show why.
 - **Sim and real are two views, not one list.** No score is assumed to predict the other, so the Ledger switches between them rather than blending.

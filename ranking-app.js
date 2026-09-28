@@ -5,10 +5,9 @@
    switches live in the URL (?track=Real&method=naive), so a particular view can
    be linked in a meeting and reloads the same.
 
-   Colour: each lab's own colour, exactly as in the Ledger and Charts, so a
-   model reads the same everywhere. Faded = the model sits on one board only
-   (its index is that board's order, re-expressed; nothing cross-checks it).
-   Agents are named "(agent)". Violet is kept for scales that are ours alone:
+   Colour: each lab's colour, exactly as in the Ledger and Charts - no
+   transparency, so a model reads the same everywhere. Coverage is a number in
+   the table, not a shade. Agents are named "(agent)". Violet is kept for scales that are ours alone:
    the capability heat map and the board-weight bars.
    ========================================================================== */
 
@@ -105,7 +104,6 @@
         range: naive ? null : entry.range,
         org: orgOf(entry.id),
         color: labColor(entry.id),
-        faint: entry.coverage === 1,
         href: "tasks.html?model=" + entry.id,
         details: [
           ["Rank", `${entry.rank} of ${result.entries.length}` + (naive ? "" : `; ${entry.rankRange[0]}-${entry.rankRange[1]} if one board is dropped`)],
@@ -116,12 +114,12 @@
       })),
       max: naive ? undefined : 100,
       valueLabel: naive ? "mean of raw scores" : "index, 0-100 (computed by PhAIL)",
-      legendNote: "Colour = lab, as in the Ledger. Faded bar = on one board only.",
+      legendNote: "Colour = lab, as in the Ledger.",
       nameLimit: 22
     }));
     document.querySelector("[data-rank-chart-caption]").innerHTML = naive
       ? "Each model's raw primary scores averaged across the boards it happens to be on, weighted as below. RoboArena's Elo cannot be averaged with percentages and is left out. Compare the order with the pairwise index: models entered on easy boards climb, models entered on hard ones sink."
-      : "Whiskers: range when any one board is dropped. Faded bars: on one board only.";
+      : "Whiskers: range when any one board is dropped. The Boards column below shows how many boards each model rests on.";
 
     drawTable(result, shown, naive);
     drawBoards(result, naive);
@@ -143,7 +141,7 @@
         ? `<img class="rank-logo" src="${escape(org.logo)}" alt="" />`
         : `<span class="rank-logo rank-logo--mark" style="background:${escape(org.color || "#8a949b")}">${escape(org.mark || "?")}</span>`;
       const width = Math.max(0, Math.min(100, entry.index));
-      return `<tr class="${entry.coverage === 1 ? "row-single" : ""}">`
+      return `<tr>`
         + `<td class="rank-cell">${entry.rank}</td>`
         + `<td><span class="rank-model">${badge}<a href="tasks.html?model=${escape(entry.id)}">${escape(model.name || entry.id)}</a>${entry.agent ? '<span class="rank-tag rank-tag--agent">agent</span>' : ""}</span><small>${escape(model.maker || "")}</small></td>`
         + `<td class="num"><span class="rank-bar"><span style="width:${width}%;background:${labColor(entry.id)}"></span></span>${fixed(entry.index)}</td>`
