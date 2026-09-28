@@ -80,6 +80,31 @@ window.phailRanking = {
       sources: [{ board: "robodojo-real", min: ["arx", "piper", "piperX"], trials: 60 }] }
   ],
 
+  /* Model gaps: where the models on the benchmark-run boards still fail, read
+     off the raw published scores (not the index). Only the rules live here;
+     every number on the page is computed from the ledger when it loads, so
+     the section follows the data. `asks` quotes each board's own definition.
+       level  best and median of one column, on one or more boards
+       axis   one RoboDojo capability axis: trained policies, then agents
+       drop   the fall from one column to another (clean -> randomised)
+       arms   per-arm scores on one board (cross-embodiment)
+     `low`: an axis score below this counts as failing that capability. */
+  gaps: [
+    { kind: "level", name: "Task completion, simulation", asks: "42 two-arm table-top tasks in simulation, 2,100 episodes per policy.",
+      boards: ["robodojo-sim"], field: "success" },
+    { kind: "level", name: "Task completion, real robots", asks: "Table-top tasks on real arms, run by each board's operator.",
+      boards: ["robodojo-real", "robochallenge-t30", "robochallenge-t30v2"], field: "success" },
+    { kind: "axis", name: "Generalization", asks: "“Varied objects, layouts and random variants” - e.g. Stack Bowls, Push T.", board: "robodojo-sim", dim: 0, low: 10 },
+    { kind: "axis", name: "Precision", asks: "“Fine-grained manipulation with tight spatial constraints” - e.g. Fasten Screws, Plug In Charger.", board: "robodojo-sim", dim: 1, low: 10 },
+    { kind: "axis", name: "Long-horizon", asks: "“Multi-step tasks with several subgoals” - e.g. Fill Pen Holder, Classify Objects.", board: "robodojo-sim", dim: 2, low: 10 },
+    { kind: "axis", name: "Memory", asks: "“State tracking, sequence recall or delayed matching” - e.g. Cover Blocks.", board: "robodojo-sim", dim: 3, low: 10 },
+    { kind: "axis", name: "Open-ended instructions", asks: "“Open-ended, language- or image-conditioned” - e.g. Stack Blocks By Language.", board: "robodojo-sim", dim: 4, low: 10 },
+    { kind: "drop", name: "Robustness to scene changes", asks: "Trained on clean scenes, tested on clean and on randomised ones (clutter, lighting, textures).",
+      board: "robotwin-2", from: "easy", to: "hard", labels: ["clean", "randomised"] },
+    { kind: "arms", name: "Cross-embodiment", asks: "The same 18 real tasks on three different arms.",
+      board: "robodojo-real", fields: ["arx", "piper", "piperX"], labels: ["ARX X5", "Piper", "Piper X"] }
+  ],
+
   /* What else a ranking could weigh, and where each factor stands today.
      status: "used" feeds the index | "toggle" a switch on the page |
              "beside" shown next to the index, not in it | "missing" no data. */

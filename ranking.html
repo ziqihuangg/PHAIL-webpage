@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A draft cross-board index for robot manipulation models, built only from within-board comparisons, with its weights, checks and open questions." />
   <title>Ranking - PhAIL</title>
-  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=12" />
 </head>
 <body>
   <header class="site-header" id="top"></header>
@@ -65,6 +65,16 @@
       <button type="button" class="filter-reset rank-more" data-rank-capabilities-more hidden></button>
     </section>
 
+    <section class="chart-block" id="gaps">
+      <h2>Model gaps</h2>
+      <ul class="slide-points">
+        <li>Where models on the benchmark-run boards still fail, read off the raw published scores, not the index.</li>
+        <li>Counted from the ledger each time the page loads. &ldquo;What is tested&rdquo; quotes the board's own definition.</li>
+      </ul>
+      <div class="data-table-wrap" data-rank-gaps tabindex="0" aria-label="Model gaps"></div>
+      <p class="rank-sources" data-rank-gaps-unmeasured></p>
+    </section>
+
     <section class="chart-block" id="agreement">
       <h2>Board agreement</h2>
       <ul class="slide-points">
@@ -96,12 +106,13 @@
   <script src="script.js?v=8"></script>
   <script src="icons.js?v=1"></script>
   <script src="charts.js?v=6"></script>
-  <script src="tasks-data-new.js?v=9"></script>
-  <script src="ranking-data.js?v=1"></script>
+  <script src="tasks-data-new.js?v=10"></script>
+  <script src="scope-data.js?v=4"></script>
+  <script src="ranking-data.js?v=2"></script>
   <script src="ranking-engine.js?v=1"></script>
-  <script src="ranking-app.js?v=4"></script>
-  <script src="discussion-data.js?v=3"></script>
-  <script src="discussion.js?v=2"></script>
+  <script src="ranking-app.js?v=5"></script>
+  <script src="discussion-data.js?v=4"></script>
+  <script src="discussion.js?v=3"></script>
   <script src="notes-data.js?v=1"></script>
   <script src="notes.js?v=1"></script>
 </body>

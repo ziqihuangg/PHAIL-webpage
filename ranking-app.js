@@ -259,6 +259,148 @@
       `${points.length} of the ${shown.length} models shown state a parameter count.`;
   }
 
+  /* --- model gaps (static: raw published scores, not the index) ----------------------------------
+     The rules come from cfg.gaps; every number is computed here from the
+     ledger, so nothing in this section is typed by hand. */
+  const gapMount = document.querySelector("[data-rank-gaps]");
+  if (gapMount && cfg.gaps) {
+    const agentSet = new Set(cfg.agents || []);
+    const groupOf = (id) => db.resultGroups.filter((group) => group.id === id)[0];
+    const boardName = (id) => (cfg.boards[id] || {}).label || id;
+    const num = (value) => typeof value === "number" && !Number.isNaN(value);
+    const median = (values) => {
+      const sorted = values.slice().sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    };
+    /* one row per model - its best on this column - sorted high to low */
+    const bestPerModel = (group, valueOf) => {
+      const best = new Map();
+      (group ? group.rows : []).forEach((row) => {
+        const value = valueOf(row);
+        if (!num(value)) return;
+        const current = best.get(row.model);
+        if (!current || value > current.value) best.set(row.model, { model: row.model, value: value, row: row });
+      });
+      return Array.from(best.values()).sort((a, b) => b.value - a.value);
+    };
+    const who = (entry) => `<small>${escape(nameOf(entry.model))}</small>`;
+    const agentTag = '<span class="rank-tag rank-tag--agent">agent</span>';
+
+    const axisMedians = new Map();
+    cfg.gaps.forEach((gap) => {
+      if (gap.kind !== "axis") return;
+      const values = bestPerModel(groupOf(gap.board), (row) => (row.d ? row.d[gap.dim] : null))
+        .filter((entry) => !agentSet.has(entry.model)).map((entry) => entry.value);
+      if (values.length) axisMedians.set(gap, median(values));
+    });
+    const medianList = Array.from(axisMedians.values());
+    const strongest = Math.max.apply(null, medianList);
+    const weakest = Math.min.apply(null, medianList);
+
+    const rowFor = (gap) => {
+      if (gap.kind === "level") {
+        const cells = gap.boards.map((id) => {
+          const rows = bestPerModel(groupOf(id), (row) => row[gap.field]);
+          return rows.length ? { id: id, rows: rows, best: rows[0], med: median(rows.map((entry) => entry.value)) } : null;
+        }).filter(Boolean);
+        if (!cells.length) return null;
+        const many = cells.length > 1;
+        const tag = (cell) => (many ? `<span class="gap-board">${escape(boardName(cell.id))}</span>` : "");
+        const fails = cells.map((cell) => Math.round(100 - cell.best.value));
+        return {
+          board: many ? "" : boardName(cells[0].id),
+          best: cells.map((cell) => `<div>${tag(cell)}<b>${fixed(cell.best.value)}%</b> ${who(cell.best)}</div>`).join(""),
+          typical: cells.map((cell) => `<div>${tag(cell)}${fixed(cell.med)}%</div>`).join(""),
+          reading: many
+            ? `Even the best entry on each board fails ${Math.min.apply(null, fails)}-${Math.max.apply(null, fails)}% of its trials. The boards differ in difficulty, so their bests are not compared with each other.`
+            : `Even the best entry fails ${fails[0]}% of episodes; half of the ${cells[0].rows.length} entries succeed in fewer than ${fixed(cells[0].med)}%.`
+        };
+      }
+      if (gap.kind === "axis") {
+        const rows = bestPerModel(groupOf(gap.board), (row) => (row.d ? row.d[gap.dim] : null));
+        const policies = rows.filter((entry) => !agentSet.has(entry.model));
+        const agent = rows.filter((entry) => agentSet.has(entry.model))[0];
+        if (!policies.length) return null;
+        const top = policies[0];
+        const below = policies.filter((entry) => entry.value < gap.low).length;
+        const agentWins = agent && agent.value > top.value;
+        const med = axisMedians.get(gap);
+        return {
+          board: boardName(gap.board),
+          best: `<div><b>${fixed(top.value)}</b> ${who(top)}</div>`
+            + (agentWins ? `<div><b>${fixed(agent.value)}</b> ${who(agent)} ${agentTag}</div>` : ""),
+          typical: fixed(med),
+          reading: `${below} of ${policies.length} trained policies score below ${gap.low} out of 100.`
+            + (med === strongest ? " The strongest of the five axes." : med === weakest ? " The weakest of the five axes." : "")
+            + (agentWins ? ` ${escape(nameOf(agent.model))}, an LLM driving the arm through a harness, beats every trained policy here.` : "")
+        };
+      }
+      if (gap.kind === "drop") {
+        const rows = bestPerModel(groupOf(gap.board), (row) => (num(row[gap.from]) && num(row[gap.to]) ? row[gap.to] : null))
+          .map((entry) => ({ model: entry.model, from: entry.row[gap.from], to: entry.row[gap.to] }));
+        if (!rows.length) return null;
+        const halved = rows.filter((entry) => entry.to < entry.from / 2).length;
+        const worst = rows.reduce((a, b) => (b.from - b.to > a.from - a.to ? b : a));
+        const top = rows[0];
+        return {
+          board: boardName(gap.board),
+          best: `<div><b>${fixed(top.to)}%</b> ${escape(gap.labels[1])} ${who(top)}</div>`,
+          typical: `${fixed(median(rows.map((entry) => entry.from)))}% ${escape(gap.labels[0])} &rarr; ${fixed(median(rows.map((entry) => entry.to)))}% ${escape(gap.labels[1])}`,
+          reading: `${halved} of ${rows.length} policies lose more than half their ${escape(gap.labels[0])}-scene score. Largest fall: ${escape(nameOf(worst.model))}, ${fixed(worst.from)}% &rarr; ${fixed(worst.to)}%.`
+        };
+      }
+      if (gap.kind === "arms") {
+        const group = groupOf(gap.board);
+        const rows = bestPerModel(group, (row) => (gap.fields.every((key) => num(row[key])) ? Math.min.apply(null, gap.fields.map((key) => row[key])) : null))
+          .map((entry) => ({ model: entry.model, min: entry.value, max: Math.max.apply(null, gap.fields.map((key) => entry.row[key])), row: entry.row }));
+        if (!rows.length) return null;
+        const zero = rows.filter((entry) => entry.min === 0).length;
+        const weakCount = gap.fields.map((key) => rows.filter((entry) => entry.max > 0 && entry.row[key] === entry.min).length);
+        const weakIndex = weakCount.indexOf(Math.max.apply(null, weakCount));
+        return {
+          board: boardName(gap.board),
+          best: `<div><b>${fixed(rows[0].min)}</b> on its weakest arm ${who(rows[0])}</div>`,
+          typical: `weakest arm ${fixed(median(rows.map((entry) => entry.min)))}, best arm ${fixed(median(rows.map((entry) => entry.max)))}`,
+          reading: `${escape(gap.labels[weakIndex])} is the weakest arm for ${weakCount[weakIndex]} of ${rows.length} policies; ${zero} score zero on at least one arm. A policy's score depends on which arm it runs on.`
+        };
+      }
+      return null;
+    };
+
+    const body = cfg.gaps.map((gap) => {
+      const row = rowFor(gap);
+      if (!row) return "";
+      return `<tr><td>${escape(gap.name)}</td><td>${escape(gap.asks)}${row.board ? `<small>${escape(row.board)}</small>` : ""}</td>`
+        + `<td class="gap-best">${row.best}</td><td class="gap-typical">${row.typical}</td><td>${row.reading}</td></tr>`;
+    }).join("");
+    gapMount.innerHTML = `<table class="data-table gap-table"><thead><tr><th>Capability</th><th>What is tested</th><th>Best</th><th>Median</th><th>Reading</th></tr></thead><tbody>${body}</tbody></table>`;
+
+    /* Everything on the Scope tab whose boards the ledger holds no numbers
+       for yet: whole domains by name, else task categories and capability
+       boards listed apart (a capability row above can come from RoboDojo's
+       axes while the dedicated boards are still untranscribed). */
+    const unmeasuredMount = document.querySelector("[data-rank-gaps-unmeasured]");
+    const scope = window.phailScope;
+    if (unmeasuredMount && scope) {
+      const hasLedger = (task) => task.benchmarks.some((benchmark) => benchmark.ledger);
+      const names = (tasks) => escape(tasks.map((task) => task.name).join(", "));
+      const parts = [];
+      const whole = [];
+      scope.layers.filter((layer) => !layer.boundary).forEach((layer) => layer.domains.forEach((domain) => {
+        const missing = domain.tasks.filter((task) => !hasLedger(task));
+        if (!missing.length) return;
+        if (missing.length === domain.tasks.length) { whole.push(domain.name); return; }
+        const tasks = missing.filter((task) => task.kind !== "capability");
+        const capabilityBoards = missing.filter((task) => task.kind === "capability");
+        if (tasks.length) parts.push(`<span><b>${escape(domain.name)} tasks</b> ${names(tasks)}</span>`);
+        if (capabilityBoards.length) parts.push(`<span><b>${escape(domain.name)} capability boards</b> ${names(capabilityBoards)}</span>`);
+      }));
+      if (whole.length) parts.push(`<span><b>${escape(whole.join(", "))}</b> every board</span>`);
+      unmeasuredMount.innerHTML = parts.length ? `<span>Boards on the Scope tab with no numbers in the ledger yet, so their gaps are not read here:</span>${parts.join("")}` : "";
+    }
+  }
+
   /* --- factors (static for the page, from the config) ------------------------------------------ */
   const factorMount = document.querySelector("[data-rank-factors]");
   if (factorMount) {

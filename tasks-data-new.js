@@ -151,13 +151,13 @@ window.phailDatabase = {
 
   /* --- benchmarks ----------------------------------------------------------- */
   benchmarks: [
-    { id: "libero", name: "LIBERO", type: "Simulation", year: "2023", url: "https://libero-project.github.io/", operator: "Lifelong Robot Learning (UT Austin)", runsPolicies: false },
+    { id: "libero", name: "LIBERO", type: "Simulation", year: "2023", url: "https://libero-project.github.io/main.html", operator: "Lifelong Robot Learning (UT Austin)", runsPolicies: false },
     { id: "metaworld", name: "Meta-World", type: "Simulation", year: "2019", url: "https://meta-world.github.io/", operator: "Stanford / UC Berkeley", runsPolicies: false },
     { id: "rlbench", name: "RLBench", type: "Simulation", year: "2019", url: "https://sites.google.com/view/rlbench", operator: "Imperial College London", runsPolicies: false },
     { id: "calvin", name: "CALVIN", type: "Simulation", year: "2022", url: "https://calvin-rl.github.io/", operator: "University of Freiburg", runsPolicies: false },
-    { id: "robocasa", name: "RoboCasa", type: "Simulation", year: "2024", url: "https://robocasa.ai/", operator: "UT Austin / NVIDIA", runsPolicies: false },
+    { id: "robocasa", name: "RoboCasa", type: "Simulation", year: "2024", url: "https://robocasa.ai/leaderboard.html", operator: "UT Austin / NVIDIA", runsPolicies: false },
     { id: "maniskill", name: "ManiSkill3", type: "GPU simulation", year: "2024", url: "https://maniskill.ai/", operator: "UC San Diego (Hillbot)", runsPolicies: false },
-    { id: "behavior", name: "BEHAVIOR-1K", type: "Sim + transfer", year: "2023", url: "https://behavior.stanford.edu/", operator: "Stanford Vision & Learning Lab", runsPolicies: false },
+    { id: "behavior", name: "BEHAVIOR-1K", type: "Sim + transfer", year: "2023", url: "https://huggingface.co/spaces/behavior-1k/2026-challenge-leaderboard", operator: "Stanford Vision & Learning Lab", runsPolicies: false },
     { id: "simpler_bridge", name: "SimplerEnv (Bridge / WidowX)", type: "Sim-real paired", year: "2024", url: "https://simpler-env.github.io/", operator: "UC San Diego / Google DeepMind", runsPolicies: false },
     { id: "simpler_fractal", name: "SimplerEnv (Fractal / Google Robot)", type: "Sim-real paired", year: "2024", url: "https://simpler-env.github.io/", operator: "UC San Diego / Google DeepMind", runsPolicies: false },
     { id: "robotwin", name: "RoboTwin 2.0", type: "Sim + real alignment", year: "2025-2026", url: "https://robotwin-platform.github.io/leaderboard", operator: "MMLab@HKU / THU (RoboTwin Team)", runsPolicies: true },
@@ -171,7 +171,7 @@ window.phailDatabase = {
     { id: "smolvla_so100", name: "SmolVLA own SO-100 suite", type: "Real robot", year: "2025", url: "https://arxiv.org/abs/2506.01844", operator: "Hugging Face / LeRobot", runsPolicies: false },
     { id: "er_suite", name: "Embodied-reasoning suite (15 benchmarks)", type: "Vision-language", year: "2025", url: "https://deepmind.google/discover/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/", operator: "Various academic benchmarks", runsPolicies: false },
     { id: "pai", name: "PAI-Bench", type: "Video-based", year: "2026", url: "https://huggingface.co/spaces/shi-labs/physical-ai-bench-leaderboard", operator: "SHI Labs", runsPolicies: false },
-    { id: "worldarena", name: "WorldArena", type: "World-model evaluation", year: "2026", url: "https://github.com/tsinghua-fib-lab/WorldArena", operator: "Tsinghua FIB Lab", runsPolicies: false },
+    { id: "worldarena", name: "WorldArena", type: "World-model evaluation", year: "2026", url: "https://huggingface.co/spaces/WorldArena/WorldArena", operator: "Tsinghua FIB Lab", runsPolicies: false },
     { id: "phail_industrial", name: "PhAIL (Positronic)", type: "Real robot, industrial", year: "2026", url: "https://phail.ai/", operator: "Positronic Robotics / Nebius / Toloka", runsPolicies: true },
     { id: "openvla_oft_efficiency", name: "OpenVLA-OFT inference profile", type: "Efficiency measurement", year: "2025", url: "https://openvla-oft.github.io/", operator: "Stanford (Kim et al.)", runsPolicies: false }
   ],

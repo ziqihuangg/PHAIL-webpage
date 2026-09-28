@@ -22,7 +22,7 @@ window.phailTodo = {
     {
       name: "Checking the ranking",
       items: [
-        { title: "Ask people in each field", detail: "Show the ranking to researchers in each domain, ask whether it matches their sense of the models, and record where and why it does not.", status: "next", added: "2026-09-28" },
+        { title: "Reviewers in each domain", detail: "One or two researchers per domain check the domain definitions, whether the benchmark list is complete, and whether the ranking matches their sense of the models; record where and why it does not.", status: "next", added: "2026-09-28" },
         { title: "Internal cross-check", detail: "A second person re-reads every transcribed number against its source and recomputes the index independently.", status: "next", added: "2026-09-28" },
         { title: "Held-out and blinded checks", detail: "Held-out board accuracy is live. Next: blinded re-runs of the pairs the boards disagree on.", status: "doing" },
         { title: "Weights from the data", detail: "Fit board difficulty and discrimination (IRT) instead of 1 − best score.", status: "later" }

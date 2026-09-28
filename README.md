@@ -19,8 +19,8 @@ Tabs, left to right:
 
 | Page | File | What it does |
 | --- | --- | --- |
-| Scope | `index.html` | Left-to-right taxonomy tree of physical AI (execution layer / design layer / boundary) with every known benchmark, plus the intro post, how the ranking works, what is missing, and public TODOs (what used to be About) |
-| Ranking | `ranking.html` | Draft cross-board index for robotics: switches, index chart, board weights, capability heatmap, board agreement, size scatter, method, ranking factors |
+| Scope | `index.html` | Left-to-right taxonomy tree of physical AI (Execution / Design / Supporting capabilities) with every known benchmark; all counts are computed from `scope-data.js` on load |
+| Ranking | `ranking.html` | Draft cross-board index for robotics: switches, index chart, board weights, capability heatmap, model gaps (computed from the ledger), board agreement, size scatter, method, ranking factors |
 | Ledger | `tasks.html` | The filterable evaluation ledger - every cited record, with a chart of whichever board is in view |
 | Charts | `charts.html` | One chart per published table, plus the cross-board comparison that explains why the index never adds numbers across boards |
 | GPT-6 Astra | `gpt-6-astra.html` | Model spotlight: one model read across six published sources |

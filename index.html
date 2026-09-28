@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="What counts as physical AI, which benchmarks measure it, and a draft cross-board ranking that records who produced every number." />
+  <meta name="description" content="Scope of physical AI: every benchmark that measures it, sorted by layer, domain and task." />
   <title>PhAIL - Physical AI Ledger</title>
-  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=12" />
 </head>
 <body>
   <header class="site-header" id="top"></header>
@@ -15,8 +15,7 @@
   <main class="scope-page">
     <section class="site-hero">
       <p class="site-hero-kicker">PhAIL &middot; Physical AI Ledger &middot; pronounced &ldquo;fail&rdquo;</p>
-      <h1>Independent analysis of physical AI</h1>
-      <p class="site-hero-sub">Understand what robots, vehicles and design models can do &mdash; and where they still fail &mdash; to choose the right model for your task.</p>
+      <h1>Understand physical AI models, choose the right model for your task.</h1>
     </section>
 
     <section class="database-intro">
@@ -27,7 +26,7 @@
     <div class="scope-toolbar">
       <div class="track-switch track-switch--small" role="tablist" aria-label="How deep to open the tree" data-scope-depth></div>
       <label class="explain-switch"><input type="checkbox" data-explain-toggle checked /><span class="explain-switch-track" aria-hidden="true"></span>Explain on hover</label>
-      <p class="scope-legend"><span><span class="st-live"></span> live leaderboard</span><span><span class="st-chip-ledger">L</span> numbers in our ledger</span><span><span class="legend-dash"></span> capability board</span><span>Placed by what is scored: an action &rarr; Execution, a manufactured design &rarr; Design, a prediction or answer &rarr; boundary</span></p>
+      <p class="scope-legend"><span><span class="st-live"></span> live leaderboard</span><span><span class="st-chip-ledger">L</span> numbers in our ledger</span><span><span class="legend-dash"></span> capability board</span></p>
     </div>
     <div class="scope-tree" data-scope-tree aria-label="Taxonomy of physical AI benchmarks"></div>
 
@@ -36,69 +35,16 @@
       <div data-scope-directory></div>
     </details>
 
-    <section class="scope-about" id="about" aria-label="About PhAIL">
-
-      <article class="scope-article">
-        <h2>Ranking method</h2>
-        <ol class="compact-steps">
-          <li><strong>Boards, not papers.</strong> Only tables where the benchmark operator ran every model on one harness feed the default index - six robotics boards today.</li>
-          <li><strong>Compare inside a board only.</strong> A raw 30 on one board and 60 on another are never added. Each board contributes “A beat B”, discounted when the gap is inside the board's own sampling noise.</li>
-          <li><strong>Pool the comparisons.</strong> A Bradley-Terry model, the same maths as Chatbot Arena, turns every pairwise result into one strength per model, even though no two models share the same boards.</li>
-          <li><strong>Weight by difficulty.</strong> A saturated board barely counts; a board where the best model is at 34% counts most. Boards from one operator share a weight.</li>
-          <li><strong>Show the doubt.</strong> Every model carries its board coverage and the range its index moves through when any one board is left out.</li>
-        </ol>
-        <p class="scope-more"><a href="ranking.html">Open the ranking, weights and checks &rarr;</a></p>
-      </article>
-    </section>
-
-    <section class="scope-missing" aria-labelledby="missing-title">
-      <h2 id="missing-title">Missing pieces</h2>
-      <div class="scope-missing-grid">
-        <div>
-          <h3>Evaluation gaps</h3>
-          <ul class="tight-list">
-            <li>No shared harness: every board is its own task set, robot and rollout count, so models are compared on whatever boards they happened to enter.</li>
-            <li>No speed or cost: none of the six benchmark-run boards reports inference latency, control frequency or hardware.</li>
-            <li>One number per board: only RoboDojo scores capabilities (memory, precision, ...) separately.</li>
-            <li>Post-trained, not general: most boards test a policy fine-tuned on that board's own demonstrations; zero-shot transfer is rarely measured.</li>
-            <li>Small real-robot boards: 5 to 16 models each, and they do not always agree with each other.</li>
-            <li>Safety sits outside the ranking: refusal and incident boards (RoboHarm) cover a handful of models.</li>
-          </ul>
-        </div>
-        <div>
-          <h3>Model gaps <span class="scope-asof">(ledger, 27 Sep 2026)</span></h3>
-          <ul class="tight-list">
-            <li>Open-ended instructions: 43 of 45 trained policies score below 5 on RoboDojo's open-vocabulary axis. GPT-6-Astra, driving the arm through a harness, scores 34.</li>
-            <li>Robustness: on RoboTwin, Fast-WAM goes from 77.8% on clean scenes to 1.9% under randomisation.</li>
-            <li>Embodiment: 10 of 11 policies on RoboDojo Real score lower on Piper X than on Piper; three score zero on at least one arm.</li>
-            <li>Memory: 5 of 45 trained policies clear 30 on RoboDojo's memory axis, 37 stay below 10.</li>
-            <li>Absolute level: the best simulated policy completes 28% of RoboDojo episodes; the best real-robot entry 24%.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="scope-sources" aria-labelledby="sources-title">
-      <h2 id="sources-title">Provenance labels</h2>
-      <ul class="source-classes">
-        <li><span class="provenance-swatch" style="background:#003b68"></span><div><strong>Benchmark-run.</strong> The operator ran the model on its own harness and published it - RoboChallenge, RoboDojo, RoboTwin, RoboArena. Strongest class; outside submitters are named.</div></li>
-        <li><span class="provenance-swatch" style="background:#a2560a"></span><div><strong>Self-reported.</strong> The model's authors, on a harness they controlled. Not wrong by default - several are reproducible from a released checkpoint - but a different kind of claim.</div></li>
-        <li><span class="provenance-swatch" style="background:#2f6b4f"></span><div><strong>Third-party.</strong> Someone else ran or re-tabulated it, usually as a baseline in a paper whose point is to beat it.</div></li>
-        <li><span class="provenance-swatch" style="background:#8a949b"></span><div><strong>No citable number.</strong> An evaluation is claimed or expected but nothing can be cited. Kept visible: a blank is information.</div></li>
-      </ul>
-      <p class="scope-fine">Anything we compute rather than copy - the index, percentiles, a mean over suites - is drawn in violet and marked as derived. Affiliations come from each paper's title block, first institution first; logos are each lab's own and remain their trademarks. Unrelated to Positronic's PhAIL industrial leaderboard despite the shared name.</p>
-    </section>
-
     <section data-discussion="scope"></section>
   </main>
 
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
   <script src="script.js?v=8"></script>
   <script src="icons.js?v=2"></script>
-  <script src="scope-data.js?v=3"></script>
-  <script src="scope-app.js?v=4"></script>
-  <script src="discussion-data.js?v=3"></script>
-  <script src="discussion.js?v=2"></script>
+  <script src="scope-data.js?v=4"></script>
+  <script src="scope-app.js?v=5"></script>
+  <script src="discussion-data.js?v=4"></script>
+  <script src="discussion.js?v=3"></script>
   <script src="notes-data.js?v=1"></script>
   <script src="notes.js?v=1"></script>
 </body>

@@ -1,9 +1,12 @@
 /* =============================================================================
    PhAIL - things to discuss, one list per tab (data only; discussion.js draws it)
    -----------------------------------------------------------------------------
-   Slide-style: a short title, one or two lines of detail, and what needs
-   deciding (omit `decide` when nothing does). Kept public: nothing internal.
-   Delete an item once it is settled; running work goes in todo-data.js.
+   Slide-style: a short title, the context in a line or two (enough to follow
+   without having seen the page before), and what needs deciding (omit
+   `decide` when nothing does). `points` adds labelled lines under the detail.
+   Kept public: nothing internal. The whole meeting is 15 minutes, so keep
+   each tab's list short. Delete an item once it is settled; running work
+   goes in todo-data.js.
    ========================================================================== */
 
 window.phailDiscussion = {
@@ -11,29 +14,38 @@ window.phailDiscussion = {
 
   scope: [
     {
-      title: "Capability boards as axes",
-      detail: "Memory, spatial, safety and touch boards cut across embodiments. For now they are dashed nodes under Robotics.",
-      decide: "Tag every task on every board with capabilities, so each capability is scored across boards?"
+      title: "What PhAIL is for",
+      points: [
+        ["Purpose", "Artificial Analysis gives language, image and video models one independent ranking; physical AI has none. PhAIL maps what physical AI benchmarks measure and turns their published results into one ranking, with capabilities scored separately."],
+        ["Output", "This site: the scope map, the ranking, and a ledger of every cited number. A write-up of what models can and cannot do yet and which benchmarks are missing. Later, a composite benchmark built from the most informative tasks."],
+        ["Audience", "People choosing a physical AI model for a task - robotics teams in labs and companies. Also model and benchmark builders, to see where models fail and which tests are missing."]
+      ],
+      decide: "Agree on purpose, outputs and audience - the rest of the site follows from them."
     },
     {
-      title: "Spatial board to confirm",
-      detail: "The only closed-loop spatial board found is VABench (Sep 2026; frontier models acting in RoboTwin). RoboSpatial, MV-RoboBench and Embodied3DBench are offline question answering.",
-      decide: "Confirm the board meant in the 19 Sep review."
+      title: "Reviewers for each domain",
+      detail: "We wrote the domain definitions, chose the benchmarks and built the ranking ourselves, from papers and leaderboards. We need one or two people working in each domain - robotics, driving, drones, CAD, chip and board design, world models - to check three things: are the definitions right, is an important benchmark missing, and does the ranking match what they see in practice.",
+      decide: "Who to ask in each domain, and by when?"
     },
     {
-      title: "The boundary",
-      detail: "Boards are placed by what they score. A driving world model (WorldLens) scores generated video, so it sits on the boundary, not under driving.",
-      decide: "Keep boundary boards out of the ranking?"
+      title: "Capability boards: separate nodes or tags",
+      detail: "Robotics is split by task category (table-top, mobile, loco-manipulation...). Some boards instead test one capability - memory, spatial, safety, touch - with tasks from any category; for now they are the dashed nodes after the task categories. The alternative: tag every task on every board with the capabilities it needs, and score each capability across all boards, as RoboDojo already does with its five axes.",
+      decide: "Keep the dashed nodes, or move to capability tags?"
     },
     {
-      title: "Agents and policies",
-      detail: "Every board is tagged policy / agent / both. DrivingBench, Drone-Bench and every CAD board test agents only.",
-      decide: "A separate agent ranking?"
+      title: "Supporting capabilities stay out of the ranking",
+      detail: "A board's layer is set by what it scores: an action goes to Execution, a manufactured design to Design, an answer or a generated video to Supporting capabilities. So WorldLens, a driving world model, sits under Supporting (it scores generated video), while EmbodiedBench sits under Robotics (its LLM agents act in a simulator). Supporting boards test other kinds of models - video generators, VLMs - than robot policies.",
+      decide: "List Supporting boards but leave them out of the model ranking?"
+    },
+    {
+      title: "The spatial board from 19 Sep",
+      detail: "The 19 Sep review mentioned a spatial benchmark. The only one we found where the model acts is VABench (Sep 2026): models find objects and send exact 3D arm poses in RoboTwin. RoboSpatial, MV-RoboBench and Embodied3DBench only ask questions, so they sit under Embodied reasoning.",
+      decide: "Is VABench the one meant, or which other?"
     },
     {
       title: "Next domains for the ledger",
-      detail: "Driving, aerial and design have no transcribed numbers yet.",
-      decide: "Order: CARLA, Drone-Bench, Parametric CAD Bench and CAD Arena?"
+      detail: "The ranking covers robotics only, because the ledger holds numbers for robotics boards only; driving, drones and design have none yet. Proposed first: CARLA Leaderboard (driving), Drone-Bench (drones), Parametric CAD Bench and CAD Arena (design) - each a live board run by its operator, the same kind the robotics ranking uses.",
+      decide: "Agree on this order?"
     }
   ],
 

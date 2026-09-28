@@ -54,15 +54,15 @@
     both: "Tests both trained policies and general models through a harness."
   };
 
-  /* --- counts: one line, three numbers -------------------------------------- */
+  /* --- counts: one line, counted from scope-data.js on every load --------------
+     The same set as the tree's root node and the directory: every board in
+     every layer, so the page never shows two different totals. */
   const statsMount = document.querySelector("[data-scope-stats]");
   if (statsMount) {
-    const ranked = scope.layers.filter((layer) => !layer.boundary);
-    const inScope = all.filter((entry) => !entry.layer.boundary);
-    const domains = [].concat(...ranked.map((layer) => layer.domains.map((domain) => domain.name)));
-    statsMount.innerHTML = `<span><b>${inScope.length}</b> benchmarks</span>`
-      + `<span><b>${domains.length}</b> domains: ${escape(domains.join(", "))}</span>`
-      + `<span><b>${inScope.filter((entry) => entry.benchmark.board === "live").length}</b> live leaderboards</span>`;
+    const live = all.filter((entry) => entry.benchmark.board === "live").length;
+    const domains = [].concat(...scope.layers.map((layer) => layer.domains.map((domain) => domain.name)));
+    statsMount.innerHTML = `<span><b>${all.length}</b> benchmarks (${live} live leaderboards)</span>`
+      + `<span><b>${domains.length}</b> domains: ${escape(domains.join(", "))}</span>`;
   }
 
   /* --- hover cards ------------------------------------------------------------- */
@@ -72,7 +72,7 @@
   const nodeCard = ({ kind, item, path }) => `<p class="explain-kicker">${escape(path)}</p>`
     + `<h4>${escape(item.name)} <span class="explain-count">${countIn(item)} board${countIn(item) === 1 ? "" : "s"}</span></h4>`
     + `<p>${escape(item.define || item.gloss || "")}</p>`
-    + (kind === "task" && item.kind === "capability" ? '<p class="explain-note">Dashed: a capability board isolates one skill and cuts across robot types.</p>' : "");
+    + (kind === "task" && item.kind === "capability" ? '<p class="explain-note">Dashed: a capability board tests one capability, with tasks drawn from any task category.</p>' : "");
 
   const boardCard = ({ benchmark, path }) => {
     const facts = [["Tasks", benchmark.tasks], ["Models", benchmark.models], ["Used for", benchmark.usage]]
