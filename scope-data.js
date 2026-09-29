@@ -66,7 +66,7 @@ window.phailScope = {
                   tasks: "42 sim + 18 real", models: "48 sim, 11 real (Sep 2026)", usage: "The widest public VLA board in 2026; also ranks frontier LLMs through a harness." },
                 { name: "RoboChallenge", url: "https://robochallenge.ai/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "robochallenge",
                   plain: "Teams upload a policy; the operator runs it on its own real robots (UR5, Franka, ARX5, ALOHA) and publishes success and progress scores.",
-                  tasks: "30 per table (Table30, Table30-v2)", models: "20 entries on Table30, 51 on Table30-v2 (Sep 2026)", usage: "The main real-robot board where outside teams submit." },
+                  tasks: "30 per table (Table30, Table30-v2)", models: "22 entries on Table30, 53 on Table30-v2 (29 Sep 2026)", usage: "The main real-robot board where outside teams submit." },
                 { name: "RoboArena", url: "https://robo-arena.github.io/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "roboarena",
                   plain: "Evaluators at eight universities pick their own task, run two anonymous policies on a DROID robot and say which did better; the votes become a ranking.",
                   tasks: "Open - evaluators choose", models: "9 policies on the public board", usage: "Crowd-sourced, like Chatbot Arena for robots; no success rate by design." },

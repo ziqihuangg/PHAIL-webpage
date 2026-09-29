@@ -221,7 +221,7 @@ function breakdownDisplay(record) {
 
 function extraLabel(key) {
   return { easy: "clean scenes", hard: "randomised", sd: "SD", evals: "A/B evals", latencyMs: "latency",
-    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X" }[key] || key;
+    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X", tasks: "tasks run (of 30)" }[key] || key;
 }
 function extraUnit(key) {
   return { easy: "%", hard: "%", pairedSuccess: "%" }[key] || "";

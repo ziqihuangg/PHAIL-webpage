@@ -164,7 +164,8 @@
         : held ? `<span class="${held.accuracy < 0.6 ? "held-weak" : ""}">${Math.round(held.accuracy * 100)}%</span> <small>of ${held.pairs} pair${held.pairs === 1 ? "" : "s"}</small>` : "<small>no overlap</small>";
       const url = board.group && board.group.sourceUrl;
       return `<tr><td>${url ? `<a href="${escape(url)}" target="_blank" rel="noreferrer">${escape(board.label)}</a>` : escape(board.label)}`
-        + `<small>${escape(board.provenance === "benchmark" ? "benchmark-run" : board.provenance === "thirdParty" ? "third-party tables" : "paper tables")}${board.assumedTrials ? ", trials assumed" : ""}</small></td>`
+        + `<small>${escape(board.provenance === "benchmark" ? "benchmark-run" : board.provenance === "thirdParty" ? "third-party tables" : "paper tables")}${board.assumedTrials ? ", trials assumed" : ""}</small>`
+        + (board.leftOut ? `<small>${board.leftOut} more ran under ${board.minTasks} tasks: Ledger only</small>` : "") + "</td>"
         + `<td>${escape(board.track)}</td><td class="num">${board.rows.length}</td>`
         + `<td class="num">${board.scale === "elo" ? fixed(board.best, 0) + " Elo" : fixed(board.best)}</td>`
         + `<td class="num">${board.scale === "elo" ? "0.50 <small>(no ceiling)</small>" : fixed(board.difficulty, 2)}</td>`
@@ -273,10 +274,13 @@
       const mid = Math.floor(sorted.length / 2);
       return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
     };
-    /* one row per model - its best on this column - sorted high to low */
+    /* one row per model - its best on this column - sorted high to low;
+       entries under a board's minTasks are left out, as in the index */
     const bestPerModel = (group, valueOf) => {
       const best = new Map();
+      const setup = group ? cfg.boards[group.id] || {} : {};
       (group ? group.rows : []).forEach((row) => {
+        if (setup.minTasks && num(row.tasks) && row.tasks < setup.minTasks) return;
         const value = valueOf(row);
         if (!num(value)) return;
         const current = best.get(row.model);

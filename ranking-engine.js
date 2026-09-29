@@ -50,6 +50,12 @@
     return 100 * Math.sqrt(p * (1 - p) / board.trials);
   }
 
+  /* A board may set `minTasks`: an entry that ran fewer of its tasks stays in
+     the ledger but not in the index (RoboChallenge counts unrun tasks as 0). */
+  function eligible(row, setup) {
+    return !(setup && setup.minTasks && typeof row.tasks === "number" && row.tasks < setup.minTasks);
+  }
+
   function primaryValue(row, key) {
     const value = row[key];
     return typeof value === "number" ? value : null;
@@ -64,10 +70,10 @@
     const keepModel = (id) => opts.agents !== false || !agentSet.has(id);
     const boards = [];
 
-    const bestRows = (rows, valueOf) => {
+    const bestRows = (rows, valueOf, setup) => {
       const best = new Map();
       rows.forEach((row) => {
-        if (!keepModel(row.model)) return;
+        if (!keepModel(row.model) || !eligible(row, setup)) return;
         const value = valueOf(row);
         if (value === null || Number.isNaN(value)) return;
         const current = best.get(row.model);
@@ -91,7 +97,9 @@
         trials: setup.trials,
         eloSd: setup.eloSd,
         metric: setup.metric || group.primary,
-        rows: bestRows(group.rows, (row) => primaryValue(row, setup.metric || group.primary))
+        rows: bestRows(group.rows, (row) => primaryValue(row, setup.metric || group.primary), setup),
+        leftOut: setup.minTasks ? group.rows.filter((row) => keepModel(row.model) && !eligible(row, setup)).length : 0,
+        minTasks: setup.minTasks
       });
     });
 
@@ -330,6 +338,7 @@
       const best = new Map();
       group.rows.forEach((row) => {
         if (opts.agents === false && agentSet.has(row.model)) return;
+        if (!eligible(row, config.boards[group.id])) return;
         const value = valueOf(row);
         if (value === null || value === undefined) return;
         const current = best.get(row.model);

@@ -15,17 +15,22 @@
               its own sd per model).
      metric   which column the board ranks by, when it is not the group's
               primary.
+     minTasks entries that ran fewer of the board's tasks stay in the ledger
+              but not in the index. RoboChallenge v2 averages over all 30 tasks
+              with unrun tasks as zero, so a 3-task entry did not lose - it did
+              not compete; without the rule ~35 such entries hand every model
+              that sits only on v2 free wins. Half the tasks (15) for now.
    ========================================================================== */
 
 window.phailRanking = {
   version: "v0 draft",
-  updated: "2026-09-27",
+  updated: "2026-09-29",
 
   boards: {
     "robodojo-sim":        { label: "RoboDojo Sim", trials: 2100, family: "robodojo-sim", metric: "score" },
     "robodojo-real":       { label: "RoboDojo Real", trials: 180, family: "robodojo-real", metric: "score" },
     "robochallenge-t30":   { label: "RoboChallenge T30", trials: 300, family: "robochallenge", metric: "success" },
-    "robochallenge-t30v2": { label: "RoboChallenge T30-v2", trials: 300, family: "robochallenge", metric: "success" },
+    "robochallenge-t30v2": { label: "RoboChallenge T30-v2", trials: 300, family: "robochallenge", metric: "success", minTasks: 15 },
     "robotwin-2":          { label: "RoboTwin 2.0", trials: 10000, family: "robotwin", metric: "success" },
     "roboarena":           { label: "RoboArena", family: "roboarena", scale: "elo", metric: "elo" }
   },
