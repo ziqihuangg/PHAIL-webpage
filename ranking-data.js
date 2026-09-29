@@ -35,6 +35,16 @@ window.phailRanking = {
     "roboarena":           { label: "RoboArena", family: "roboarena", scale: "elo", metric: "elo" }
   },
 
+  /* Operator-run tables that stay in the Ledger but not in the index, and
+     why. Keyed by resultGroups id; ranking-app.js prints each reason under
+     "Boards and weights", with entry counts and overlaps computed from the
+     ledger. A benchmark-run table in neither `boards` nor here is listed
+     there too, as "no reason recorded". */
+  outOfIndex: {
+    "robochallenge-cvpr26": "A closed competition on RoboChallenge's own \u201cTable30 CVPR version\u201d. Its entrants are the Table30-v2 teams, scored under a different rule, so ranking both would count the same teams twice.",
+    "robochallenge-icra26": "A closed competition with only 2 tasks, in a different category (mobile manipulation in a shop, not table-top). Apart from the organiser's baseline its entrants are on no other board, so it adds no comparison between models."
+  },
+
   /* Paper tables (self-reported / third-party), used only when the reader
      switches evidence to "all tables". Trial counts are rarely stated, so one
      conservative number stands in for all of them. */

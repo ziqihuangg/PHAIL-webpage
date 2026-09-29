@@ -405,6 +405,26 @@
     }
   }
 
+  /* --- operator-run tables left out of the index (static: they never enter it) ------------------ */
+  const outMount = document.querySelector("[data-rank-out]");
+  if (outMount) {
+    const inIndex = db.resultGroups.filter((group) => cfg.boards[group.id]);
+    const left = db.resultGroups.filter((group) => group.provenance === "benchmark" && !cfg.boards[group.id]);
+    const reasons = cfg.outOfIndex || {};
+    outMount.innerHTML = left.length ? `<h3 class="rank-out-title">Run by an operator, but left out of the index</h3><ul class="rank-out-list">`
+      + left.map((group) => {
+        const entrants = Array.from(new Set(group.rows.map((row) => row.model)));
+        const overlap = inIndex.map((board) => {
+          const there = new Set(board.rows.map((row) => row.model));
+          return { label: cfg.boards[board.id].label, count: entrants.filter((id) => there.has(id)).length };
+        }).filter((item) => item.count);
+        const meta = (db.benchmarks || []).filter((item) => item.id === group.benchmark)[0] || {};
+        return `<li><a href="${escape(group.sourceUrl)}" target="_blank" rel="noreferrer">${escape(meta.name || group.id)}</a>`
+          + `<small>${entrants.length} entrants${overlap.length ? " · " + overlap.map((item) => `${item.count} also on ${escape(item.label)}`).join(" · ") : " · none on an index board"} · in the Ledger</small>`
+          + `<span>${escape(reasons[group.id] || "No reason recorded yet.")}</span></li>`;
+      }).join("") + "</ul>" : "";
+  }
+
   /* --- factors (static for the page, from the config) ------------------------------------------ */
   const factorMount = document.querySelector("[data-rank-factors]");
   if (factorMount) {

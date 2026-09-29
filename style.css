@@ -664,6 +664,13 @@ td:first-child { min-width: 170px; font-weight: 500; }
 .gap-best div, .gap-typical div { white-space: nowrap; }
 .gap-best b { font-weight: 600; }
 
+.rank-out { max-width: 980px; }
+.rank-out-title { margin: 16px 0 4px; font-size: 1rem; font-weight: 650; letter-spacing: -0.01em; }
+.rank-out-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.rank-out-list li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.5; }
+.rank-out-list small { margin-left: 8px; color: var(--muted); font-size: 12px; }
+.rank-out-list span { display: block; margin-top: 2px; color: #2b3137; }
+
 .factor-table { min-width: 880px; font-size: 13.5px; }
 .factor-status { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; white-space: nowrap; }
 .factor-status--used { background: var(--violet-soft); color: var(--violet); }

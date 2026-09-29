@@ -7,7 +7,7 @@
   <title>Ranking - PhAIL</title>
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=12" />
+  <link rel="stylesheet" href="style.css?v=13" />
 </head>
 <body>
   <header class="site-header" id="top"></header>
@@ -33,7 +33,7 @@
     <section class="slide" id="method">
       <h2>Index method</h2>
       <ol class="slide-steps">
-        <li><b>Six boards, each run by its operator</b><span>RoboDojo Sim and Real, RoboChallenge T30 and T30-v2, RoboTwin 2.0, RoboArena. Paper tables join only when switched on, at half weight.</span></li>
+        <li><b>Six boards, each run by its operator</b><span>RoboDojo Sim and Real, RoboChallenge T30 and T30-v2, RoboTwin 2.0, RoboArena. Paper tables join only when switched on, at half weight. RoboChallenge's closed competitions stay in the Ledger only; the reasons are under Boards and weights.</span></li>
         <li><b>Never add scores across boards</b><span>A board only says who beat whom. 34 on RoboDojo and 64 on RoboChallenge are different scales.</span></li>
         <li><b>Small gaps count as ties</b><span>P(A beats B) = &Phi;(gap / noise), with noise from the board's trial count. A 1-point gap over 180 real trials is only about 60/40.</span></li>
         <li><b>Harder boards count more</b><span>Weight = 1 &minus; best score / 100: LIBERO (best 97%) &asymp; 0, RoboDojo Sim (best 34%) &asymp; 0.66. One operator's boards share one weight.</span></li>
@@ -52,6 +52,7 @@
         <li><b>Held-out accuracy:</b> fit without the board, then check its clearly separated pairs. 50% is a coin flip; red is below 60%.</li>
       </ul>
       <div class="data-table-wrap" data-rank-boards tabindex="0" aria-label="Boards and weights"></div>
+      <div class="rank-out" data-rank-out></div>
     </section>
 
     <section class="chart-block" id="capabilities">
@@ -106,11 +107,11 @@
   <script src="script.js?v=8"></script>
   <script src="icons.js?v=1"></script>
   <script src="charts.js?v=6"></script>
-  <script src="tasks-data-new.js?v=11"></script>
-  <script src="scope-data.js?v=5"></script>
-  <script src="ranking-data.js?v=3"></script>
+  <script src="tasks-data-new.js?v=13"></script>
+  <script src="scope-data.js?v=7"></script>
+  <script src="ranking-data.js?v=4"></script>
   <script src="ranking-engine.js?v=2"></script>
-  <script src="ranking-app.js?v=6"></script>
+  <script src="ranking-app.js?v=7"></script>
   <script src="discussion-data.js?v=4"></script>
   <script src="discussion.js?v=3"></script>
   <script src="notes-data.js?v=1"></script>

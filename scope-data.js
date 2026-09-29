@@ -27,7 +27,7 @@
      url     the page hosting the live leaderboard where there is one; else the
              project page; arXiv / GitHub only when nothing else exists
      mode    "Sim" | "Real" | "Sim + real" | "Offline" (no closed loop)
-     board   "live" | "challenge" | "paper"   (scope-app.js explains each)
+     board   "live" | "challenge" | "paper" | "archived"   (scope-app.js explains each)
      tests   "policy" | "agent" | "both"
      plain   one plain-English sentence: what the robot / model has to do
      tasks   size of the task set, as the authors count it
@@ -39,7 +39,7 @@
    ========================================================================== */
 
 window.phailScope = {
-  updated: "2026-09-28",
+  updated: "2026-09-29",
 
   layers: [
     {
@@ -66,7 +66,7 @@ window.phailScope = {
                   tasks: "42 sim + 18 real", models: "48 sim, 11 real (Sep 2026)", usage: "The widest public VLA board in 2026; also ranks frontier LLMs through a harness." },
                 { name: "RoboChallenge", url: "https://robochallenge.ai/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "robochallenge",
                   plain: "Teams upload a policy; the operator runs it on its own real robots (UR5, Franka, ARX5, ALOHA) and publishes success and progress scores.",
-                  tasks: "30 per table (Table30, Table30-v2)", models: "22 entries on Table30, 53 on Table30-v2 (29 Sep 2026)", usage: "The main real-robot board where outside teams submit." },
+                  tasks: "30 per table (Table30, Table30-v2)", models: "22 entries on Table30, 53 on Table30-v2 (29 Sep 2026)", usage: "The main real-robot board where outside teams submit. Also ran a CVPR 2026 competition on a Table30-v2 variant (in the Ledger, not the index) and is building an Isaac Lab simulation of Table30-v2 with Lightwheel, Dexmal and NVIDIA." },
                 { name: "RoboArena", url: "https://robo-arena.github.io/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "roboarena",
                   plain: "Evaluators at eight universities pick their own task, run two anonymous policies on a DROID robot and say which did better; the votes become a ranking.",
                   tasks: "Open - evaluators choose", models: "9 policies on the public board", usage: "Crowd-sourced, like Chatbot Arena for robots; no success rate by design." },
@@ -128,7 +128,10 @@ window.phailScope = {
                   tasks: "3 composite tasks" },
                 { name: "ManiSkill-HAB", url: "https://maniskill.readthedocs.io/en/latest/tasks/external/", mode: "Sim", board: "paper", tests: "policy",
                   plain: "The same three Habitat home tasks re-built on fast GPU simulation.",
-                  tasks: "3 composite tasks" }
+                  tasks: "3 composite tasks" },
+                { name: "RoboChallenge ICRA 2026", url: "https://robochallenge.ai/competition/icra", mode: "Real", board: "challenge", tests: "policy", ledger: "robochallenge_icra26", added: "2026-09-29",
+                  plain: "Real robots in a supermarket scene follow instructions to navigate, pick up and load goods and restock shelves; a whole-body-control track run with Dexmal.",
+                  tasks: "2 (weighted 0.4 and 0.6)", models: "11 teams; best 94% success", usage: "Closed 28 May 2026. In the Ledger, not in the index: 2 tasks, and its entrants are on no other board." }
               ]
             },
             {
@@ -199,7 +202,10 @@ window.phailScope = {
                   tasks: "Room-to-Room instructions in continuous space" },
                 { name: "Butter-Bench", url: "https://andonlabs.com/evals/butter-bench", mode: "Real", board: "paper", tests: "agent", added: "2026-09-27",
                   plain: "An LLM runs a real small robot through an office errand - find the butter, bring it over - testing judgement rather than motor control.",
-                  tasks: "One errand split into sub-tasks" }
+                  tasks: "One errand split into sub-tasks" },
+                { name: "Quadruped VLN 2026", url: "https://robochallenge.ai/competition/quadruped-vln", mode: "Real", board: "challenge", tests: "policy", added: "2026-09-29",
+                  plain: "Quadruped robots follow language instructions over rough terrain - stairs, narrow passages, low openings, stepping stones, gullies - choosing footholds and gaits as well as the route.",
+                  tasks: "12 tracks: 10 single-skill, 2 combined long-horizon", usage: "Tsinghua EE on RoboChallenge; first season not started (Sep 2026)." }
               ]
             },
             {
@@ -452,49 +458,103 @@ window.phailScope = {
           id: "mechanical",
           name: "Mechanical design",
           icon: "drafting-compass",
-          define: "Mechanical parts and assemblies defined in CAD, to be machined, 3D-printed or moulded.",
+          define: "A model designs mechanical parts and assemblies that will be machined, 3D-printed or moulded - mostly as CAD models, sometimes as a product's design parameters. Split by task category, as in Robotics; the dashed node checks whether a design physically works. Circuit boards and chips are under Electronics design.",
           tasks: [
             {
-              id: "cad",
-              name: "CAD generation and editing",
+              id: "cad-part",
+              name: "CAD part generation",
               icon: "box",
-              define: "Input: text, an engineering drawing, an image or a point cloud - or an existing model plus an edit request. Output: an editable (parametric) CAD model, or the code that builds it. Checked by building the part in a CAD kernel and comparing its geometry and dimensions with a reference.",
+              define: "Create one part from text, an engineering drawing, an image or a point cloud. Output: an editable (parametric) CAD model, or the code that builds it. Checked by building the part in a CAD kernel and comparing its geometry and dimensions with a reference. The most measured mechanical task, and the closest to saturated: narrow protocols are near full marks.",
               benchmarks: [
                 { name: "BenchCAD", url: "https://benchcad.com/leaderboard", mode: "Offline", board: "live", tests: "agent",
-                  plain: "Models write CAD code for industrial parts, answer questions about them and edit them; the generated part is built and compared to the reference.",
+                  plain: "Models turn four views of an industrial part into CadQuery code, answer questions about the part and edit it; the generated part is built and compared with the reference. BenchCAD 2.0 (preview) adds assembly drawings and circuit boards.",
                   tasks: "17,900 parts in 106 families; 4 leaderboard tasks", usage: "OpenAI and Anthropic quote it in model launches." },
                 { name: "Parametric CAD Bench", url: "https://cadbench.ai/leaderboard", mode: "Offline", board: "live", tests: "agent",
-                  plain: "Build a specified part in FreeCAD; geometry and every stated dimension are checked separately.",
-                  tasks: "100 held-out tasks (v2)" },
+                  plain: "Agents build parts in FreeCAD from text or engineering drawings, and some tasks then ask for an edit; geometry and every stated dimension are scored.",
+                  tasks: "100 in V3: 30 from text, 30 create-then-edit, 40 from drawings", usage: "V3 since Sep 2026; best overall 61%, V1 and V2 kept as historical boards." },
                 { name: "CAD Arena", url: "https://normal.ai/leaderboard/cad-arena", mode: "Offline", board: "live", tests: "agent",
                   plain: "Agents rebuild real engineering drawings natively in five commercial CAD tools; scored on geometry and on whether the model stays editable.",
                   tasks: "18 drawings x 5 CAD platforms", models: "12 (Sep 2026)" },
-                { name: "neuralCAD-Edit", url: "https://autodeskailab.github.io/neuralCAD-Edit/", mode: "Offline", board: "live", tests: "agent",
-                  plain: "Carry out designers' edit requests on existing CAD models, judged against edits made by experts (Autodesk Research).",
-                  tasks: "192 requests, 384 expert edits" },
                 { name: "CADBench", url: "https://anniedoris.github.io/CADBench/#Leaderboard", mode: "Offline", board: "live", tests: "agent",
                   plain: "Rebuild CAD models from different kinds of input - images, point clouds, text - at large scale (MIT).",
                   tasks: "18,000 samples, 6 families, 5 input types" },
-                { name: "CadQueryEval", url: "https://danwahl.net/cadqueryeval/", mode: "Offline", board: "live", tests: "agent", added: "2026-09-27",
+                { name: "CadQueryEval", url: "https://danwahl.net/cadqueryeval/", mode: "Offline", board: "archived", tests: "agent", flag: "saturated", added: "2026-09-27",
                   plain: "Turn a plain-language description into CadQuery code; the part is built and checked against a reference mesh.",
-                  tasks: "25", models: "90" },
+                  tasks: "25", models: "90", usage: "Archived Sep 2026: four models score 1.00 on all 25 tasks." },
                 { name: "Text2CAD", url: "https://sadilkhan.github.io/text2cad-project/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-27",
                   plain: "Generate a CAD construction sequence from text written at four levels, from beginner to expert.",
                   tasks: "Large text-to-CAD dataset", usage: "NeurIPS 2024." }
               ]
             },
             {
-              id: "engineering",
-              name: "Constrained engineering design",
+              id: "cad-edit",
+              name: "CAD editing and engineering change",
+              icon: "wrench",
+              define: "Start from an existing CAD model and a change request - enlarge a bore, move a hole, carry out a designer's note. Output: the modified model. Scored on whether the change was made and nothing else broke: the rest of the geometry, the constraints and the design intent must survive. Far from saturated.",
+              benchmarks: [
+                { name: "neuralCAD-Edit", url: "https://autodeskailab.github.io/neuralCAD-Edit/", mode: "Offline", board: "live", tests: "agent",
+                  plain: "Carry out designers' edit requests on existing CAD models, judged against edits made by experts (Autodesk Research).",
+                  tasks: "192 requests, 384 expert edits", usage: "Expert edits are accepted 78% of the time, the best model's 25%." },
+                { name: "CAD-Preserve", url: "https://huggingface.co/datasets/harrrshall/cad-preserve", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-29",
+                  plain: "Given a part (STEP) and a change order, write a function that makes the change for any parameter value; graded at a nominal value and three hidden ones, and nothing else in the part may move.",
+                  tasks: "80 parts x 4 parameter values", usage: "The closest thing to SWE-bench for CAD, still small." },
+                { name: "HistCAD", url: "https://arxiv.org/abs/2602.19171", mode: "Offline", board: "paper", tests: "both", added: "2026-09-29",
+                  plain: "Apply parameter edits to CAD models built with explicit constraints; scores whether the edit could be made at all and whether the constraints (concentric, tangent, parallel) still hold afterwards.",
+                  tasks: "170,236 constraint-aware modelling sequences" }
+              ]
+            },
+            {
+              id: "cad-assembly",
+              name: "CAD assembly",
+              icon: "layers",
+              define: "Put many parts together: place each part, work out which parts mate and how, or build a whole machine from a kit of parts. Scored today on geometric placement - position, orientation, gaps between mating faces; tolerances and small fasteners are barely checked.",
+              benchmarks: [
+                { name: "MARB", url: "https://huggingface.co/spaces/SunnydayTech/marb-leaderboard", mode: "Offline", board: "live", tests: "agent", added: "2026-09-29",
+                  plain: "Build a whole machine from a blind kit of about 100 parts; an open grader (CADCLAW) checks every part's position, orientation and interface gaps against the target. It measures the exported geometry, not whether the machine could really be built.",
+                  tasks: "1 founding kit, ~100 parts", usage: "Mechanical Assembly Readiness Benchmark; no submitted run is buildable yet." },
+                { name: "OmniCAD", url: "https://arxiv.org/abs/2608.22637", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-29",
+                  plain: "VLMs look at renderings of industrial assemblies and must give each part's position and orientation, recover which parts mate and how, and assemble step by step with tools.",
+                  tasks: "25k assemblies, ~12 parts each, 21 mate types", usage: "Code and data announced, not yet released." }
+              ]
+            },
+            {
+              id: "cad-workflow",
+              name: "Full CAD workflow",
               icon: "cog",
-              define: "The design must meet functional requirements, not just match a shape: stay within load, weight and size limits, fit into an assembly, and pass a physics simulation.",
+              define: "An agent drives real CAD software through its interface for a whole job - sketch, model, assemble, generate a toolpath, run a simulation, make a drawing - and the saved project file is checked. Mixes the categories above, like Embodied agent suites in Robotics.",
+              benchmarks: [
+                { name: "CADWorld", url: "https://cad-world.github.io", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-29",
+                  plain: "Computer-use agents operate FreeCAD through screenshots, mouse and keyboard to sketch, model, assemble, make toolpaths, run simulations and draw; the saved project file is checked by executable rules.",
+                  tasks: "200 in 11 workflow categories", models: "7 agents; best 17.5%, experts 87%" }
+              ]
+            },
+            {
+              id: "design-opt",
+              name: "Design optimization",
+              icon: "scale",
+              define: "Given requirements and constraints, choose a design's parameters - a bicycle frame's tube sizes, a beam's material layout, an airfoil's shape - to do as well as possible on several objectives. The output is design parameters, not a CAD model; scored on how many constraints are met and on objective values from a simulator.",
               benchmarks: [
                 { name: "Bike-Bench", url: "https://decode.mit.edu/projects/bikebench/", mode: "Offline", board: "paper", tests: "both",
                   plain: "Design a bicycle frame that is valid, meets engineering targets and satisfies the constraints (MIT).",
-                  tasks: "Parametric bike design" },
+                  tasks: "Parametric bike design", usage: "Scores constraint satisfaction and multi-objective hypervolume." },
+                { name: "EngiBench", url: "https://engibench.ethz.ch/", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-29",
+                  plain: "A common interface to engineering design problems - airfoils, beams, heat conduction, thermo-elastic parts, photonics, power electronics - each with its own simulator, for comparing optimizers and generative design models.",
+                  tasks: "10 problems, 2D and 3D", usage: "NeurIPS 2025; reaches beyond mechanical design." }
+              ]
+            },
+            {
+              id: "cad-physics",
+              name: "Physics and function",
+              icon: "flask-conical",
+              kind: "capability",
+              define: "Capability board. Checks whether a design works, not just whether it looks right: manufacturability rules (DFM), stress under load (finite-element analysis), stability, and whether parts can move and be assembled along a feasible path. Applies to parts and assemblies alike.",
+              benchmarks: [
                 { name: "CADEngBench", url: "https://arxiv.org/abs/2608.09296", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
-                  plain: "Asks whether generated CAD actually works: parametric design, assembly reasoning and a physics simulation of the result.",
-                  tasks: "Design, assembly and simulation tasks" }
+                  plain: "Parametric parts checked for valid geometry, manufacturability rules and stress under load (finite-element analysis), plus assembly pairs checked for joints and motion.",
+                  tasks: "600 part tasks on 300 parts + 150 assembly pairs", models: "8" },
+                { name: "AssemblyBench", url: "https://arxiv.org/abs/2605.12845", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-29",
+                  plain: "From an instruction manual and 3D parts, predict the assembly order and each part's 6-DoF motion; the motions are checked for physical feasibility in simulation.",
+                  tasks: "2,789 synthetic industrial objects" }
               ]
             }
           ]

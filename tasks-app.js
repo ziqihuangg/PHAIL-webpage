@@ -213,7 +213,7 @@ function breakdownDisplay(record) {
   if (group.extras) {
     const parts = group.extras
       .filter((extra) => typeof row[extra] === "number")
-      .map((extra) => `${extraLabel(extra)} ${charts.formatValue(row[extra], extraUnit(extra))}`);
+      .map((extra) => `${extra === "tasks" && group.taskTotal ? `tasks run (of ${group.taskTotal})` : extraLabel(extra)} ${charts.formatValue(row[extra], extraUnit(extra))}`);
     return parts.join(" · ");
   }
   return "";
@@ -221,7 +221,7 @@ function breakdownDisplay(record) {
 
 function extraLabel(key) {
   return { easy: "clean scenes", hard: "randomised", sd: "SD", evals: "A/B evals", latencyMs: "latency",
-    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X", tasks: "tasks run (of 30)" }[key] || key;
+    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X", tasks: "tasks run" }[key] || key;
 }
 function extraUnit(key) {
   return { easy: "%", hard: "%", pairedSuccess: "%" }[key] || "";

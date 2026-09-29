@@ -34,7 +34,7 @@
   };
 
   const modeShort = { "Sim": "Sim", "Real": "Real", "Sim + real": "Sim+Real", "Offline": "Offline" };
-  const boardLabel = { live: "Live leaderboard", challenge: "Challenge", paper: "Results in papers" };
+  const boardLabel = { live: "Live leaderboard", challenge: "Challenge", paper: "Results in papers", archived: "Archived board" };
 
   /* What each label means, in the words shown on hover. */
   const modeMeaning = {
@@ -46,10 +46,11 @@
   const boardMeaning = {
     live: "Live leaderboard: takes new submissions and updates the ranking.",
     challenge: "Challenge: a competition with a deadline and its own board.",
-    paper: "Results in papers: no central board; each paper reports its own numbers."
+    paper: "Results in papers: no central board; each paper reports its own numbers.",
+    archived: "Archived board: no longer takes submissions; its last results stay up."
   };
   const testsMeaning = {
-    policy: "Tests trained policies (VLAs, imitation or RL controllers).",
+    policy: "Tests trained, task-specific models: robot policies (VLAs, imitation or RL controllers), or trained generators and optimizers.",
     agent: "Tests general models (LLMs, VLMs) driving a harness or writing code.",
     both: "Tests both trained policies and general models through a harness."
   };
