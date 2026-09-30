@@ -12,7 +12,7 @@
    ========================================================================== */
 
 (function () {
-  const labels = { scope: "Scope", ranking: "Ranking", ledger: "Ledger", charts: "Charts", astra: "GPT-6 Astra", benchmarks: "Benchmarks", related: "Related work", todo: "TODO" };
+  const labels = { scope: "Scope", ranking: "Ranking", ledger: "Ledger", charts: "Charts", astra: "GPT-6 Astra", related: "Related work", todo: "TODO" };
   const escape = (text) => String(text === undefined || text === null ? "" : text)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   let notes = window.phailNotes || [];

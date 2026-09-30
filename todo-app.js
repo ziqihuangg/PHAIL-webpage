@@ -12,8 +12,10 @@
     const all = [];
     window.phailScope.layers.forEach((layer) => layer.domains.forEach((domain) => domain.tasks.forEach((task) =>
       task.benchmarks.forEach((benchmark) => all.push(benchmark)))));
-    boards = all.length;
-    ledger = all.filter((benchmark) => benchmark.ledger).length;
+    /* a board split into sub-benchmarks is listed once per part; count it once */
+    const unique = (list) => new Set(list.map((benchmark) => benchmark.name)).size;
+    boards = unique(all);
+    ledger = unique(all.filter((benchmark) => benchmark.ledger));
   }
   const fill = (text) => escape(text).replace("{boards}", boards).replace("{ledger}", ledger);
   const statusText = { doing: "In progress", next: "Next", later: "Later" };

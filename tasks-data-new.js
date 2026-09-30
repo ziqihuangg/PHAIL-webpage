@@ -152,7 +152,7 @@ window.phailDatabase = {
     { id: "household", family: "Robotics", name: "Long-horizon household", detail: "Multi-step activities in changing scenes." },
     { id: "generalist", family: "Robotics", name: "Open-ended generalist", detail: "Evaluator picks the task; no fixed task list." },
     { id: "driving", family: "Autonomous driving", name: "Autonomous driving", detail: "Perception, planning, and vehicle control." },
-    { id: "world", family: "World models", name: "World-model prediction", detail: "Predict physical-world video without directly acting." },
+    { id: "world", family: "Video world models", name: "World-model prediction", detail: "Predict physical-world video without directly acting." },
     { id: "reasoning", family: "Embodied reasoning", name: "Embodied reasoning", detail: "Spatial and physical reasoning, pointing, and planning - no actuation." },
     { id: "industrial", family: "Industrial robotics", name: "Bin-picking and assembly", detail: "Throughput, reliability, and recovery on production-like tasks." },
     { id: "locomotion", family: "Robotics", name: "Whole-body locomotion", detail: "Balance, gait, contact, and disturbance rejection." },

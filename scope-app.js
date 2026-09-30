@@ -1,5 +1,5 @@
 /* =============================================================================
-   PhAIL - Scope tab: the left-to-right tree, the counts, and the directory
+   PhAIL - Scope tab: the tree, the counts, the directory and the metric glossary
    -----------------------------------------------------------------------------
    Reads window.phailScope (scope-data.js) and window.phailIcon (icons.js).
    The tree is plain nested flex boxes; the connector lines are CSS, so there is
@@ -8,7 +8,12 @@
    depth switch above the tree opens or closes a whole level at once. It opens
    at domain level so the first screen stays short.
 
-   Hover explanations: resting on a layer, domain or task shows its
+   A domain may group its task nodes (task.group -> domain.groups); a group
+   is drawn as one more column between the domain and its tasks. A board split
+   into sub-benchmarks appears once per part (benchmark.part) and is counted
+   once everywhere.
+
+   Hover explanations: resting on a layer, domain, group or task shows its
    definition; resting on a board shows what it is in plain words, its size,
    and what its Sim / Real / Offline and board labels mean. The switch in the
    toolbar turns this off; the choice is remembered in this browser only.
@@ -26,12 +31,17 @@
   scope.layers.forEach((layer) => layer.domains.forEach((domain) => domain.tasks.forEach((task) =>
     task.benchmarks.forEach((benchmark) => all.push({ layer, domain, task, benchmark })))));
 
-  const countIn = (node) => {
-    if (node.benchmarks) return node.benchmarks.length;
-    if (node.tasks) return node.tasks.reduce((sum, task) => sum + countIn(task), 0);
-    if (node.domains) return node.domains.reduce((sum, domain) => sum + countIn(domain), 0);
-    return 0;
+  /* boards under a node, each board once even when split into parts */
+  const boardsIn = (node) => {
+    if (node.benchmarks) return node.benchmarks;
+    if (node.tasks) return [].concat(...node.tasks.map(boardsIn));
+    if (node.domains) return [].concat(...node.domains.map(boardsIn));
+    if (node.layers) return [].concat(...node.layers.map(boardsIn));
+    return [];
   };
+  const unique = (benchmarks) => new Set(benchmarks.map((benchmark) => benchmark.name)).size;
+  const countIn = (node) => unique(boardsIn(node));
+  const fullName = (benchmark) => benchmark.part ? `${benchmark.name}: ${benchmark.part}` : benchmark.name;
 
   const modeShort = { "Sim": "Sim", "Real": "Real", "Sim + real": "Sim+Real", "Offline": "Offline" };
   const boardLabel = { live: "Live leaderboard", challenge: "Challenge", paper: "Results in papers", archived: "Archived board" };
@@ -60,9 +70,9 @@
      every layer, so the page never shows two different totals. */
   const statsMount = document.querySelector("[data-scope-stats]");
   if (statsMount) {
-    const live = all.filter((entry) => entry.benchmark.board === "live").length;
+    const live = unique(all.filter((entry) => entry.benchmark.board === "live").map((entry) => entry.benchmark));
     const domains = [].concat(...scope.layers.map((layer) => layer.domains.map((domain) => domain.name)));
-    statsMount.innerHTML = `<span><b>${all.length}</b> benchmarks (${live} live leaderboards)</span>`
+    statsMount.innerHTML = `<span><b>${unique(all.map((entry) => entry.benchmark))}</b> benchmarks (${live} live leaderboards)</span>`
       + `<span><b>${domains.length}</b> domains: ${escape(domains.join(", "))}</span>`;
   }
 
@@ -73,13 +83,13 @@
   const nodeCard = ({ kind, item, path }) => `<p class="explain-kicker">${escape(path)}</p>`
     + `<h4>${escape(item.name)} <span class="explain-count">${countIn(item)} board${countIn(item) === 1 ? "" : "s"}</span></h4>`
     + `<p>${escape(item.define || item.gloss || "")}</p>`
-    + (kind === "task" && item.kind === "capability" ? '<p class="explain-note">Dashed: a capability board tests one capability, with tasks drawn from any task category.</p>' : "");
+    + (item.kind === "capability" ? '<p class="explain-note">Dashed: a capability board tests one capability, with tasks drawn from any task category.</p>' : "");
 
   const boardCard = ({ benchmark, path }) => {
-    const facts = [["Tasks", benchmark.tasks], ["Models", benchmark.models], ["Used for", benchmark.usage]]
+    const facts = [["Tasks", benchmark.tasks], ["Models", benchmark.models], ["Used for", benchmark.usage], ["Placed here", benchmark.placed]]
       .filter((pair) => pair[1]);
     return `<p class="explain-kicker">${escape(path)}</p>`
-      + `<h4>${escape(benchmark.name)}</h4>`
+      + `<h4>${escape(fullName(benchmark))}</h4>`
       + `<p class="explain-plain">${escape(benchmark.plain)}</p>`
       + (facts.length ? `<dl class="explain-facts">${facts.map(([key, value]) => `<div><dt>${key}</dt><dd>${escape(value)}</dd></div>`).join("")}</dl>` : "")
       + `<ul class="explain-labels">`
@@ -99,6 +109,7 @@
     return `<a class="${classes.join(" ")}" href="${escape(benchmark.url)}" target="_blank" rel="noreferrer" data-explain-board="${explainBoard.length - 1}">`
       + (benchmark.board === "live" ? '<span class="st-live" aria-label="live leaderboard"></span>' : "")
       + `<span class="st-chip-name">${escape(benchmark.name)}</span>`
+      + (benchmark.part ? `<span class="st-chip-part">${escape(benchmark.part)}</span>` : "")
       + `<span class="st-chip-mode">${escape(modeShort[benchmark.mode] || benchmark.mode)}</span>`
       + (benchmark.ledger ? '<span class="st-chip-ledger">L</span>' : "")
       + "</a>";
@@ -107,14 +118,30 @@
   const node = (kind, item, extra, path) => {
     explainNode.push({ kind, item, path });
     return `<div class="st-node st-node--${kind}${extra || ""}" role="button" tabindex="0" aria-expanded="true" data-toggle data-explain-node="${explainNode.length - 1}">`
-      + `<span class="st-icon">${icon(item.icon, kind === "layer" ? 18 : 15)}</span>`
+      + (item.icon ? `<span class="st-icon">${icon(item.icon, kind === "layer" ? 18 : 15)}</span>` : "")
       + `<span class="st-text"><span class="st-name">${escape(item.name)}</span>`
       + (kind === "layer" ? `<span class="st-gloss">${escape(item.gloss)}</span>` : "")
-      + (kind === "task" && item.kind === "capability" ? '<span class="st-kind">capability board</span>' : "")
+      + (kind === "task" && item.kind === "capability" && !item.group ? '<span class="st-kind">capability board</span>' : "")
       + `</span><span class="st-count">${countIn(item)}</span><span class="st-caret" aria-hidden="true"></span></div>`;
   };
 
   const branch = (head, kids, depth) => `<div class="st-branch"${depth !== undefined ? ` data-depth="${depth}"` : ""}>${head}${kids.length ? `<div class="st-kids">${kids.join("")}</div>` : ""}</div>`;
+
+  /* a domain's tasks in order, consecutive tasks of one group gathered */
+  const groupedTasks = (domain) => {
+    const out = [];
+    domain.tasks.forEach((task) => {
+      const group = task.group && (domain.groups || []).filter((item) => item.id === task.group)[0];
+      const last = out[out.length - 1];
+      if (group && last && last.group === group) last.tasks.push(task);
+      else out.push({ group, tasks: [task] });
+    });
+    return out;
+  };
+  const groupName = (domain, task) => {
+    const group = task.group && (domain.groups || []).filter((item) => item.id === task.group)[0];
+    return group ? ` &rsaquo; ${escape(group.name)}` : "";
+  };
 
   const treeMount = document.querySelector("[data-scope-tree]");
   if (treeMount) {
@@ -122,16 +149,22 @@
       node("layer", layer, ` st-layer-${layer.id}${layer.boundary ? " st-node--boundary" : ""}`, "Layer"),
       layer.domains.map((domain) => branch(
         node("domain", domain, layer.boundary ? " st-node--boundary" : "", layer.name),
-        domain.tasks.map((task) => branch(
-          node("task", task, `${task.kind === "capability" ? " st-node--capability" : ""}${layer.boundary ? " st-node--boundary" : ""}`, `${layer.name.replace(" layer", "")} › ${domain.name}`),
-          [`<div class="st-branch"><div class="st-chips">${task.benchmarks.map((benchmark) => chip(benchmark, `${domain.name} › ${task.name}`)).join("")}</div></div>`],
-          3
-        )),
+        groupedTasks(domain).map(({ group, tasks }) => {
+          const where = group ? ` › ${group.name}` : "";
+          const taskBranch = (task) => branch(
+            node("task", task, `${task.kind === "capability" ? " st-node--capability" : ""}${layer.boundary ? " st-node--boundary" : ""}`, `${layer.name.replace(" layer", "")} › ${domain.name}${where}`),
+            [`<div class="st-branch"><div class="st-chips">${task.benchmarks.map((benchmark) => chip(benchmark, `${domain.name}${where} › ${task.name}`)).join("")}</div></div>`],
+            3
+          );
+          if (!group) return taskBranch(tasks[0]);
+          /* depth 2.5: opens with the tasks level of the depth switch */
+          return branch(node("group", Object.assign({}, group, { tasks }), group.kind === "capability" ? " st-node--capability" : "", `${layer.name.replace(" layer", "")} › ${domain.name}`), tasks.map(taskBranch), 2.5);
+        }),
         2
       )),
       1
     ));
-    const root = `<div class="st-node st-node--root"><img class="st-root-mark" src="physical-ai-mark.svg" alt="" /><span class="st-text"><span class="st-name">Physical AI</span></span><span class="st-count">${all.length}</span></div>`;
+    const root = `<div class="st-node st-node--root"><img class="st-root-mark" src="physical-ai-mark.svg" alt="" /><span class="st-text"><span class="st-name">Physical AI</span></span><span class="st-count">${countIn(scope)}</span></div>`;
     treeMount.innerHTML = `<div class="st-tree">${branch(root, layers, 0)}</div>`;
 
     const setOpen = (branchEl, open) => {
@@ -236,18 +269,40 @@
   const directoryMount = document.querySelector("[data-scope-directory]");
   if (directoryMount) {
     const summary = document.querySelector("[data-scope-directory-summary]");
-    if (summary) summary.textContent = `All ${all.length} benchmarks, in plain words`;
+    if (summary) summary.textContent = `All ${countIn(scope)} benchmarks, in plain words`;
     directoryMount.innerHTML = `<div class="data-table-wrap"><table class="data-table scope-directory-table">`
       + `<thead><tr><th>Benchmark</th><th>Where it sits</th><th>What it is</th><th>Tasks</th><th>Models</th><th>Mode</th><th>Board</th><th>Tests</th></tr></thead><tbody>`
       + all.map(({ layer, domain, task, benchmark }) => `<tr${layer.boundary ? ' class="row-reference"' : ""}>`
-        + `<td><a href="${escape(benchmark.url)}" target="_blank" rel="noreferrer">${escape(benchmark.name)}</a>`
+        + `<td><a href="${escape(benchmark.url)}" target="_blank" rel="noreferrer">${escape(fullName(benchmark))}</a>`
         + (benchmark.added ? ` <span class="scope-new" title="Added ${escape(benchmark.added)}">new</span>` : "")
         + (benchmark.flag === "saturated" ? ' <span class="scope-flag">saturated</span>' : "")
         + (benchmark.ledger ? ' <a class="scope-ledger" href="tasks.html">in ledger</a>' : "") + "</td>"
-        + `<td>${escape(layer.name.replace(" layer", ""))} &rsaquo; ${escape(domain.name)} &rsaquo; ${escape(task.name)}</td>`
+        + `<td>${escape(layer.name.replace(" layer", ""))} &rsaquo; ${escape(domain.name)}${groupName(domain, task)} &rsaquo; ${escape(task.name)}`
+        + (benchmark.placed ? `<small class="scope-placed">${escape(benchmark.placed)}</small>` : "") + "</td>"
         + `<td>${escape(benchmark.plain)}</td><td>${escape(benchmark.tasks || "")}</td><td>${escape(benchmark.models || "")}</td>`
         + `<td>${escape(benchmark.mode)}</td><td>${escape(boardLabel[benchmark.board])}</td>`
         + `<td>${escape({ policy: "Policy", agent: "Agent", both: "Both" }[benchmark.tests])}</td></tr>`).join("")
       + `</tbody></table></div>`;
+  }
+
+  /* --- metric glossary: how boards score --------------------------------------------
+     A board name that is not in the tree is flagged, so a rename cannot leave a
+     stale name behind unnoticed. metrics.html redirects to #metrics: open it. */
+  const metricsMount = document.querySelector("[data-scope-metrics]");
+  if (metricsMount && scope.metrics) {
+    const names = new Set(all.map((entry) => entry.benchmark.name));
+    const boardName = (name) => escape(name) + (names.has(name) ? "" : ' <span class="scope-flag">not in Scope</span>');
+    metricsMount.innerHTML = `<div class="data-table-wrap"><table class="data-table metrics-table">`
+      + `<thead><tr><th>Metric</th><th>Used in</th><th>Measures</th><th>Limitation</th></tr></thead><tbody>`
+      + scope.metrics.map((metric) => `<tr><td>${escape(metric.name)}</td><td>${metric.usedIn.map(boardName).join(", ")}</td>`
+        + `<td>${escape(metric.measures)}${metric.link ? ` (<a href="${escape(metric.link[1])}">${escape(metric.link[0])}</a>)` : ""}</td>`
+        + `<td>${escape(metric.limit)}</td></tr>`).join("")
+      + `</tbody></table></div>`
+      + (scope.metricsMissing ? `<p class="table-footnote">${escape(scope.metricsMissing)}</p>` : "");
+    const metricsBox = metricsMount.closest("details");
+    if (metricsBox && window.location.hash === "#metrics") {
+      metricsBox.open = true;
+      metricsBox.scrollIntoView();
+    }
   }
 })();

@@ -19,26 +19,25 @@ Tabs, left to right:
 
 | Page | File | What it does |
 | --- | --- | --- |
-| Scope | `index.html` | Left-to-right taxonomy tree of physical AI (Execution / Design / Supporting capabilities) with every known benchmark; all counts are computed from `scope-data.js` on load |
+| Scope | `index.html` | Left-to-right taxonomy tree of physical AI (Execution / Design / Supporting capabilities) with every known benchmark; all counts are computed from `scope-data.js` on load. Below the tree: every benchmark in plain words, and the metric glossary |
 | Robotics Index | `ranking.html` | Draft cross-board index for robot manipulation: switches, index chart, method with formulas, board weights, capability heatmap, model gaps, board agreement and pooled-vs-single check, size scatter, ranking factors |
 | CAD Index | `cad-index.html` | The same engine and page code for CAD boards (`cad-ranking-data.js`): index, CAD-specific rules, weights, capabilities (text / edit / drawings / workflow), gaps, agreement, index against cost |
 | Ledger | `tasks.html` | The filterable evaluation ledger - every cited record, with a chart of whichever board is in view |
 | Charts | `charts.html` | One chart per published table, plus the cross-board comparison that explains why the index never adds numbers across boards |
 | GPT-6 Astra | `gpt-6-astra.html` | Model spotlight: one model read across six published sources |
-| Benchmarks | `benchmarks.html` | Protocol table for the transcribed boards and the metric glossary |
 | Related work | `related.html` | Internal notes on closely related projects (noindex) |
 | TODO | `todo.html` | The one list of open work, plus meeting notes from every tab |
 | (no tab) | `models.html` | Model spec sheet, kept so old links resolve |
-| (redirects) | `about.html`, `metrics.html` | Forward to `index.html#about` and `benchmarks.html#metrics` |
+| (redirects) | `about.html`, `metrics.html` | Forward to `index.html`; `metrics.html` to the metric glossary at `index.html#metrics` |
 
-Tabs are defined only in `script.js` (`pageLinks`); pages ship an empty header. Every tab ends with "Things to discuss" (from `discussion-data.js`) and a meeting-notes box: under `bash preview.sh`, a note typed there is written to `notes-data.js`.
+Tabs are defined only in `script.js`: `pageLinks` are the top-level tabs (Scope, Robotics Index, Ledger); `internalLinks` (CAD Index, Charts, GPT-6 Astra, Related work, TODO) sit under one "Internal Work in Progress" tab that opens a menu on hover or tap. Pages ship an empty header. Every tab ends with "Things to discuss" (from `discussion-data.js`) and a meeting-notes box: under `bash preview.sh`, a note typed there is written to `notes-data.js`.
 
 ## 3. Code logic
 
 **Data and rendering are always separate files.** Rendering code never contains data, and data files never contain markup:
 
 - [`tasks-data-new.js`](tasks-data-new.js) / [`astra-data.js`](astra-data.js) - the data: every record, citation, and source
-- [`scope-data.js`](scope-data.js) - the taxonomy: layer > domain > task > benchmarks, with mode, board type, what can be entered, and whether the ledger transcribes it
+- [`scope-data.js`](scope-data.js) - the taxonomy: layer > domain > (group) > task > benchmarks, with mode, board type, what can be entered, and whether the ledger transcribes it. A board split into sub-benchmarks is listed once per part (`part`) and counted once
 - [`ranking-data.js`](ranking-data.js) - every knob of the index: trial counts, board families, evidence weights, capability axes, ranking factors
 - [`cad-ranking-data.js`](cad-ranking-data.js) - the same knobs for the CAD Index; a page picks its config with `<body data-ranking="robotics" | "cad">`
 - [`discussion-data.js`](discussion-data.js) - the open questions at the foot of each tab

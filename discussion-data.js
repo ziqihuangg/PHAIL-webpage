@@ -29,23 +29,27 @@ window.phailDiscussion = {
     },
     {
       title: "Capability boards: separate nodes or tags",
-      detail: "Robotics is split by task category (table-top, mobile, loco-manipulation...). Some boards instead test one capability - memory, spatial, safety, touch - with tasks from any category; for now they are the dashed nodes after the task categories. The alternative: tag every task on every board with the capabilities it needs, and score each capability across all boards, as RoboDojo already does with its five axes.",
+      detail: "Robotics is split by what the task needs - fixed-base manipulation (table-top, dexterous, industrial), moving-base manipulation (on wheels or on legs), navigation. Some boards instead test one capability - memory, long-horizon, safety, touch - with tasks from any category; for now they are the dashed nodes grouped under Capability boards. The alternative: tag every task on every board with the capabilities it needs, and score each capability across all boards, as RoboDojo already does with its five axes.",
       decide: "Keep the dashed nodes, or move to capability tags?"
     },
     {
       title: "Supporting capabilities stay out of the ranking",
-      detail: "A board's layer is set by what it scores: an action goes to Execution, a manufactured design to Design, an answer or a generated video to Supporting capabilities. So WorldLens, a driving world model, sits under Supporting (it scores generated video), while EmbodiedBench sits under Robotics (its LLM agents act in a simulator). Supporting boards test other kinds of models - video generators, VLMs - than robot policies.",
+      detail: "A board's layer is set by what it scores: an action goes to Execution, a manufactured design to Design, an answer, a generated video, or the commands of an LLM agent with no trained policy behind them to Supporting capabilities. So WorldLens, a driving world model, sits under Supporting (it scores generated video), and so does EmbodiedBench: its LLMs issue steps or gripper poses that the simulator carries out, and no robot policy is tested. Supporting boards test other kinds of models - video generators, LLMs, VLMs - than robot policies.",
       decide: "List Supporting boards but leave them out of the model ranking?"
     },
     {
       title: "The spatial board from 19 Sep",
-      detail: "The 19 Sep review mentioned a spatial benchmark. The only one we found where the model acts is VABench (Sep 2026): general multimodal LLMs - not trained robot policies - find objects with a camera they move and write metric arm commands that a fixed controller executes in RoboTwin. RoboSpatial, MV-RoboBench and Embodied3DBench only ask questions, so they sit under Embodied reasoning.",
+      detail: "The 19 Sep review mentioned a spatial benchmark. The only one we found where the model acts is VABench (Sep 2026): general multimodal LLMs - not trained robot policies - find objects with a camera they move and write metric arm commands that a fixed controller executes in RoboTwin. No trained policy is tested, so it sits under Supporting capabilities with the other LLM and VLM agent boards; RoboSpatial, MV-RoboBench and Embodied3DBench only ask questions.",
       decide: "Is VABench the one meant, or which other?"
     },
     {
       title: "Next domains for the ledger",
       detail: "The ranking covers robotics only, because the ledger holds numbers for robotics boards only; driving, drones and design have none yet. Proposed first: CARLA Leaderboard (driving), Drone-Bench (drones), Parametric CAD Bench and CAD Arena (design) - each a live board run by its operator, the same kind the robotics ranking uses.",
       decide: "Agree on this order?"
+    },
+    {
+      title: "Design-layer metrics",
+      detail: "The metric glossary below the tree covers robotics only; design boards score voxel IoU, B-rep validity, DRC-clean routing, editability."
     }
   ],
 
@@ -153,17 +157,6 @@ window.phailDiscussion = {
     {
       title: "Overlap with the MIT CSAIL survey",
       detail: "It tracks many of the same Astra sources. Comparison on the Related work tab."
-    }
-  ],
-
-  benchmarks: [
-    {
-      title: "Two lists of boards",
-      detail: "This table and the Scope tree overlap. Proposal: generate this one from the scope data."
-    },
-    {
-      title: "Design-layer metrics",
-      detail: "The glossary covers robotics only; design boards score voxel IoU, B-rep validity, DRC-clean routing, editability."
     }
   ]
 };
