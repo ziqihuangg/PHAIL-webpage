@@ -33,15 +33,15 @@ window.phailRanking = {
   updated: "2026-09-30",
 
   boards: {
-    "robodojo-sim":        { label: "RoboDojo Sim", trials: 2100, family: "robodojo-sim", metric: "score" },
-    "robodojo-real":       { label: "RoboDojo Real", trials: 180, family: "robodojo-real", metric: "score" },
-    "robochallenge-t30":   { label: "RoboChallenge T30", trials: 300, family: "robochallenge", metric: "success" },
-    "robochallenge-t30v2": { label: "RoboChallenge T30-v2", trials: 300, family: "robochallenge", metric: "success", minTasks: 15 },
-    "robotwin-2":          { label: "RoboTwin 2.0", trials: 10000, family: "robotwin", metric: "success" },
-    "roboarena":           { label: "RoboArena", family: "roboarena", scale: "elo", metric: "elo" },
+    "robodojo-sim":        { label: "RoboDojo Sim", trials: 2100, family: "robodojo-sim", metric: "score", scopeTask: "tabletop" },
+    "robodojo-real":       { label: "RoboDojo Real", trials: 180, family: "robodojo-real", metric: "score", scopeTask: "tabletop" },
+    "robochallenge-t30":   { label: "RoboChallenge T30", trials: 300, family: "robochallenge", metric: "success", scopeTask: "tabletop" },
+    "robochallenge-t30v2": { label: "RoboChallenge T30-v2", trials: 300, family: "robochallenge", metric: "success", minTasks: 15, scopeTask: "tabletop" },
+    "robotwin-2":          { label: "RoboTwin 2.0", trials: 10000, family: "robotwin", metric: "success", scopeTask: "tabletop" },
+    "roboarena":           { label: "RoboArena", family: "roboarena", scale: "elo", metric: "elo", scopeTask: "tabletop" },
     /* The board says 3,600 evaluations per model, but its rates are multiples
        of 1/1,800 (1/180 per environment), so 1,800 is the conservative count. */
-    "paw-gen-10":          { label: "PAW-GEN-10", trials: 1800, family: "paw", metric: "success" }
+    "paw-gen-10":          { label: "PAW-GEN-10", trials: 1800, family: "paw", metric: "success", scopeTask: "tabletop" }
   },
 
   /* Operator-run tables that stay in the Ledger but not in the index, and
@@ -88,20 +88,32 @@ window.phailRanking = {
      Precision, Long-horizon, Memory, Open-vocab. RoboDojo spreads 42 tasks over
      five axes, so each axis rests on roughly a fifth of the rollouts. */
   capabilities: [
+    /* definedBy: who decides what the capability is. A board's own task
+       grouping is quoted from the board; groupings of several boards are ours.
+       `what` says what each source column measures, in the board's words. */
     { id: "generalization", name: "Generalization", short: "Gen.", icon: "shuffle",
-      sources: [{ board: "robodojo-sim", dim: 0, trials: 840 }, { board: "robotwin-2", field: "hard", trials: 5000 }, { board: "paw-gen-10", field: "interp", trials: 900 }] },
-    { id: "precision", name: "Precision", short: "Prec.", icon: "gauge",
-      sources: [{ board: "robodojo-sim", dim: 1, trials: 420 }] },
-    { id: "long", name: "Long-horizon", short: "Long", icon: "route",
-      sources: [{ board: "robodojo-sim", dim: 2, trials: 420 }] },
-    { id: "memory", name: "Memory", short: "Mem.", icon: "history",
-      sources: [{ board: "robodojo-sim", dim: 3, trials: 420 }] },
-    { id: "open", name: "Open-vocabulary", short: "Open", icon: "list-checks",
-      sources: [{ board: "robodojo-sim", dim: 4, trials: 420 }] },
-    { id: "real", name: "Real robot", short: "Real", icon: "bot",
-      sources: [{ board: "robodojo-real" }, { board: "robochallenge-t30" }, { board: "robochallenge-t30v2" }, { board: "roboarena" }, { board: "paw-gen-10" }] },
-    { id: "embodiment", name: "Worst arm (cross-embodiment)", short: "Worst arm", icon: "git-merge",
-      sources: [{ board: "robodojo-real", min: ["arx", "piper", "piperX"], trials: 60 }] }
+      definedBy: "PhAIL, joining three boards' own measures of unseen variation",
+      sources: [
+        { board: "robodojo-sim", dim: 0, trials: 840, what: "RoboDojo's Generalization axis: \u201cvaried objects, layouts and random variants\u201d (mean of standard and randomised layouts)" },
+        { board: "robotwin-2", field: "hard", trials: 5000, what: "RoboTwin 2.0 success on randomised scenes (clutter, lighting, textures), after training on clean ones" },
+        { board: "paw-gen-10", field: "interp", trials: 900, what: "PAW-GEN-10 success on unseen object placements between the training placements" }] },
+    { id: "precision", name: "Precision", short: "Prec.", icon: "gauge", definedBy: "RoboDojo (its own task grouping)",
+      sources: [{ board: "robodojo-sim", dim: 1, trials: 420, what: "RoboDojo's Precision axis: \u201cfine-grained manipulation with tight spatial constraints\u201d, e.g. Fasten Screws" }] },
+    { id: "long", name: "Long-horizon", short: "Long", icon: "route", definedBy: "RoboDojo (its own task grouping)",
+      sources: [{ board: "robodojo-sim", dim: 2, trials: 420, what: "RoboDojo's Long-Horizon axis: \u201cmulti-step tasks that require completing several subgoals\u201d" }] },
+    { id: "memory", name: "Memory", short: "Mem.", icon: "history", definedBy: "RoboDojo (its own task grouping)",
+      sources: [{ board: "robodojo-sim", dim: 3, trials: 420, what: "RoboDojo's Memory axis: \u201cstate tracking, sequence recall or delayed matching\u201d" }] },
+    { id: "open", name: "Open-vocabulary", short: "Open", icon: "list-checks", definedBy: "RoboDojo (its own task grouping)",
+      sources: [{ board: "robodojo-sim", dim: 4, trials: 420, what: "RoboDojo's Open axis: \u201copen-ended or language- / image-conditioned manipulation\u201d" }] },
+    { id: "real", name: "Real robot", short: "Real", icon: "bot", definedBy: "PhAIL: every real-robot board's headline score",
+      sources: [
+        { board: "robodojo-real", what: "RoboDojo Real score, 18 tasks on three real arms" },
+        { board: "robochallenge-t30", what: "RoboChallenge Table30 success rate" },
+        { board: "robochallenge-t30v2", what: "RoboChallenge Table30-v2 success rate" },
+        { board: "roboarena", what: "RoboArena Elo from head-to-head votes" },
+        { board: "paw-gen-10", what: "PAW-GEN-10 success rate" }] },
+    { id: "embodiment", name: "Worst arm (cross-embodiment)", short: "Worst arm", icon: "git-merge", definedBy: "PhAIL: the weakest of a model's per-arm scores",
+      sources: [{ board: "robodojo-real", min: ["arx", "piper", "piperX"], trials: 60, what: "RoboDojo Real: the lowest of the model's scores on ARX X5, Piper and Piper X" }] }
   ],
 
   /* Model gaps: where the models on the benchmark-run boards still fail, read

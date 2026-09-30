@@ -28,11 +28,11 @@ window.phailCadRanking = {
   controls: ["coverage", "weighting", "evidence", "method"],
 
   boards: {
-    "paramcad-v3":          { label: "Parametric CAD Bench V3", trials: 100, family: "paramcad", metric: "overall" },
-    "benchcad-vision2code": { label: "BenchCAD Vision2Code", trials: 1000, family: "benchcad", metric: "iou" },   /* stand-in */
-    "cad-arena":            { label: "CAD Arena", trials: 90, family: "cadarena", metric: "score" },
-    "cadbench-mit-image":   { label: "CADBench (MIT)", trials: 1000, family: "cadbench_mit", metric: "iou" },     /* stand-in */
-    "cadworld":             { label: "CADWorld", trials: 200, family: "cadworld", metric: "success" }
+    "paramcad-v3":          { label: "Parametric CAD Bench V3", trials: 100, family: "paramcad", metric: "overall", scopeTask: "cad-part" },
+    "benchcad-vision2code": { label: "BenchCAD Vision2Code", trials: 1000, family: "benchcad", metric: "iou", scopeTask: "cad-part" },   /* stand-in */
+    "cad-arena":            { label: "CAD Arena", trials: 90, family: "cadarena", metric: "score", scopeTask: "cad-part" },
+    "cadbench-mit-image":   { label: "CADBench (MIT)", trials: 1000, family: "cadbench_mit", metric: "iou", scopeTask: "cad-part" },     /* stand-in */
+    "cadworld":             { label: "CADWorld", trials: 200, family: "cadworld", metric: "success", scopeTask: "cad-workflow" }
   },
 
   outOfIndex: {
@@ -50,14 +50,18 @@ window.phailCadRanking = {
   minSharedForTau: 4,
 
   capabilities: [
-    { id: "text", name: "Create from text", short: "Text", icon: "pencil-ruler",
-      sources: [{ board: "paramcad-v3", field: "create", trials: 30 }] },
-    { id: "edit", name: "Create, then edit", short: "Edit", icon: "wrench",
-      sources: [{ board: "paramcad-v3", field: "createEdit", trials: 30 }] },
-    { id: "drawings", name: "From drawings or views", short: "Drawings", icon: "drafting-compass",
-      sources: [{ board: "paramcad-v3", field: "image", trials: 40 }, { board: "cad-arena" }, { board: "benchcad-vision2code" }, { board: "cadbench-mit-image" }] },
-    { id: "workflow", name: "Whole workflow in the CAD program", short: "Workflow", icon: "cog",
-      sources: [{ board: "cadworld" }] }
+    { id: "text", name: "Create from text", short: "Text", icon: "pencil-ruler", definedBy: "Parametric CAD Bench (its own task category)",
+      sources: [{ board: "paramcad-v3", field: "create", trials: 30, what: "Parametric CAD Bench \u201cCreate\u201d: 30 parts described in words" }] },
+    { id: "edit", name: "Create, then edit", short: "Edit", icon: "wrench", definedBy: "Parametric CAD Bench (its own task category)",
+      sources: [{ board: "paramcad-v3", field: "createEdit", trials: 30, what: "Parametric CAD Bench \u201cCreate + Edit\u201d: 30 tasks, build a part then change it" }] },
+    { id: "drawings", name: "From drawings or views", short: "Drawings", icon: "drafting-compass", definedBy: "PhAIL, joining four boards' drawing- or image-to-CAD tasks",
+      sources: [
+        { board: "paramcad-v3", field: "image", trials: 40, what: "Parametric CAD Bench \u201cImage-to-CAD\u201d: 40 engineering drawings" },
+        { board: "cad-arena", what: "CAD Arena: 18 drawings rebuilt in 5 commercial CAD tools" },
+        { board: "benchcad-vision2code", what: "BenchCAD Vision2Code: four orthographic views to CadQuery code" },
+        { board: "cadbench-mit-image", what: "CADBench (MIT): images to CAD programs, 6 families" }] },
+    { id: "workflow", name: "Whole workflow in the CAD program", short: "Workflow", icon: "cog", definedBy: "CADWorld (the whole board)",
+      sources: [{ board: "cadworld", what: "CADWorld: 200 FreeCAD tasks operated through the screen" }] }
   ],
 
   gaps: [

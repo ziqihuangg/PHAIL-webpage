@@ -7,7 +7,7 @@
   <title>CAD Index - PhAIL</title>
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=22" />
 </head>
 <body data-ranking="cad">
   <header class="site-header" id="top"></header>
@@ -15,6 +15,7 @@
   <main class="ranking-page">
     <section class="database-intro">
       <h1>CAD Index</h1>
+      <p class="index-scope" data-index-scope></p>
     </section>
 
     <div class="rank-controls" data-rank-controls></div>
@@ -36,7 +37,7 @@
         <div><dt>Why</dt><dd data-why>No single CAD board ranks the field, and each board alone is noisy - see Board agreement.</dd></div>
         <div><dt>Data</dt><dd>Published results from <b data-m="boards">5</b> CAD leaderboards whose operators run every model themselves, on one protocol - <b data-m="results">0</b> results for <b data-m="models">0</b> models, copied unchanged from the Ledger. We measure nothing ourselves; numbers the model vendors report on their own set-up are off by default.</dd></div>
         <div><dt>Method</dt><dd>The same as the <a href="ranking.html#method">Robotics Index</a>: inside each board every pair of models is compared against the board's noise, boards are weighted by the room they leave at the top, and all comparisons are pooled into one strength per model.</dd></div>
-        <div><dt>Meaning</dt><dd>A model's index is the share of head-to-head match-ups it is expected to win against every other ranked model: 50 is the middle of this field. It is relative to the models ranked here - not a share of tasks solved.</dd></div>
+        <div><dt>Meaning</dt><dd>A model's index is its average chance of beating each of the other ranked models, taken one at a time, according to the pooled comparisons of all boards. 50 is the middle of this field. It is not a share of tasks solved, and not the share of models it is ranked above. <span data-meaning-example></span></dd></div>
       </dl>
       <h3 class="rank-out-title">What is specific to CAD</h3>
       <ol class="slide-steps">
@@ -67,9 +68,13 @@
     <section class="chart-block" id="capabilities">
       <h2>Capabilities, decoupled</h2>
       <ul class="slide-points">
-        <li>The same fit, run once per capability.</li>
-        <li>Text and Edit rest on Parametric CAD Bench alone; &middot; means never measured.</li>
+        <li>Each column is its own small index: the same method (steps 2-7) run only on the sub-scores that measure that capability. A cell is the model's chance of beating the other models on that capability (0-100), not a raw score; &middot; means the model has no such score.</li>
+        <li data-cap-summary></li>
       </ul>
+      <details class="step-more">
+        <summary>Details: who defines each capability, and the data behind each column</summary>
+        <div data-cap-details></div>
+      </details>
       <div class="data-table-wrap" data-rank-capabilities tabindex="0" aria-label="Capability profile"></div>
       <p class="rank-sources" data-rank-capability-sources></p>
       <button type="button" class="filter-reset rank-more" data-rank-capabilities-more hidden></button>
@@ -88,7 +93,7 @@
     <section class="chart-block" id="agreement">
       <h2>Board agreement</h2>
       <ul class="slide-points">
-        <li>Kendall's &tau; over the models two boards share (four or more): <b>+1</b> same order, <b>&minus;1</b> reversed. What &tau; means, with formulas, is on the <a href="ranking.html#agreement">Robotics Index</a>.</li>
+        <li><b>In short:</b> when two boards test the same models, do they put them in the same order? Kendall's &tau; scores that from <b>+1</b> (same order) through 0 to <b>&minus;1</b> (reversed), on the models both share (four or more). Formulas are on the <a href="ranking.html#agreement">Robotics Index</a>.</li>
         <li data-agree-reading></li>
       </ul>
       <div class="data-table-wrap" data-rank-agreement tabindex="0" aria-label="Board agreement"></div>
@@ -124,11 +129,11 @@
   <script src="icons.js?v=1"></script>
   <script src="charts.js?v=6"></script>
   <script src="tasks-data-new.js?v=16"></script>
-  <script src="scope-data.js?v=9"></script>
-  <script src="cad-ranking-data.js?v=2"></script>
-  <script src="ranking-engine.js?v=3"></script>
-  <script src="ranking-app.js?v=17"></script>
-  <script src="discussion-data.js?v=8"></script>
+  <script src="scope-data.js?v=10"></script>
+  <script src="cad-ranking-data.js?v=4"></script>
+  <script src="ranking-engine.js?v=4"></script>
+  <script src="ranking-app.js?v=23"></script>
+  <script src="discussion-data.js?v=9"></script>
   <script src="discussion.js?v=3"></script>
   <script src="notes-data.js?v=1"></script>
   <script src="notes.js?v=1"></script>

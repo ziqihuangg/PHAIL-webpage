@@ -260,8 +260,8 @@ window.phailScope = {
               define: "Capability board. Tasks where success depends on getting 3D positions right - where an object is, how far away, which way it faces - and then acting on them: move the camera to find a hidden object, send an exact arm pose. Answering questions about space without acting is under Embodied reasoning.",
               benchmarks: [
                 { name: "VABench", url: "https://github.com/zhangzhongbo2213/VABench", mode: "Sim", board: "paper", tests: "agent", added: "2026-09-28",
-                  plain: "A model learns a task from a demonstration, moves the camera to find what it cannot see, then sends exact 3D arm commands, all in closed loop on RoboTwin.",
-                  tasks: "14 task families + long-horizon tracks", models: "12 model set-ups; best 53.9%", usage: "New (DUT / NTU, Sep 2026)." }
+                  plain: "Tests general multimodal LLMs (GPT, Claude, Gemini, Qwen...), not trained robot policies. The LLM watches a demonstration, moves the camera to find what it cannot see, and writes step commands - move 30 mm along x, turn the gripper 15 degrees, close it; a fixed controller turns them into arm motion in RoboTwin. Nothing is trained on robot data.",
+                  tasks: "14 task families + long-horizon tracks", models: "12 LLMs; best 53.9% success", usage: "New (DUT / NTU, Sep 2026). The same kind of entry as GPT-6-Astra driving the arm on RoboDojo. The LLMs locate targets almost perfectly in diagnostics yet fail half the tasks: the gap is execution." }
               ]
             },
             {

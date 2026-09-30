@@ -39,7 +39,7 @@ window.phailDiscussion = {
     },
     {
       title: "The spatial board from 19 Sep",
-      detail: "The 19 Sep review mentioned a spatial benchmark. The only one we found where the model acts is VABench (Sep 2026): models find objects and send exact 3D arm poses in RoboTwin. RoboSpatial, MV-RoboBench and Embodied3DBench only ask questions, so they sit under Embodied reasoning.",
+      detail: "The 19 Sep review mentioned a spatial benchmark. The only one we found where the model acts is VABench (Sep 2026): general multimodal LLMs - not trained robot policies - find objects with a camera they move and write metric arm commands that a fixed controller executes in RoboTwin. RoboSpatial, MV-RoboBench and Embodied3DBench only ask questions, so they sit under Embodied reasoning.",
       decide: "Is VABench the one meant, or which other?"
     },
     {

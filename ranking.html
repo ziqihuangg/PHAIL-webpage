@@ -8,7 +8,7 @@
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
   <link rel="stylesheet" href="vendor/katex/katex.min.css" />
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=22" />
 </head>
 <body data-ranking="robotics">
   <header class="site-header" id="top"></header>
@@ -16,6 +16,7 @@
   <main class="ranking-page">
     <section class="database-intro">
       <h1>Robotics Index</h1>
+      <p class="index-scope" data-index-scope></p>
     </section>
 
     <div class="rank-controls" data-rank-controls></div>
@@ -33,16 +34,19 @@
 
     <section class="slide" id="method">
       <h2>Index method</h2>
-      <dl class="method-intro">
-        <div><dt>Why</dt><dd data-why>No single board ranks the field, each board alone is noisy, and the boards share enough signal that the pooled index predicts a left-out board as well as the best single board while judging more pairs - see Board agreement.</dd></div>
-        <div><dt>Data</dt><dd>Published results from <b data-m="boards">6</b> leaderboards whose operators run every model themselves, on one protocol - <b data-m="results">121</b> results for <b data-m="models">85</b> models, copied unchanged from the Ledger. We measure nothing ourselves; the models' own paper tables are off by default.</dd></div>
-        <div><dt>Method</dt><dd>Inside each board, every pair of models is compared: who scored higher, and by more than the board's own noise? Boards are weighted by how much room they leave at the top. All comparisons are then pooled into one strength per model, which puts models on one scale even when they never met on the same board.</dd></div>
-        <div><dt>Meaning</dt><dd>A model's index is the share of head-to-head match-ups it is expected to win against every other ranked model: 50 is the middle of this field, 90 beats nine in ten. It is relative to the models ranked here - not a success rate, and not an absolute skill level.</dd></div>
+      <dl class="method-intro method-intro--short">
+        <div><dt>What</dt><dd>One number per model, 0-100: how often it would beat the other ranked models. <b data-m="models">86</b> models from <b data-m="boards">7</b> boards.</dd></div>
+        <div><dt>Why</dt><dd>No single board tests every model, and each board alone is noisy, so the boards are pooled.</dd></div>
+        <div><dt>How</dt><dd>Inside each board, count who beat whom - scores are never added across boards. Pool all these results into one strength per model, as Elo does for chess players, then turn the strengths into the 0-100 index.</dd></div>
       </dl>
-      <p class="method-note">Each step opens for details. Their numbers are for the default settings and are recomputed from the Ledger on every load.</p>
+      <p class="method-note">Each point opens for details; the numbers there are for the default settings and are recomputed from the Ledger on every load.</p>
       <ol class="slide-steps">
         <li><b>Seven boards, each run by its operator</b><span>RoboDojo Sim and Real, RoboChallenge T30 and T30-v2, RoboTwin 2.0, RoboArena, PAW-GEN-10. Paper tables join only when switched on, at half weight. RoboChallenge's closed competitions stay in the Ledger only; the reasons are under Boards and weights.</span>
           <details class="step-more"><summary>Details</summary>
+            <h4 class="step-sub">Why pool several boards</h4>
+            <div data-why></div>
+            <h4 class="step-sub">What goes in</h4>
+            <p><b data-m="results">125</b> published results for <b data-m="models">86</b> models from <b data-m="boards">7</b> boards, copied unchanged from the Ledger. We measure nothing ourselves; the models' own paper tables are off by default.</p>
             <p><i>Intuition.</i> Only tables where one operator ran every model under one protocol - the same tasks, robots and number of trials - are comparable within the table. A number a model's own authors published on their own set-up is a different kind of claim, so it stays out unless the Evidence switch is on.</p>
             <ul>
               <li>Each model's <i>best</i> entry on a board is used, as the board itself shows it.</li>
@@ -103,7 +107,7 @@
             </div>
             <div data-method="pairs"></div>
           </details></li>
-        <li><b>Pool with Bradley-Terry</b><span>One strength per model from every pairwise result - the maths behind Chatbot Arena.</span>
+        <li><b>Fit the strengths (Bradley-Terry)</b><span>Every model gets one number, its strength \(s\): the chance that A beats B is \(s_A / (s_A + s_B)\). All strengths are fitted to every weighted head-to-head result at once - the maths behind Elo and Chatbot Arena.</span>
           <details class="step-more"><summary>Details</summary>
             <p><i>Intuition.</i> Think of Elo ratings in chess, or Chatbot Arena for language models. Each model gets one hidden number, its strength. When two models meet, the stronger one usually wins, and the bigger the gap the surer the win. We do not set the strengths by hand: we choose the ones that best explain all the comparisons from steps 3-5 at once. Comparisons chain - A beat B on one board, B beat C on another - so the fit can place A above C even if A and C never met. Models that sit on two or more boards are those links.</p>
             <div class="step-math">
@@ -112,29 +116,51 @@
               <div class="eq-note">the logistic curve Elo ratings use (step 3)</div>
               <div class="eq"><span class="eq-label">data</span><span class="eq-body">\(\displaystyle \omega_{ij} = \frac{w}{k - 1} \;\text{(steps 4-5)}, \qquad W_{ij} = \text{win share (step 3)}\)</span></div>
               <div class="eq"><span class="eq-label">fit</span><span class="eq-body">\(\displaystyle \max_{s} \; \sum_{\text{pairs}} \omega_{ij} \left[ W_{ij} \ln \frac{s_i}{s_i + s_j} + (1 - W_{ij}) \ln \frac{s_j}{s_i + s_j} \right]\)</span></div>
-              <div class="eq"><span class="eq-label">update</span><span class="eq-body">\(\displaystyle s_i \;\leftarrow\; \frac{\sum_j \omega_{ij} W_{ij}}{\sum_j \omega_{ij} / (s_i + s_j)}\)</span></div>
-              <div class="eq-note">repeated until nothing moves (Hunter's MM algorithm, 2004); plus a weak tie, weight 0.1, against a fixed reference of strength 1, so a model that lost - or won - every comparison still gets a finite strength</div>
+              <div class="eq"><span class="eq-label">start</span><span class="eq-body">\(\displaystyle s_i = 1 \quad \text{for every model}\)</span></div>
+              <div class="eq"><span class="eq-label">update</span><span class="eq-body">\(\displaystyle s_i \;\leftarrow\; \frac{\tfrac{\pi}{2} + \sum_j \omega_{ij} W_{ij}}{\tfrac{\pi}{s_i + 1} + \sum_j \dfrac{\omega_{ij}}{s_i + s_j}}, \qquad \pi = 0.1\)</span></div>
+              <div class="eq-note">top: the wins the model actually collected (weighted); bottom: how many wins each unit of strength earns against its current opponents. A model that wins more than its strength predicts moves up, one that wins less moves down. The \(\pi\) terms are a weak tie against a fixed reference of strength 1, so a model that lost - or won - every comparison still gets a finite strength (Hunter's MM algorithm, 2004)</div>
+              <div class="eq"><span class="eq-label">stop</span><span class="eq-body">\(\displaystyle \max_i \big|\ln s_i^{\text{new}} - \ln s_i^{\text{old}}\big| &lt; 10^{-9} \quad \text{(at most 4,000 rounds)}\)</span></div>
             </div>
             <div data-method="bt"></div>
+            <h4 class="step-sub">Worked example: one model's strength</h4>
+            <div data-strength-example></div>
           </details></li>
-        <li><b>Index = expected win rate</b><span>0-100: the share of head-to-heads a model should win against every other ranked model.</span>
+        <li><b>From strengths to the index</b><span>0-100: the model's average chance of beating each other ranked model, one at a time, computed from the strengths. Not a success rate, and not the share of models it is ranked above.</span>
           <details class="step-more"><summary>Details</summary>
-            <p><i>Intuition.</i> Strengths have no natural unit. To make them readable, imagine each model playing every other ranked model once: its index is the share of those games it is expected to win.</p>
+            <p>A "match" here means the mix of tasks these boards test, weighted as in step 4 - not one particular task. 50 is the middle of this field. <span data-meaning-example></span></p>
+            <p><i>Intuition.</i> Strengths have no natural unit. To make them readable, pair the model with every other ranked model in turn, take its chance of winning each pair from the strengths, and average those chances.</p>
             <div class="step-math">
               <div class="eq"><span class="eq-label">index</span><span class="eq-body">\(\displaystyle \text{Index}_i = \frac{100}{N - 1} \sum_{j \neq i} \frac{s_i}{s_i + s_j}\)</span></div>
               <div class="eq-note">\(N\) = number of ranked models</div>
             </div>
             <div data-method="index"></div>
+            <h4 class="step-sub">Index and strengths, side by side</h4>
+            <div class="strength-charts">
+              <figure><figcaption>Strength (as fitted)</figcaption><div class="chart-surface" data-strength-chart="strength"></div></figure>
+              <figure><figcaption>Index (what the page shows)</figcaption><div class="chart-surface" data-strength-chart="index"></div></figure>
+            </div>
+            <div data-strength-table></div>
+            <h4 class="step-sub">Why the page shows the index, not the strengths</h4>
+            <ul data-strength-why></ul>
             <ul>
               <li>Relative to this field: adding many weak models raises everyone's index. That is why RoboChallenge T30-v2 entries that ran few tasks are left out (step 1).</li>
               <li>Not a success rate: an index of 94 does not mean 94% of tasks done.</li>
             </ul>
           </details></li>
-        <li><b>Show the doubt</b><span>Whisker: lowest and highest index when any one board is dropped. Boards column: how many boards a model rests on.</span>
+        <li><b>Error bars: drop one board at a time</b><span>Each whisker runs from the lowest to the highest index the model gets when the whole index is recomputed without one of the boards. It shows how much the ranking leans on any single board; it is not a confidence interval.</span>
           <details class="step-more"><summary>Details</summary>
-            <p><i>Intuition.</i> With a handful of boards, one board can move a model a lot. So the whole fit is repeated once per board with that board removed, and the spread is shown instead of hidden.</p>
+            <p><i>Intuition.</i> With a handful of boards, one board can move a model a lot. So the whole index - noise, weights, fit - is recomputed once per board with that board removed, and the spread is shown instead of hidden. Removing a board the model is not on can move it too: the other models' strengths change, and the index is relative to them.</p>
+            <div class="step-math">
+              <div class="eq"><span class="eq-label">full index</span><span class="eq-body">\(\displaystyle I_i = \text{index of model } i \text{ from all boards } \mathcal{B}\)</span></div>
+              <div class="eq"><span class="eq-label">one board removed</span><span class="eq-body">\(\displaystyle I_i^{(-b)} = \text{index of } i \text{ when board } b \text{ is removed and everything is refitted}\)</span></div>
+              <div class="eq"><span class="eq-label">refits that count</span><span class="eq-body">\(\displaystyle D_i = \{\, b \in \mathcal{B} : i \text{ is still ranked without } b \,\}\)</span></div>
+              <div class="eq-note">a model on one board disappears when that board is removed, so that refit is skipped</div>
+              <div class="eq"><span class="eq-label">error bar</span><span class="eq-body">\(\displaystyle \Big[\, \min\big(I_i,\ \min_{b \in D_i} I_i^{(-b)}\big),\ \max\big(I_i,\ \max_{b \in D_i} I_i^{(-b)}\big) \Big]\)</span></div>
+              <div class="eq-note">the rank range is the same with ranks in place of index values</div>
+            </div>
+            <div data-method="doubt-example"></div>
             <ul>
-              <li><i>Drop-one range</i> (whiskers, table column): the lowest and highest index across the full fit and every refit that still contains the model. <i>Rank range</i> is the same for rank.</li>
+              <li><i>Drop-one range</i> (whiskers, table column) and <i>rank range</i> are these two intervals.</li>
               <li><i>Held-out accuracy</i> (Boards and weights): fit without board X, take the pairs on X whose gap exceeds their noise, and count how often the refit orders them the same way. 50% is a coin flip.</li>
               <li><i>Boards</i> column: a model on one board rests entirely on that board. <i>Board agreement</i> (below) compares the order two boards give their shared models.</li>
             </ul>
@@ -157,9 +183,13 @@
     <section class="chart-block" id="capabilities">
       <h2>Capabilities, decoupled</h2>
       <ul class="slide-points">
-        <li>The same fit, run once per capability.</li>
-        <li>Five of the seven columns rest on RoboDojo alone; &middot; means never measured.</li>
+        <li>Each column is its own small index: the same method (steps 2-7) run only on the sub-scores that measure that capability. A cell is the model's chance of beating the other models on that capability (0-100), not a raw score; &middot; means the model has no such score.</li>
+        <li data-cap-summary></li>
       </ul>
+      <details class="step-more">
+        <summary>Details: who defines each capability, and the data behind each column</summary>
+        <div data-cap-details></div>
+      </details>
       <div class="data-table-wrap" data-rank-capabilities tabindex="0" aria-label="Capability profile"></div>
       <p class="rank-sources" data-rank-capability-sources></p>
       <button type="button" class="filter-reset rank-more" data-rank-capabilities-more hidden></button>
@@ -178,8 +208,8 @@
     <section class="chart-block" id="agreement">
       <h2>Board agreement</h2>
       <ul class="slide-points">
-        <li>Kendall's &tau; over the models two boards share (four or more).</li>
-        <li><b>+1</b> same order, <b>&minus;1</b> reversed. Red cells lean towards reversed; the details show which &tau; could be chance.</li>
+        <li><b>In short:</b> when two boards test the same models, do they put them in the same order? Kendall's &tau; scores that from <b>+1</b> (same order) through 0 (no relation) to <b>&minus;1</b> (reversed), using only the models both boards share (four or more).</li>
+        <li>Red cells lean towards reversed; the details show which &tau; could be chance.</li>
         <li data-agree-reading></li>
       </ul>
       <details class="step-more agreement-more">
@@ -200,6 +230,8 @@
         <div data-tau-details></div>
       </details>
       <div class="data-table-wrap" data-rank-agreement tabindex="0" aria-label="Board agreement"></div>
+      <h3 class="rank-out-title">Sim boards against real boards</h3>
+      <div data-simreal></div>
       <h3 class="rank-out-title">Pooled index against any single board</h3>
       <ul class="slide-points">
         <li>Leave one board out, fit the index on the others, and check the left-out board's clearly separated pairs: how many can it judge, and how many does it order correctly?</li>
@@ -232,13 +264,13 @@
   <script src="icons.js?v=1"></script>
   <script src="charts.js?v=6"></script>
   <script src="tasks-data-new.js?v=16"></script>
-  <script src="scope-data.js?v=9"></script>
-  <script src="ranking-data.js?v=6"></script>
-  <script src="ranking-engine.js?v=3"></script>
+  <script src="scope-data.js?v=10"></script>
+  <script src="ranking-data.js?v=8"></script>
+  <script src="ranking-engine.js?v=4"></script>
   <script src="vendor/katex/katex.min.js"></script>
   <script src="vendor/katex/contrib/auto-render.min.js"></script>
-  <script src="ranking-app.js?v=17"></script>
-  <script src="discussion-data.js?v=8"></script>
+  <script src="ranking-app.js?v=25"></script>
+  <script src="discussion-data.js?v=9"></script>
   <script src="discussion.js?v=3"></script>
   <script src="notes-data.js?v=1"></script>
   <script src="notes.js?v=1"></script>

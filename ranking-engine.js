@@ -417,12 +417,19 @@
           ranks.push(looRanks[i].get(id));
         }
       });
+      /* the model's index and rank with each board removed; null where the
+         model is no longer ranked (it was only on that board) */
+      const drops = boards.map((board, i) => {
+        const has = loo[i].index.has(id) && loo[i].index.get(id) !== null;
+        return { board: board.label, index: has ? loo[i].index.get(id) : null, rank: has ? looRanks[i].get(id) : null };
+      });
       return {
         id: id,
         index: main.index.get(id),
         rank: rankOf.get(id),
         range: [Math.min.apply(null, values), Math.max.apply(null, values)],
         rankRange: [Math.min.apply(null, ranks), Math.max.apply(null, ranks)],
+        drops: drops,
         boards: onBoards,
         coverage: onBoards.length,
         agent: (config.agents || []).indexOf(id) !== -1
@@ -439,6 +446,7 @@
       options: opts,
       boards: boards,
       entries: entries,
+      strengths: main.strengths,
       agreement: boardAgreement(boards, config.minSharedForTau || 4),
       capabilities: capabilities
     };
