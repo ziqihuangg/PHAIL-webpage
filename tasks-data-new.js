@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - Physical AI Ledger : evaluation database
    -----------------------------------------------------------------------------
-   Last updated: 2026-09-29
+   Last updated: 2026-09-30
 
    HOW TO EDIT THIS FILE
    ---------------------
@@ -34,7 +34,7 @@
 
 window.phailDatabase = {
   meta: {
-    updated: "2026-09-29",
+    updated: "2026-09-30",
     note: "Numbers are copied from the cited table and not renormalised. Scores from different benchmarks are not comparable and are never averaged together on this site; the Ranking index compares models within each board only."
   },
 
@@ -120,6 +120,15 @@ window.phailDatabase = {
     simate:        { name: "Simate", mark: "SM", color: "#8e44ad", site: "", logo: "logos/simate.png" },
     hust:          { name: "Huazhong Univ. of Science and Technology", mark: "HU", color: "#1f5aa6", site: "https://www.hust.edu.cn/" },
     robochallenge: { name: "RoboChallenge", mark: "RC", color: "#46607a", site: "https://robochallenge.ai/", logo: "logos/robochallenge.png" },
+    cmu:           { name: "Carnegie Mellon University", mark: "CMU", color: "#a0287a", site: "https://www.cmu.edu/" },
+    anthropic:     { name: "Anthropic", mark: "A", color: "#cc785c", site: "https://www.anthropic.com/" },
+    xai:           { name: "xAI", mark: "xAI", color: "#6b7280", site: "https://x.ai/" },
+    moonshot:      { name: "Moonshot AI", mark: "K", color: "#be185d", site: "https://www.moonshot.ai/" },
+    qwen:          { name: "Alibaba (Qwen team)", mark: "Qw", color: "#0e7490", site: "https://qwen.ai/" },
+    minimax:       { name: "MiniMax", mark: "MM", color: "#e11d48", site: "https://www.minimax.io/" },
+    meta:          { name: "Meta", mark: "M", color: "#4d7c0f", site: "https://ai.meta.com/" },
+    thinking_machines: { name: "Thinking Machines", mark: "TM", color: "#a16207", site: "https://thinkingmachines.ai/" },
+    mit:           { name: "MIT", mark: "MIT", color: "#a31f34", site: "https://www.mit.edu/" },
     unconfirmed:   { name: "Affiliation not confirmed", mark: "?", color: "#8a949b" },
     reference:     { name: "Reference baseline", mark: "H", color: "#aeb7bd" }
   },
@@ -146,7 +155,8 @@ window.phailDatabase = {
     { id: "world", family: "World models", name: "World-model prediction", detail: "Predict physical-world video without directly acting." },
     { id: "reasoning", family: "Embodied reasoning", name: "Embodied reasoning", detail: "Spatial and physical reasoning, pointing, and planning - no actuation." },
     { id: "industrial", family: "Industrial robotics", name: "Bin-picking and assembly", detail: "Throughput, reliability, and recovery on production-like tasks." },
-    { id: "locomotion", family: "Robotics", name: "Whole-body locomotion", detail: "Balance, gait, contact, and disturbance rejection." }
+    { id: "locomotion", family: "Robotics", name: "Whole-body locomotion", detail: "Balance, gait, contact, and disturbance rejection." },
+    { id: "cad", family: "Mechanical design", name: "CAD modelling", detail: "Parts, edits and whole workflows produced as CAD models or CAD code." }
   ],
 
   /* --- benchmarks ----------------------------------------------------------- */
@@ -161,6 +171,13 @@ window.phailDatabase = {
     { id: "simpler_bridge", name: "SimplerEnv (Bridge / WidowX)", type: "Sim-real paired", year: "2024", url: "https://simpler-env.github.io/", operator: "UC San Diego / Google DeepMind", runsPolicies: false },
     { id: "simpler_fractal", name: "SimplerEnv (Fractal / Google Robot)", type: "Sim-real paired", year: "2024", url: "https://simpler-env.github.io/", operator: "UC San Diego / Google DeepMind", runsPolicies: false },
     { id: "robotwin", name: "RoboTwin 2.0", type: "Sim + real alignment", year: "2025-2026", url: "https://robotwin-platform.github.io/leaderboard", operator: "MMLab@HKU / THU (RoboTwin Team)", runsPolicies: true },
+    { id: "paw_gen_10", name: "PAW-GEN-10 (Poke & Wiggle)", type: "Real robot", year: "2026", url: "https://pokeandwiggle.com/leaderboard", operator: "Poke & Wiggle", runsPolicies: true },
+    { id: "paramcad", name: "Parametric CAD Bench", type: "CAD, agents in FreeCAD", year: "2026", url: "https://cadbench.ai/leaderboard", operator: "gnucleus.ai", runsPolicies: true },
+    { id: "benchcad", name: "BenchCAD (Vision2Code)", type: "CAD code from drawings", year: "2026", url: "https://benchcad.com/leaderboard", operator: "BenchCAD team", runsPolicies: true },
+    { id: "cadarena", name: "CAD Arena", type: "CAD, agents in commercial CAD tools", year: "2026", url: "https://normal.ai/leaderboard/cad-arena", operator: "Normal", runsPolicies: true },
+    { id: "cadbench_mit", name: "CADBench (MIT)", type: "CAD program reconstruction", year: "2026", url: "https://anniedoris.github.io/CADBench/#Leaderboard", operator: "MIT DeCoDE Lab", runsPolicies: true },
+    { id: "cadworld", name: "CADWorld", type: "CAD, computer-use agents in FreeCAD", year: "2026", url: "https://cad-world.github.io", operator: "CADWorld authors", runsPolicies: true },
+    { id: "neuralcad_edit", name: "neuralCAD-Edit", type: "CAD editing, expert-judged", year: "2026", url: "https://autodeskailab.github.io/neuralCAD-Edit/", operator: "Autodesk Research", runsPolicies: true },
     { id: "robodojo_sim", name: "RoboDojo (Sim)", type: "Simulation", year: "2026", url: "https://robodojo-benchmark.com/leaderboard", operator: "RoboDojo Team", runsPolicies: true },
     { id: "robodojo_real", name: "RoboDojo (Real)", type: "Real robot", year: "2026", url: "https://robodojo-benchmark.com/leaderboard", operator: "RoboDojo Team (RoboDojo-RealEval)", runsPolicies: true },
     { id: "robochallenge", name: "RoboChallenge Table30", type: "Real robot", year: "2025", url: "https://robochallenge.ai/leaderboard", operator: "RoboChallenge", runsPolicies: true },
@@ -193,6 +210,7 @@ window.phailDatabase = {
     { id: "smolvla", name: "SmolVLA", maker: "Hugging Face / LeRobot", org: "huggingface", open: "Open", embodiment: "Tabletop", size: "0.24B / 0.45B / 2.25B params", sizeB: 0.45, runtime: "Consumer GPU or CPU", license: "Apache-2.0", note: "Trainable on a single GPU; asynchronous inference decouples action prediction from execution." },
     { id: "groot_n16", name: "GR00T N1.6", maker: "NVIDIA", org: "nvidia", open: "Open weights", embodiment: "Cross-embodiment", size: "3B params", sizeB: 3, runtime: "NVIDIA GPU", license: "NVIDIA model terms" },
     { id: "groot_n17", name: "GR00T N1.7", maker: "NVIDIA", org: "nvidia", open: "Open weights", embodiment: "Cross-embodiment", size: "3B params", sizeB: 3, runtime: "NVIDIA GPU", license: "NVIDIA model terms", note: "N1.7 refreshes documented results across RoboCasa, SimplerEnv, LIBERO, and real Unitree G1." },
+    { id: "dit_flow", name: "DiT-Flow", maker: "Carnegie Mellon University / UC Berkeley (Dasari et al.)", org: "cmu", open: "Open", embodiment: "Not specific", size: "115M params", sizeB: 0.115, license: "MIT", note: "Diffusion-transformer policy (code: SudeepDasari/dit-policy, Oct 2024). No public pretrained checkpoint: PAW-GEN-10 trains it from an ImageNet vision encoder." },
     { id: "gemini_15", name: "Gemini Robotics 1.5", maker: "Google DeepMind", org: "deepmind", open: "Closed", embodiment: "Bi-arm", size: "Not reported", runtime: "Partner access", license: "Closed (select partners)" },
     { id: "gemini_er15", name: "Gemini Robotics-ER 1.5", maker: "Google DeepMind", org: "deepmind", open: "Closed", embodiment: "World model", size: "Not reported", runtime: "Gemini API", license: "Closed", note: "Reasons about the physical world; does not drive actuators." },
     { id: "helix", name: "Helix", maker: "Figure AI", org: "figure", open: "Closed", embodiment: "Humanoid", size: "Not reported", runtime: "Embedded GPU (onboard)", license: "Closed", note: "200 Hz whole-upper-body control per Figure's own announcement; no public benchmark number." },
@@ -307,6 +325,54 @@ window.phailDatabase = {
     { id: "gpt6_astra", name: "GPT-6-Astra", maker: "OpenAI", org: "openai", open: "Closed (API)", embodiment: "None of its own", size: "Not disclosed", runtime: "API", license: "Closed", note: "A general text+image model with no robotics training and no motor outputs. Every robot number attached to it was produced by someone else's harness - see the spotlight page." },
     { id: "gpt55", name: "GPT-5.5", maker: "OpenAI", org: "openai", open: "Closed (API)", embodiment: "None of its own", size: "Not disclosed", runtime: "API", license: "Closed" },
     { id: "deepseek_flash", name: "DeepSeek-Flash", maker: "DeepSeek", org: "deepseek", open: "Not reported", embodiment: "None of its own", size: "Not disclosed", runtime: "API", license: "Not reported", note: "Third planner through the identical RoboDojo L3 harness, at 10 episodes per task rather than 50." },
+    /* CAD Index entrants (read 2026-09-30): language and vision-language models, plus CAD-specialised models. */
+    { id: "claude_opus_55", name: "Claude Opus 5.5", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_fable_51", name: "Claude Fable 5.1", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_opus_5", name: "Claude Opus 5", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_opus_48", name: "Claude Opus 4.8", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_opus_47", name: "Claude Opus 4.7", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_sonnet_5", name: "Claude Sonnet 5", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_sonnet_46", name: "Claude Sonnet 4.6", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_sonnet_45", name: "Claude Sonnet 4.5", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_mythos_5", name: "Claude Mythos 5", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "claude_mythos_preview", name: "Claude Mythos Preview", maker: "Anthropic", org: "anthropic", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt6_sol", name: "GPT-6 Sol", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt6_luna", name: "GPT-6 Luna", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt56_sol", name: "GPT-5.6 Sol", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt56_terra", name: "GPT-5.6 Terra", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt56_luna", name: "GPT-5.6 Luna", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt54", name: "GPT-5.4", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt53", name: "GPT-5.3", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt52", name: "GPT-5.2", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gpt4o", name: "GPT-4o", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "openai_o3", name: "o3", maker: "OpenAI", org: "openai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gemini_38_flash", name: "Gemini 3.8 Flash", maker: "Google DeepMind", org: "deepmind", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gemini_31_pro", name: "Gemini 3.1 Pro", maker: "Google DeepMind", org: "deepmind", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "gemini_3_pro", name: "Gemini 3 Pro", maker: "Google DeepMind", org: "deepmind", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "grok_47", name: "Grok 4.7", maker: "xAI", org: "xai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "grok_46", name: "Grok 4.6", maker: "xAI", org: "xai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "grok_45", name: "Grok 4.5", maker: "xAI", org: "xai", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "kimi_k3", name: "Kimi K3", maker: "Moonshot AI", org: "moonshot", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "kimi_k26", name: "Kimi K2.6", maker: "Moonshot AI", org: "moonshot", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "moonshot_v1_128k", name: "Moonshot v1-128k", maker: "Moonshot AI", org: "moonshot", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "moonshot_v1_8k", name: "Moonshot v1-8k", maker: "Moonshot AI", org: "moonshot", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "qwen3_vl_2b", name: "Qwen3-VL-2B", maker: "Alibaba (Qwen team)", org: "qwen", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "qwen35_27b", name: "Qwen 3.5 27B", maker: "Alibaba (Qwen team)", org: "qwen", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "qwen35_9b", name: "Qwen 3.5 9B", maker: "Alibaba (Qwen team)", org: "qwen", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "qwen36", name: "Qwen3.6", maker: "Alibaba (Qwen team)", org: "qwen", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "minimax_m3", name: "MiniMax M3", maker: "MiniMax", org: "minimax", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "muse_13", name: "Muse 1.3", maker: "Meta", org: "meta", open: "Not reported", embodiment: "None of its own", size: "Not disclosed", note: "Listed as Muse 1.3 by CAD Arena. Parametric CAD Bench lists a Muse Spark 1.3; they may be the same model, but neither board says so, so they are kept apart." },
+    { id: "muse_spark_13", name: "Muse Spark 1.3", maker: "Not confirmed (a Muse model)", org: "unconfirmed", open: "Not reported", embodiment: "None of its own", size: "Not disclosed", note: "See Muse 1.3 - possibly the same model under another name." },
+    { id: "inkling", name: "Inkling", maker: "Thinking Machines", org: "thinking_machines", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "inkling_small", name: "Inkling Small", maker: "Thinking Machines", org: "thinking_machines", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "deepseek_v4", name: "DeepSeek V4", maker: "DeepSeek", org: "deepseek", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "opencua", name: "OpenCUA", maker: "Not confirmed", org: "unconfirmed", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "holo_31", name: "Holo 3.1", maker: "Not confirmed", org: "unconfirmed", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "cad_coder", name: "CAD-Coder", maker: "MIT (DeCoDE Lab)", org: "mit", open: "Not reported", embodiment: "None of its own", size: "Not disclosed", note: "Open vision-language model fine-tuned to write CAD code." },
+    { id: "cadfit", name: "CADFit", maker: "MIT (DeCoDE Lab)", org: "mit", open: "Not reported", embodiment: "None of its own", size: "Not disclosed", note: "Mesh-to-CAD program generation with hybrid optimisation." },
+    { id: "cadevolve", name: "CADEvolve", maker: "Not confirmed", org: "unconfirmed", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "cadrille", name: "Cadrille", maker: "Not confirmed", org: "unconfirmed", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
+    { id: "cad_recode", name: "CAD-Recode", maker: "Not confirmed", org: "unconfirmed", open: "Not reported", embodiment: "None of its own", size: "Not disclosed" },
     { id: "liber0_preview", name: "Liber-0 Preview", maker: "LiberAI", org: "liberai", open: "Not reported", embodiment: "Not reported", size: "Not reported" },
     { id: "liber0_lite", name: "Liber-0 Lite", maker: "LiberAI", org: "liberai", open: "Not reported", embodiment: "Not reported", size: "Not reported" },
     { id: "galaxea_g05", name: "GalaxeaVLA (G0.5)", maker: "Galaxea", org: "galaxea", open: "Open", embodiment: "Bi-arm", size: "Not reported" },
@@ -698,6 +764,271 @@ window.phailDatabase = {
       ]
     },
 
+    /* ================= BENCHMARK-RUN: PAW-GEN-10 (Poke & Wiggle) ================
+       Read from the page's own data attributes (exact values, not the rounded
+       display). `env` follows `envs`. Extra metrics kept for later use:
+       quality = Excellent share of successes, timeS = mean active seconds of a
+       success, stepsPerMin = task steps per active minute, sparc = smoothness
+       (closer to -1 is smoother), jerk in m/s^3, safeFail = share of failures
+       that left both arms ok, forceN = mean of each episode's max contact force.
+       ---------------------------------------------------------------------- */
+    {
+      id: "paw-gen-10",
+      task: "tabletop",
+      benchmark: "paw_gen_10",
+      track: "Real",
+      metric: "Success rate (episodes rated Ok or Excellent) / Progress",
+      provenance: "benchmark",
+      reporter: "Poke & Wiggle (fine-tunes and runs every model)",
+      source: "Poke & Wiggle Reality Check Leaderboard, PAW-GEN-10 (4 models)",
+      sourceUrl: "https://pokeandwiggle.com/leaderboard",
+      retrieved: "2026-09-30",
+      protocol: "10 environments on a two-arm Franka FR3 Duo station, 5 public and 5 held out; every model fine-tuned by the operator from its public checkpoint on ~10, ~100 and ~300 demonstrations per environment (DiT-Flow from an ImageNet encoder); 30 scenes on training placements and 30 on unseen placements per environment and data tier; 30 Hz arm and gripper control",
+      primary: "success",
+      unit: "%",
+      secondary: "progress",
+      secondaryUnit: "%",
+      extras: ["d10", "d100", "d300", "nominal", "interp"],
+      envs: ["Sort screws into bins", "Datum-corner alignment", "Pour screws into the funnel", "Connect DC jack", "Route cable through closed hoops", "Put tools in standing toolbox", "Place loaded boxes in container (bimanual)", "Place spray bottles upright, nozzle forward (bimanual handover)", "Open the toolbox with a screwdriver", "Clamp electrical component"],
+      note: "The operator trains every model itself, from the developer's public checkpoint and recipe, so the board compares models under one training and test protocol. It states 3,600 evaluations per model, but every rate it publishes is a multiple of 1/1,800 (1/180 per environment, 1/600 per data tier), so the Ranking uses 1,800 episodes per model. Also publishes execution speed, smoothness, contact force and the share of failures that stayed safe.",
+      rows: [
+        { model: "molmoact2", success: 28.17, progress: 45.12, d10: 3.83, d100: 36.50, d300: 44.17, nominal: 30.89, interp: 25.44, env: [10.00, 44.44, 51.67, 15.00, 20.56, 4.44, 41.67, 51.67, 18.33, 23.89], quality: 78.50, timeS: 39.6, stepsPerMin: 7.87, sparc: -6.07, jerk: 4.93, safeFail: 69.06, forceN: 66.2, evals: 3600 },
+        { model: "pi05", success: 21.00, progress: 39.73, d10: 4.50, d100: 25.67, d300: 32.83, nominal: 23.00, interp: 19.00, env: [4.44, 39.44, 65.56, 2.22, 9.44, 2.78, 12.78, 58.89, 12.78, 1.67], quality: 74.34, timeS: 37.1, stepsPerMin: 8.37, sparc: -5.73, jerk: 10.29, safeFail: 93.53, forceN: 45.6, evals: 3600 },
+        { model: "dit_flow", success: 18.50, progress: 33.78, d10: 2.33, d100: 24.17, d300: 29.00, nominal: 21.44, interp: 15.56, env: [1.67, 16.67, 48.33, 1.67, 0.00, 1.11, 32.22, 62.78, 16.11, 4.44], quality: 85.29, timeS: 40.1, stepsPerMin: 8.48, sparc: -5.93, jerk: 7.65, safeFail: 96.93, forceN: 34.7, evals: 3600 },
+        { model: "groot_n17", success: 12.11, progress: 33.43, d10: 3.50, d100: 13.83, d300: 19.00, nominal: 12.67, interp: 11.56, env: [2.78, 13.89, 25.00, 1.11, 0.56, 1.11, 13.89, 50.00, 12.78, 0.00], quality: 58.26, timeS: 45.0, stepsPerMin: 8.24, sparc: -6.56, jerk: 15.70, safeFail: 82.81, forceN: 50.1, evals: 3600 }
+      ]
+    },
+
+    /* ======================= CAD INDEX TABLES (read 2026-09-30) ======================= */
+    {
+      id: "paramcad-v3",
+      task: "cad",
+      benchmark: "paramcad",
+      track: "Design",
+      metric: "Mean task reward, 0-100 (failed or unscored tasks count as zero)",
+      provenance: "benchmark",
+      reporter: "gnucleus.ai (runs every agent itself, Harbor harness)",
+      source: "Parametric CAD Bench V3 leaderboard (13 runs)",
+      sourceUrl: "https://cadbench.ai/leaderboard",
+      retrieved: "2026-09-30",
+      protocol: "100 FreeCAD tasks: 30 create from text, 30 create then edit from text, 40 create from engineering drawings; one run per model, agent and effort",
+      primary: "overall",
+      unit: "score",
+      extras: ["create", "createEdit", "image", "costPerTask"],
+      note: "Each row is one model with one agent harness and effort level (variant); the index keeps each model's best row. The board's 95% intervals are stored as `se` (half-width / 1.96) and used as the noise. Cost is the whole 100-task run divided by 100.",
+      rows: [
+        { model: "claude_opus_55", overall: 61.03, se: 3.84, create: 50.87, createEdit: 39.69, image: 84.66, perfect: 9, scored: 99, costPerTask: 5.74, variant: "Claude Code 2.1.280, max effort" },
+        { model: "claude_opus_55", overall: 57.96, se: 3.99, create: 42.79, createEdit: 41.38, image: 81.77, perfect: 8, scored: 93, costPerTask: 4.98, variant: "mini-swe-agent 2.4.6, max effort" },
+        { model: "gpt6_astra", overall: 56.87, se: 3.49, create: 52.26, createEdit: 44.37, image: 69.70, perfect: 5, scored: 100, costPerTask: 3.18, variant: "Codex 0.154.0, max effort" },
+        { model: "claude_fable_51", overall: 56.75, se: 3.66, create: 55.48, createEdit: 36.75, image: 72.71, perfect: 7, scored: 98, costPerTask: 10.56, variant: "Claude Code 2.1.270, max effort" },
+        { model: "claude_opus_5", overall: 50.86, se: 3.80, create: 49.48, createEdit: 36.52, image: 62.64, perfect: 6, scored: 99, costPerTask: 10.12, variant: "Claude Code 2.1.270, max effort" },
+        { model: "gemini_38_flash", overall: 36.19, se: 3.56, create: 47.94, createEdit: 31.22, image: 31.10, perfect: 4, scored: 94, costPerTask: 2.72, variant: "mini-swe-agent 2.4.6, high effort" },
+        { model: "grok_47", overall: 34.82, se: 3.39, create: 45.57, createEdit: 34.63, image: 26.91, perfect: 3, scored: 100, costPerTask: 6.70, variant: "Grok Build 1.0.30, high effort" },
+        { model: "gpt56_sol", overall: 29.98, se: 3.15, create: 36.23, createEdit: 24.78, image: 29.20, perfect: 1, scored: 100, costPerTask: 2.92, variant: "Codex 0.154.0, max effort" },
+        { model: "grok_46", overall: 27.72, se: 3.21, create: 41.61, createEdit: 33.45, image: 13.00, perfect: 2, scored: 100, costPerTask: 3.91, variant: "Grok Build 1.0.30, high effort" },
+        { model: "gemini_38_flash", overall: 27.56, se: 3.43, create: 43.28, createEdit: 25.32, image: 17.45, perfect: 4, scored: 100, costPerTask: 1.97, variant: "Antigravity 1.2.7, high effort" },
+        { model: "kimi_k3", overall: 24.92, se: 3.27, create: 39.11, createEdit: 23.49, image: 15.36, perfect: 1, scored: 96, costPerTask: 3.15, variant: "mini-swe-agent 2.4.6, max effort" },
+        { model: "muse_spark_13", overall: 20.92, se: 2.96, create: 33.61, createEdit: 24.33, image: 8.84, perfect: 1, scored: 99, costPerTask: 3.57, variant: "mini-swe-agent 2.4.6, max effort" },
+        { model: "gpt56_terra", overall: 17.24, se: 2.98, create: 23.32, createEdit: 23.23, image: 8.18, perfect: 0, scored: 99, costPerTask: 2.15, variant: "Codex 0.154.0, max effort" }
+      ]
+    },
+    {
+      id: "benchcad-vision2code",
+      task: "cad",
+      benchmark: "benchcad",
+      track: "Design",
+      metric: "IoU-score x100 (voxel IoU x execution rate; failed programs score 0)",
+      provenance: "benchmark",
+      reporter: "BenchCAD team (re-grades submitted predictions itself)",
+      source: "BenchCAD leaderboard, Vision2Code task, entries BenchCAD re-graded",
+      sourceUrl: "https://benchcad.com/leaderboard",
+      retrieved: "2026-09-30",
+      protocol: "Four orthographic views of an industrial part in, a CadQuery program out; the program is re-executed and compared with the ground-truth solid",
+      primary: "iou",
+      unit: "score",
+      extras: ["iouTools"],
+      note: "Only the rows BenchCAD re-graded itself. Rows the vendors reported (marked * on the board) are in the self-reported table below. Effort level in `variant`; `iouTools` is the agentic setting with a Python sandbox. GPT-4o on blank images is BenchCAD's control.",
+      rows: [
+        { model: "grok_46", iou: 36.38, iouTools: 80.55, variant: "xhigh effort" },
+        { model: "grok_45", iou: 31.94, iouTools: 77.71, variant: "high effort" },
+        { model: "kimi_k3", iou: 36.70, variant: "max effort" },
+        { model: "gpt4o", iou: 18.23 },
+        { model: "gpt53", iou: 18.73 },
+        { model: "gpt53", iou: 17.93, variant: "max effort" },
+        { model: "claude_sonnet_46", iou: 19.20 },
+        { model: "claude_sonnet_46", iou: 22.20, variant: "max effort" },
+        { model: "claude_opus_47", iou: 26.17 },
+        { model: "claude_opus_47", iou: 26.92, variant: "max effort" },
+        { model: "gemini_31_pro", iou: 27.79 },
+        { model: "gemini_31_pro", iou: 28.90, variant: "thinking effort" },
+        { model: "openai_o3", iou: 12.18 },
+        { model: "moonshot_v1_128k", iou: 1.60 },
+        { model: "moonshot_v1_8k", iou: 1.27 },
+        { model: "qwen3_vl_2b", iou: 0.05 },
+        { model: "gpt4o", iou: 6.98, variant: "control: blank images" },
+        { model: "grok_46", iou: 35.10, variant: "high effort" }
+      ]
+    },
+    {
+      id: "benchcad-vision2code-vendor",
+      task: "cad",
+      benchmark: "benchcad",
+      track: "Design",
+      metric: "IoU-score x100, as reported by the vendor",
+      provenance: "model",
+      reporter: "Model vendors (Anthropic system cards, OpenAI launch tables), listed on BenchCAD",
+      source: "BenchCAD leaderboard, Vision2Code task, rows marked * (self-reported, not re-graded)",
+      sourceUrl: "https://benchcad.com/leaderboard",
+      retrieved: "2026-09-30",
+      protocol: "Vendor-run; Anthropic on a random 1,000-file subset, OpenAI without tools",
+      primary: "iou",
+      unit: "score",
+      extras: ["iouTools"],
+      note: "Self-reported by the model's maker on its own set-up and subset, so a different kind of claim from the re-graded table; used only with Evidence = + paper tables.",
+      rows: [
+        { model: "claude_opus_55", iou: 73.00, iouTools: 96.20, variant: "max effort" },
+        { model: "gpt6_astra", iouTools: 95.90 },
+        { model: "claude_fable_51", iou: 60.60, iouTools: 92.60, variant: "max effort" },
+        { model: "claude_opus_5", iou: 49.70, iouTools: 89.90, variant: "max effort" },
+        { model: "gpt56_sol", iou: 70.60, iouTools: 83.40, variant: "max effort" },
+        { model: "gpt56_terra", iou: 62.30, iouTools: 78.20, variant: "max effort" },
+        { model: "gpt56_luna", iou: 63.10, iouTools: 73.90, variant: "max effort" },
+        { model: "claude_mythos_5", iou: 38.40, iouTools: 65.00, variant: "max effort" },
+        { model: "claude_mythos_preview", iou: 35.50, iouTools: 61.00, variant: "max effort" },
+        { model: "gpt55", iou: 44.40, iouTools: 55.80, variant: "max effort" },
+        { model: "claude_sonnet_5", iou: 32.20, iouTools: 51.90, variant: "max effort" },
+        { model: "claude_opus_48", iou: 27.30, iouTools: 51.80, variant: "max effort" }
+      ]
+    },
+    {
+      id: "cad-arena",
+      task: "cad",
+      benchmark: "cadarena",
+      track: "Design",
+      metric: "CAD Arena score x100 (mean of geometry and editability over scored trials)",
+      provenance: "benchmark",
+      reporter: "Normal (runs every model on each CAD platform itself)",
+      source: "CAD Arena leaderboard (12 models, updated 2026-09-25)",
+      sourceUrl: "https://normal.ai/leaderboard/cad-arena",
+      retrieved: "2026-09-30",
+      protocol: "18 mechanical parts from engineering drawings, each rebuilt natively on 5 CAD platforms (Build123d, NX Open, SolidWorks, FeatureScript, Fusion): 90 trials per model",
+      primary: "score",
+      unit: "score",
+      extras: ["costPerTrial", "scored"],
+      note: "Harness in `variant`. Cost is the mean for one scored trial; `scored` counts trials that produced a gradable part (of 90).",
+      rows: [
+        { model: "claude_opus_55", score: 75.0, costPerTrial: 15.54, scored: 88, variant: "Claude Code" },
+        { model: "gpt6_astra", score: 67.1, costPerTrial: 7.13, scored: 90, variant: "Codex" },
+        { model: "claude_fable_51", score: 66.2, costPerTrial: 17.70, scored: 90, variant: "Claude Code" },
+        { model: "gpt6_sol", score: 52.5, costPerTrial: 1.88, scored: 85, variant: "Codex" },
+        { model: "gemini_38_flash", score: 41.0, costPerTrial: 8.83, scored: 90, variant: "Gemini CLI" },
+        { model: "grok_46", score: 34.8, costPerTrial: 7.44, scored: 90, variant: "Grok Build" },
+        { model: "muse_13", score: 31.8, costPerTrial: 3.54, scored: 87, variant: "Muse Code" },
+        { model: "gpt6_luna", score: 30.1, costPerTrial: 1.85, scored: 83, variant: "Codex" },
+        { model: "grok_47", score: 25.8, costPerTrial: 16.12, scored: 84, variant: "Grok Build" },
+        { model: "deepseek_v4", score: 18.7, costPerTrial: 0.73, scored: 76, variant: "OpenCode" },
+        { model: "inkling_small", score: 14.3, costPerTrial: 1.36, scored: 65, variant: "OpenCode" },
+        { model: "inkling", score: 12.4, costPerTrial: 1.30, scored: 67, variant: "OpenCode" }
+      ]
+    },
+    {
+      id: "cadbench-mit-image",
+      task: "cad",
+      benchmark: "cadbench_mit",
+      track: "Design",
+      metric: "IoU x100, overall across 6 benchmark families",
+      provenance: "benchmark",
+      reporter: "CADBench team (MIT DeCoDE Lab)",
+      source: "CADBench overall leaderboard, image-to-CAD systems (7 of 11)",
+      sourceUrl: "https://anniedoris.github.io/CADBench/#Leaderboard",
+      retrieved: "2026-09-30",
+      protocol: "Overall leaderboard: IoU averaged across the six benchmark families (DeepCAD, Fusion 360, ABC, MCB, Objaverse); image-to-CAD systems",
+      primary: "iou",
+      unit: "score",
+      extras: ["siou", "vsr"],
+      note: "The board's legend splits image-to-CAD from mesh-to-CAD systems; these are the image-to-CAD ones (general vision-language models and CAD-Coder). `vsr` is the share of programs that execute; `cd` is Chamfer distance (lower is better).",
+      rows: [
+        { model: "claude_opus_47", iou: 41.2, siou: 10.8, vsr: 79.8, cd: 0.101 },
+        { model: "gemini_31_pro", iou: 38.2, siou: 10.6, vsr: 72.9, cd: 0.087 },
+        { model: "cad_coder", iou: 35.4, siou: 11.5, vsr: 94.6, cd: 0.157 },
+        { model: "kimi_k26", iou: 22.4, siou: 4.2, vsr: 61.6, cd: 0.111 },
+        { model: "gpt54", iou: 15.8, siou: 2.9, vsr: 51.3, cd: 0.109 },
+        { model: "qwen35_27b", iou: 1.5, siou: 0.2, vsr: 33.5, cd: 0.176 },
+        { model: "qwen35_9b", iou: 0.0, siou: 0.0, vsr: 9.9, cd: 0.195 }
+      ]
+    },
+    {
+      id: "cadbench-mit-mesh",
+      task: "cad",
+      benchmark: "cadbench_mit",
+      track: "Design",
+      metric: "IoU x100, overall across 6 benchmark families",
+      provenance: "benchmark",
+      reporter: "CADBench team (MIT DeCoDE Lab)",
+      source: "CADBench overall leaderboard, mesh-to-CAD systems (4 of 11)",
+      sourceUrl: "https://anniedoris.github.io/CADBench/#Leaderboard",
+      retrieved: "2026-09-30",
+      protocol: "Overall leaderboard: IoU averaged across the six benchmark families (DeepCAD, Fusion 360, ABC, MCB, Objaverse); mesh-to-CAD specialists, which read a 3D mesh rather than an image",
+      primary: "iou",
+      unit: "score",
+      extras: ["siou", "vsr"],
+      note: "Kept out of the CAD Index: these systems read a 3D mesh, not an image or a drawing, and none of them appears on another CAD board. The reason is also stated on the CAD Index tab.",
+      rows: [
+        { model: "cadfit", iou: 85.9, siou: 67.9, vsr: 98.1, cd: 0.038 },
+        { model: "cadevolve", iou: 70.7, siou: 49.8, vsr: 96.7, cd: 0.062 },
+        { model: "cadrille", iou: 68.7, siou: 51.7, vsr: 93.9, cd: 0.056 },
+        { model: "cad_recode", iou: 67.3, siou: 50.3, vsr: 91.2, cd: 0.056 }
+      ]
+    },
+    {
+      id: "cadworld",
+      task: "cad",
+      benchmark: "cadworld",
+      track: "Design",
+      metric: "Task success (%)",
+      provenance: "benchmark",
+      reporter: "CADWorld authors (run every agent themselves)",
+      source: "CADWorld results (7 agents)",
+      sourceUrl: "https://cad-world.github.io",
+      retrieved: "2026-09-30",
+      protocol: "200 FreeCAD tasks in 11 workflow categories (sketch, part, assembly, CAM, FEM, drawings...), operated through screenshots, mouse and keyboard; saved project files checked by executable rules",
+      primary: "success",
+      unit: "%",
+      extras: [],
+      note: "Experts complete 87% of the tasks.",
+      rows: [
+        { model: "gpt54", success: 17.5, variant: "computer-use agent" },
+        { model: "claude_opus_48", success: 16.0, variant: "computer-use agent" },
+        { model: "kimi_k26", success: 7.5 },
+        { model: "opencua", success: 1.5 },
+        { model: "holo_31", success: 0.5 },
+        { model: "qwen36", success: 0.0 },
+        { model: "minimax_m3", success: 0.0 }
+      ]
+    },
+    {
+      id: "neuralcad-edit",
+      task: "cad",
+      benchmark: "neuralcad_edit",
+      track: "Design",
+      metric: "Expert acceptance x100 (human evaluation)",
+      provenance: "benchmark",
+      reporter: "Autodesk Research (runs every model; experts judge the edits)",
+      source: "neuralCAD-Edit leaderboard",
+      sourceUrl: "https://autodeskailab.github.io/neuralCAD-Edit/",
+      retrieved: "2026-09-30",
+      protocol: "Designers' edit requests on existing CAD models; experts judge whether they would accept each edit",
+      primary: "accept",
+      unit: "score",
+      extras: ["vlmAccept", "voxelIoU"],
+      note: "Edits by a human baseline are accepted 78% of the time. Kept out of the CAD Index: its three models are on no other CAD board, so it adds no comparison between models. The reason is also stated on the CAD Index tab.",
+      rows: [
+        { model: "gpt52", accept: 25, vlmAccept: 30, voxelIoU: 57 },
+        { model: "gemini_3_pro", accept: 10, vlmAccept: 19, voxelIoU: 30 },
+        { model: "claude_sonnet_45", accept: 5, vlmAccept: 15, voxelIoU: 18 }
+      ]
+    },
+
     /* ====================== BENCHMARK-RUN: RoboArena ======================== */
     {
       id: "roboarena",
@@ -714,7 +1045,7 @@ window.phailDatabase = {
       primary: "elo",
       unit: "score",
       extras: ["sd", "evals"],
-      note: "There is no absolute success rate here by design - only relative preference. A higher score means evaluators preferred this policy head-to-head, not that it succeeds N% of the time.",
+      note: "There is no absolute success rate here by design - only relative preference. A higher score means evaluators preferred this policy head-to-head, not that it succeeds N% of the time. Read gaps, not levels: a 100-point gap means the higher-rated policy is preferred in about 64% of head-to-heads, a 400-point gap 10 to 1 (91%); the level around 1,500 is arbitrary.",
       rows: [
         { model: "dreamzero", elo: 1735, sd: 42.6, evals: 190 },
         { model: "pi05", elo: 1608, sd: 30.7, evals: 745, variant: "pi05_droid" },

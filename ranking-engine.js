@@ -46,6 +46,7 @@
      zero still carries some doubt. Elo-style boards publish their own sd. */
   function standardError(value, row, board) {
     if (board.scale === "elo") return typeof row.sd === "number" ? row.sd : board.eloSd || 30;
+    if (typeof row.se === "number") return row.se;  /* a board's own published interval, when it gives one */
     const p = clamp(value / 100, 0.02, 0.98);
     return 100 * Math.sqrt(p * (1 - p) / board.trials);
   }
@@ -110,6 +111,7 @@
       db.resultGroups.forEach((group) => {
         if (group.provenance !== "model" && group.provenance !== "thirdParty") return;
         if (!group.primary || (config.paper.exclude || []).indexOf(group.benchmark) !== -1) return;
+        if (config.tasks && config.tasks.indexOf(group.task) === -1) return;  /* this index's domain only */
         if (!pooled.has(group.benchmark)) pooled.set(group.benchmark, []);
         pooled.get(group.benchmark).push(group);
       });

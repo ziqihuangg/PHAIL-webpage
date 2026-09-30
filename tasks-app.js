@@ -76,7 +76,10 @@ const trackSwitch = document.querySelector("[data-track-switch]");
 
 /* --- track: the view, not a filter ----------------------------------------- */
 let track = "Sim";
-const hasTrack = (record) => record.group.track === "Sim" || record.group.track === "Real";
+/* Three views that are never mixed: robots in simulation, real robots, and
+   design results (CAD) that involve no robot at all. */
+const trackNames = { Sim: "simulation", Real: "real-hardware", Design: "design" };
+const hasTrack = (record) => Object.prototype.hasOwnProperty.call(trackNames, record.group.track);
 const inTrack = (record) => !hasTrack(record) || record.group.track === track;
 
 /* --- model size: a range over the sizes that are actually published ---------
@@ -221,10 +224,10 @@ function breakdownDisplay(record) {
 
 function extraLabel(key) {
   return { easy: "clean scenes", hard: "randomised", sd: "SD", evals: "A/B evals", latencyMs: "latency",
-    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X", tasks: "tasks run" }[key] || key;
+    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X", tasks: "tasks run", d10: "10 demos", d100: "100 demos", d300: "300 demos", nominal: "seen placements", interp: "unseen placements" }[key] || key;
 }
 function extraUnit(key) {
-  return { easy: "%", hard: "%", pairedSuccess: "%" }[key] || "";
+  return { easy: "%", hard: "%", pairedSuccess: "%", d10: "%", d100: "%", d300: "%", nominal: "%", interp: "%" }[key] || "";
 }
 
 /* --- chart plumbing --------------------------------------------------------
@@ -327,7 +330,7 @@ function percentileRows(modelId) {
   const pools = new Map();
   database.resultGroups.forEach((group) => {
     if (!group.primary) return;
-    if ((group.track === "Sim" || group.track === "Real") && group.track !== track) return;
+    if (trackNames[group.track] && group.track !== track) return;
     const key = `${group.benchmark}|${group.primary}|${group.unit}`;
     const pool = pools.get(key) || { benchmark: group.benchmark, field: group.primary, rows: [], groups: [] };
     group.rows.forEach((row) => {
@@ -376,7 +379,7 @@ function renderModelProfile() {
   chartTitle.textContent = `${model.name} · where it sits on each board`;
 
   if (!ranked.length) {
-    chartMount.innerHTML = `<p class="chart-missing">No board in the ${track === "Sim" ? "simulation" : "real-hardware"} view ranks enough entries to place ${model.name}.</p>`;
+    chartMount.innerHTML = `<p class="chart-missing">No board in the ${trackNames[track]} view ranks enough entries to place ${model.name}.</p>`;
     chartCaption.innerHTML = `A single model is always drawn as its position on each board rather than its score, and a position needs a field to hold it - `
       + `at least ${MIN_BOARD} ranked entries.${aside || " Every record for this model in this view is a documented gap rather than a number."}`;
     return true;
@@ -484,7 +487,7 @@ function render() {
   }).filter(Boolean);
 
   const inThisTrack = records.filter(inTrack).length;
-  resultCount.textContent = `${visible.length} of ${inThisTrack} ${track === "Sim" ? "simulation" : "real-hardware"} records`;
+  resultCount.textContent = `${visible.length} of ${inThisTrack} ${trackNames[track]} records`;
   const summaryAside = document.querySelector("[data-result-breakdown]");
   if (summaryAside) {
     const parts = provenanceCounts.slice();
@@ -557,7 +560,7 @@ if (trackSwitch) {
 
 /* --- deep links: tasks.html?benchmark=robodojo_sim&track=Real --------------- */
 const params = new URLSearchParams(window.location.search);
-if (params.get("track") === "Real" || params.get("track") === "Sim") track = params.get("track");
+if (trackNames[params.get("track")]) track = params.get("track");
 
 /* A link from a chart points at one model, and that model may only appear on the
    other track. Follow it there rather than showing an empty view. */

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A draft cross-board index for models that produce CAD, built with the same within-board method as the Robotics Index." />
+  <title>CAD Index - PhAIL</title>
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
+  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
+  <link rel="stylesheet" href="style.css?v=18" />
+</head>
+<body data-ranking="cad">
+  <header class="site-header" id="top"></header>
+
+  <main class="ranking-page">
+    <section class="database-intro">
+      <h1>CAD Index</h1>
+    </section>
+
+    <div class="rank-controls" data-rank-controls></div>
+    <div class="database-summary" data-rank-summary></div>
+
+    <section class="ledger-chart" aria-label="Index chart">
+      <h2 class="ledger-chart-title" data-rank-chart-title></h2>
+      <div class="chart-surface" data-rank-chart></div>
+      <p class="chart-caption" data-rank-chart-caption></p>
+    </section>
+
+    <div class="data-table-wrap rank-table-wrap" data-rank-table tabindex="0" aria-label="Ranking table"></div>
+    <button type="button" class="filter-reset rank-more" data-rank-table-more hidden></button>
+    <p class="table-footnote">Ranks count every fitted model, so a filtered view keeps the original numbers. Each model's best entry on each board is used - usually its best agent harness and effort level.</p>
+
+    <section class="slide" id="method">
+      <h2>Index method</h2>
+      <dl class="method-intro">
+        <div><dt>Why</dt><dd data-why>No single CAD board ranks the field, and each board alone is noisy - see Board agreement.</dd></div>
+        <div><dt>Data</dt><dd>Published results from <b data-m="boards">5</b> CAD leaderboards whose operators run every model themselves, on one protocol - <b data-m="results">0</b> results for <b data-m="models">0</b> models, copied unchanged from the Ledger. We measure nothing ourselves; numbers the model vendors report on their own set-up are off by default.</dd></div>
+        <div><dt>Method</dt><dd>The same as the <a href="ranking.html#method">Robotics Index</a>: inside each board every pair of models is compared against the board's noise, boards are weighted by the room they leave at the top, and all comparisons are pooled into one strength per model.</dd></div>
+        <div><dt>Meaning</dt><dd>A model's index is the share of head-to-head match-ups it is expected to win against every other ranked model: 50 is the middle of this field. It is relative to the models ranked here - not a share of tasks solved.</dd></div>
+      </dl>
+      <h3 class="rank-out-title">What is specific to CAD</h3>
+      <ol class="slide-steps">
+        <li><b>One entry per model</b><span>A board may list a model several times, with different agent harnesses (Claude Code, Codex, mini-swe-agent...) or effort levels. Its best entry counts; the harness is kept in the Ledger.</span></li>
+        <li><b>Noise from the board where it is published</b><span>Parametric CAD Bench gives a 95% interval for every run; the index uses it directly (half-width / 1.96). Elsewhere the noise comes from the number of tasks, with a conservative stand-in where a board does not state it.</span></li>
+        <li><b>Vendor numbers are a different claim</b><span>BenchCAD also lists numbers the model makers report from their own set-ups and subsets. They enter only with Evidence = "+ paper tables", at half weight.</span></li>
+        <li><b>Like-for-like only</b><span>Mesh-to-CAD specialists and a board whose models appear nowhere else stay in the Ledger only; the reasons are under Boards and weights.</span></li>
+      </ol>
+      <details class="step-more">
+        <summary>Details: the boards and their weights, in numbers</summary>
+        <p>The step-by-step derivation with formulas - noise, difficulty weights, Bradley-Terry, the expected-win-rate index and the drop-one checks - is on the <a href="ranking.html#method">Robotics Index</a>. The numbers below are this index's own, for the default settings.</p>
+        <div data-method="boards"></div>
+        <div data-method="weights"></div>
+        <div data-method="index"></div>
+      </details>
+    </section>
+
+    <section class="chart-block" id="boards">
+      <h2>Boards and weights</h2>
+      <ul class="slide-points">
+        <li><b>Weight</b> = difficulty &times; family share &times; evidence.</li>
+        <li><b>Held-out accuracy:</b> fit without the board, then check its clearly separated pairs. 50% is a coin flip; red is below 60%.</li>
+      </ul>
+      <div class="data-table-wrap" data-rank-boards tabindex="0" aria-label="Boards and weights"></div>
+      <div class="rank-out" data-rank-out></div>
+    </section>
+
+    <section class="chart-block" id="capabilities">
+      <h2>Capabilities, decoupled</h2>
+      <ul class="slide-points">
+        <li>The same fit, run once per capability.</li>
+        <li>Text and Edit rest on Parametric CAD Bench alone; &middot; means never measured.</li>
+      </ul>
+      <div class="data-table-wrap" data-rank-capabilities tabindex="0" aria-label="Capability profile"></div>
+      <p class="rank-sources" data-rank-capability-sources></p>
+      <button type="button" class="filter-reset rank-more" data-rank-capabilities-more hidden></button>
+    </section>
+
+    <section class="chart-block" id="gaps">
+      <h2>Model gaps</h2>
+      <ul class="slide-points">
+        <li>Where models on the CAD boards still fall short, read off the raw published scores, not the index.</li>
+        <li>Counted from the Ledger each time the page loads.</li>
+      </ul>
+      <div class="data-table-wrap" data-rank-gaps tabindex="0" aria-label="Model gaps"></div>
+      <p class="rank-sources" data-rank-gaps-unmeasured></p>
+    </section>
+
+    <section class="chart-block" id="agreement">
+      <h2>Board agreement</h2>
+      <ul class="slide-points">
+        <li>Kendall's &tau; over the models two boards share (four or more): <b>+1</b> same order, <b>&minus;1</b> reversed. What &tau; means, with formulas, is on the <a href="ranking.html#agreement">Robotics Index</a>.</li>
+        <li data-agree-reading></li>
+      </ul>
+      <div class="data-table-wrap" data-rank-agreement tabindex="0" aria-label="Board agreement"></div>
+      <h3 class="rank-out-title">Pooled index against any single board</h3>
+      <ul class="slide-points">
+        <li>Leave one board out, fit the index on the others, and check the left-out board's clearly separated pairs: how many can it judge, and how many does it order correctly?</li>
+        <li>Compared with the single other board that shares the most models with it.</li>
+      </ul>
+      <div class="data-table-wrap" data-rank-pooled tabindex="0" aria-label="Pooled index against single boards"></div>
+      <p class="rank-sources" data-rank-pooled-total></p>
+    </section>
+
+    <section class="chart-block" id="efficiency">
+      <h2>Index against cost</h2>
+      <ul class="slide-points">
+        <li>What a result costs to get: Parametric CAD Bench publishes the cost of every run.</li>
+        <li>CAD Arena also publishes a cost per trial, on its own tasks; see the Ledger.</li>
+      </ul>
+      <div class="chart-surface" data-rank-size></div>
+      <p class="chart-caption" data-rank-size-caption></p>
+    </section>
+
+    <section class="chart-block" id="factors">
+      <h2>Other ranking factors</h2>
+      <div class="data-table-wrap" data-rank-factors tabindex="0" aria-label="Ranking factors"></div>
+    </section>
+
+    <section data-discussion="cad"></section>
+  </main>
+
+  <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
+  <script src="script.js?v=9"></script>
+  <script src="icons.js?v=1"></script>
+  <script src="charts.js?v=6"></script>
+  <script src="tasks-data-new.js?v=16"></script>
+  <script src="scope-data.js?v=9"></script>
+  <script src="cad-ranking-data.js?v=2"></script>
+  <script src="ranking-engine.js?v=3"></script>
+  <script src="ranking-app.js?v=17"></script>
+  <script src="discussion-data.js?v=8"></script>
+  <script src="discussion.js?v=3"></script>
+  <script src="notes-data.js?v=1"></script>
+  <script src="notes.js?v=1"></script>
+</body>
+</html>

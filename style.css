@@ -712,10 +712,45 @@ td:first-child { min-width: 170px; font-weight: 500; }
 .slide { max-width: 800px; padding: 30px 0 30px; border-bottom: 1px solid var(--line); }
 .slide h2, .ranking-page .chart-block h2 { font-size: clamp(1.35rem, 2.2vw, 1.7rem); }
 .slide-steps { margin: 16px 0 0; padding: 0; list-style: none; counter-reset: step; }
-.slide-steps li { position: relative; counter-increment: step; padding: 10px 0 10px 44px; border-top: 1px solid #eceff1; }
-.slide-steps li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; border-radius: 50%; background: var(--violet); color: #fff; font-size: 14px; font-weight: 650; line-height: 28px; text-align: center; }
-.slide-steps b { display: block; font-size: 18px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.3; }
-.slide-steps span { display: block; margin-top: 3px; color: #343b42; font-size: 15.5px; line-height: 1.5; }
+.slide-steps > li { position: relative; counter-increment: step; padding: 10px 0 10px 44px; border-top: 1px solid #eceff1; }
+.slide-steps > li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; border-radius: 50%; background: var(--violet); color: #fff; font-size: 14px; font-weight: 650; line-height: 28px; text-align: center; }
+.slide-steps > li > b { display: block; font-size: 18px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.3; }
+.slide-steps > li > span { display: block; margin-top: 3px; color: #343b42; font-size: 15.5px; line-height: 1.5; }
+/* Index method: overview, and the details under each step */
+.method-intro { margin: 14px 0 0; }
+.method-intro div { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; padding: 4px 0; }
+.method-intro dt { color: var(--muted); font-size: 13px; font-weight: 600; line-height: 1.7; }
+.method-intro dd { margin: 0; color: #2b3137; font-size: 15.5px; line-height: 1.5; }
+.method-intro b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.method-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.step-more { margin: 6px 0 2px; font-size: 14px; line-height: 1.5; color: #2b3137; }
+.step-more summary { display: inline-block; color: var(--violet); font-size: 13px; font-weight: 600; cursor: pointer; }
+.step-more summary:hover { text-decoration: underline; }
+.step-more[open] { padding: 2px 0 6px; }
+.step-more p { margin: 8px 0 0; }
+.step-more ul { margin: 6px 0 0; padding-left: 18px; }
+.step-more li { margin: 2px 0; }
+.step-more b { font-weight: 600; }
+.step-more small { color: var(--muted); font-size: 11.5px; }
+.step-math { margin: 8px 0 0; padding: 8px 12px; border-left: 3px solid var(--violet); background: var(--violet-soft); font-size: 14px; line-height: 1.5; overflow-x: auto; }
+.step-math .eq { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 12px; align-items: center; padding: 5px 0; }
+.step-math .eq + .eq { border-top: 1px solid rgba(91, 63, 196, .12); }
+.eq-label { color: #4c555d; font-size: 12.5px; }
+.eq-body .katex { font-size: 1.12em; }
+.eq-note { margin: -2px 0 4px 144px; color: #4c555d; font-size: 12.5px; }
+.eq-note .katex { font-size: 1.05em; }
+.step-sub { margin: 16px 0 0; font-size: 14.5px; font-weight: 650; }
+@media (max-width: 620px) {
+  .step-math .eq { grid-template-columns: 1fr; gap: 2px; }
+  .eq-note { margin-left: 0; }
+}
+.method-table-wrap { overflow-x: auto; margin: 8px 0 0; }
+.pooled-table { width: auto; min-width: 0; margin-top: 4px; }
+.pooled-table td:last-child { min-width: 220px; white-space: normal; }
+.method-table { width: auto; min-width: 0; font-size: 13px; }
+.method-table th { font-size: 11px; letter-spacing: .03em; text-transform: none; }
+.method-table td, .method-table th { padding: 5px 14px 5px 0; white-space: nowrap; }
+.method-table td:first-child { min-width: 0; }
 .slide-aside { margin: 14px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .slide-points { max-width: 800px; margin: 12px 0 14px; padding-left: 20px; font-size: 16px; line-height: 1.5; color: #2b3137; }
 .slide-points li { margin: 4px 0; }

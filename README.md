@@ -9,7 +9,7 @@ A static research dashboard mapping physical AI tasks, evaluation metrics, model
 | Public | https://ziqihuangg.github.io/PHAIL-webpage/ |
 | Local dev | `bash preview.sh`, then open http://127.0.0.1:4173/ - runs `preview_server.py` (caching off, and the meeting-notes box can save) |
 
-No build step, no dependencies - `index.html` can also be opened directly from disk (notes are then read-only).
+No build step and no external requests - `index.html` can also be opened directly from disk (notes are then read-only). The one third-party library, KaTeX (MIT), is vendored in `vendor/katex/` and typesets the formulas on the Ranking tab; a deploy that copies site files must include `vendor/`.
 
 ## 2. What the webpage does
 
@@ -20,7 +20,8 @@ Tabs, left to right:
 | Page | File | What it does |
 | --- | --- | --- |
 | Scope | `index.html` | Left-to-right taxonomy tree of physical AI (Execution / Design / Supporting capabilities) with every known benchmark; all counts are computed from `scope-data.js` on load |
-| Ranking | `ranking.html` | Draft cross-board index for robotics: switches, index chart, board weights, capability heatmap, model gaps (computed from the ledger), board agreement, size scatter, method, ranking factors |
+| Robotics Index | `ranking.html` | Draft cross-board index for robot manipulation: switches, index chart, method with formulas, board weights, capability heatmap, model gaps, board agreement and pooled-vs-single check, size scatter, ranking factors |
+| CAD Index | `cad-index.html` | The same engine and page code for CAD boards (`cad-ranking-data.js`): index, CAD-specific rules, weights, capabilities (text / edit / drawings / workflow), gaps, agreement, index against cost |
 | Ledger | `tasks.html` | The filterable evaluation ledger - every cited record, with a chart of whichever board is in view |
 | Charts | `charts.html` | One chart per published table, plus the cross-board comparison that explains why the index never adds numbers across boards |
 | GPT-6 Astra | `gpt-6-astra.html` | Model spotlight: one model read across six published sources |
@@ -39,6 +40,7 @@ Tabs are defined only in `script.js` (`pageLinks`); pages ship an empty header. 
 - [`tasks-data-new.js`](tasks-data-new.js) / [`astra-data.js`](astra-data.js) - the data: every record, citation, and source
 - [`scope-data.js`](scope-data.js) - the taxonomy: layer > domain > task > benchmarks, with mode, board type, what can be entered, and whether the ledger transcribes it
 - [`ranking-data.js`](ranking-data.js) - every knob of the index: trial counts, board families, evidence weights, capability axes, ranking factors
+- [`cad-ranking-data.js`](cad-ranking-data.js) - the same knobs for the CAD Index; a page picks its config with `<body data-ranking="robotics" | "cad">`
 - [`discussion-data.js`](discussion-data.js) - the open questions at the foot of each tab
 - [`todo-data.js`](todo-data.js) / [`related-data.js`](related-data.js) - the TODO list and the related-work notes
 - [`notes-data.js`](notes-data.js) - meeting notes, written by [`preview_server.py`](preview_server.py) and drawn by [`notes.js`](notes.js)

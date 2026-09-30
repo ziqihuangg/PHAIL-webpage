@@ -16,7 +16,8 @@ const pageKey = path === "index.html" ? "home" : path.replace(".html", "");
    only redirect; models.html has no tab. */
 const pageLinks = [
   ["Scope", "index.html", "home"],
-  ["Ranking", "ranking.html", "ranking"],
+  ["Robotics Index", "ranking.html", "ranking"],
+  ["CAD Index", "cad-index.html", "cad-index"],
   ["Ledger", "tasks.html", "tasks"],
   ["Charts", "charts.html", "charts"],
   ["GPT-6 Astra", "gpt-6-astra.html", "gpt-6-astra"],

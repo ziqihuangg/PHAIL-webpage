@@ -6,7 +6,7 @@
   <title>Benchmarks - PhAIL</title>
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
   <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="stylesheet" href="style.css?v=18" />
 </head>
 <body>
   <header class="site-header" id="top"></header>
@@ -49,7 +49,7 @@
           <tr><td>Partial-completion / progress score</td><td>RoboChallenge, BEHAVIOR-1K, RoboDojo</td><td>Credit for partial progress, not just pass/fail</td><td>Scoring rubric differs per benchmark</td></tr>
           <tr><td>Success-rate drop under perturbation</td><td>The Colosseum</td><td>Robustness across 14 environment-perturbation axes</td><td>Measures robustness, not raw capability</td></tr>
           <tr><td>Sim-real correlation (Pearson / MMRV)</td><td>SIMPLER</td><td>Whether sim ranking predicts real-robot ranking</td><td>Does not score capability directly</td></tr>
-          <tr><td>Pairwise preference / Elo</td><td>RoboArena</td><td>Head-to-head human preference across policies</td><td>Expensive, hard to scale, no absolute success number</td></tr>
+          <tr><td>Pairwise preference / Elo</td><td>RoboArena</td><td>Head-to-head human preference across policies. Only gaps mean anything: 100 points higher = preferred in about 64% of head-to-heads, 400 points = 10 to 1 (<a href="ranking.html#method">details</a>)</td><td>Expensive, hard to scale, no absolute success number</td></tr>
           <tr><td>Lifelong-learning transfer (FWT / NBT / AUC)</td><td>LIBERO</td><td>Transfer over a task sequence</td><td>Specific to continual-learning setups</td></tr>
           <tr><td>Integration cost</td><td>XPolicyLab</td><td>Time to plug a new policy into an evaluation harness</td><td>Infrastructure metric, not model quality</td></tr>
           <tr><td>Throughput (units/hour) + MTBF</td><td>PhAIL</td><td>Industrial productivity and reliability</td><td>Economic metrics remain rare in real-world evaluation</td></tr>
@@ -60,8 +60,8 @@
     <section data-discussion="benchmarks"></section>
   </main>
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=8"></script>
-  <script src="discussion-data.js?v=4"></script>
+  <script src="script.js?v=9"></script>
+  <script src="discussion-data.js?v=8"></script>
   <script src="discussion.js?v=3"></script>
   <script src="notes-data.js?v=1"></script>
   <script src="notes.js?v=1"></script>

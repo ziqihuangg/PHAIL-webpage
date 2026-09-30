@@ -24,7 +24,13 @@
 
 window.phailRanking = {
   version: "v0 draft",
-  updated: "2026-09-29",
+  indexName: "PhAIL Robotics Index (draft)",
+  /* Ledger tasks this index draws on: paper tables pooled with Evidence =
+     "+ paper tables", and the "left out of the index" list, stay inside it. */
+  tasks: ["tabletop", "bimanual", "mobile", "loco", "household", "generalist", "industrial", "locomotion"],
+  scopeDomains: ["robotics"],
+  controls: ["track", "agents", "coverage", "weighting", "evidence", "method"],
+  updated: "2026-09-30",
 
   boards: {
     "robodojo-sim":        { label: "RoboDojo Sim", trials: 2100, family: "robodojo-sim", metric: "score" },
@@ -32,7 +38,10 @@ window.phailRanking = {
     "robochallenge-t30":   { label: "RoboChallenge T30", trials: 300, family: "robochallenge", metric: "success" },
     "robochallenge-t30v2": { label: "RoboChallenge T30-v2", trials: 300, family: "robochallenge", metric: "success", minTasks: 15 },
     "robotwin-2":          { label: "RoboTwin 2.0", trials: 10000, family: "robotwin", metric: "success" },
-    "roboarena":           { label: "RoboArena", family: "roboarena", scale: "elo", metric: "elo" }
+    "roboarena":           { label: "RoboArena", family: "roboarena", scale: "elo", metric: "elo" },
+    /* The board says 3,600 evaluations per model, but its rates are multiples
+       of 1/1,800 (1/180 per environment), so 1,800 is the conservative count. */
+    "paw-gen-10":          { label: "PAW-GEN-10", trials: 1800, family: "paw", metric: "success" }
   },
 
   /* Operator-run tables that stay in the Ledger but not in the index, and
@@ -80,7 +89,7 @@ window.phailRanking = {
      five axes, so each axis rests on roughly a fifth of the rollouts. */
   capabilities: [
     { id: "generalization", name: "Generalization", short: "Gen.", icon: "shuffle",
-      sources: [{ board: "robodojo-sim", dim: 0, trials: 840 }, { board: "robotwin-2", field: "hard", trials: 5000 }] },
+      sources: [{ board: "robodojo-sim", dim: 0, trials: 840 }, { board: "robotwin-2", field: "hard", trials: 5000 }, { board: "paw-gen-10", field: "interp", trials: 900 }] },
     { id: "precision", name: "Precision", short: "Prec.", icon: "gauge",
       sources: [{ board: "robodojo-sim", dim: 1, trials: 420 }] },
     { id: "long", name: "Long-horizon", short: "Long", icon: "route",
@@ -90,7 +99,7 @@ window.phailRanking = {
     { id: "open", name: "Open-vocabulary", short: "Open", icon: "list-checks",
       sources: [{ board: "robodojo-sim", dim: 4, trials: 420 }] },
     { id: "real", name: "Real robot", short: "Real", icon: "bot",
-      sources: [{ board: "robodojo-real" }, { board: "robochallenge-t30" }, { board: "robochallenge-t30v2" }, { board: "roboarena" }] },
+      sources: [{ board: "robodojo-real" }, { board: "robochallenge-t30" }, { board: "robochallenge-t30v2" }, { board: "roboarena" }, { board: "paw-gen-10" }] },
     { id: "embodiment", name: "Worst arm (cross-embodiment)", short: "Worst arm", icon: "git-merge",
       sources: [{ board: "robodojo-real", min: ["arx", "piper", "piperX"], trials: 60 }] }
   ],
@@ -108,14 +117,16 @@ window.phailRanking = {
     { kind: "level", name: "Task completion, simulation", asks: "42 two-arm table-top tasks in simulation, 2,100 episodes per policy.",
       boards: ["robodojo-sim"], field: "success" },
     { kind: "level", name: "Task completion, real robots", asks: "Table-top tasks on real arms, run by each board's operator.",
-      boards: ["robodojo-real", "robochallenge-t30", "robochallenge-t30v2"], field: "success" },
+      boards: ["robodojo-real", "robochallenge-t30", "robochallenge-t30v2", "paw-gen-10"], field: "success" },
     { kind: "axis", name: "Generalization", asks: "“Varied objects, layouts and random variants” - e.g. Stack Bowls, Push T.", board: "robodojo-sim", dim: 0, low: 10 },
     { kind: "axis", name: "Precision", asks: "“Fine-grained manipulation with tight spatial constraints” - e.g. Fasten Screws, Plug In Charger.", board: "robodojo-sim", dim: 1, low: 10 },
     { kind: "axis", name: "Long-horizon", asks: "“Multi-step tasks with several subgoals” - e.g. Fill Pen Holder, Classify Objects.", board: "robodojo-sim", dim: 2, low: 10 },
     { kind: "axis", name: "Memory", asks: "“State tracking, sequence recall or delayed matching” - e.g. Cover Blocks.", board: "robodojo-sim", dim: 3, low: 10 },
     { kind: "axis", name: "Open-ended instructions", asks: "“Open-ended, language- or image-conditioned” - e.g. Stack Blocks By Language.", board: "robodojo-sim", dim: 4, low: 10 },
     { kind: "drop", name: "Robustness to scene changes", asks: "Trained on clean scenes, tested on clean and on randomised ones (clutter, lighting, textures).",
-      board: "robotwin-2", from: "easy", to: "hard", labels: ["clean", "randomised"] },
+      board: "robotwin-2", from: "easy", to: "hard", labels: ["clean-scene", "randomised-scene"] },
+    { kind: "drop", name: "Data efficiency", asks: "The same model fine-tuned on ~300 and on ~10 real demonstrations per environment, then tested on the real robot.",
+      board: "paw-gen-10", from: "d300", to: "d10", labels: ["300-demo", "10-demo"] },
     { kind: "arms", name: "Cross-embodiment", asks: "The same 18 real tasks on three different arms.",
       board: "robodojo-real", fields: ["arx", "piper", "piperX"], labels: ["ARX X5", "Piper", "Piper X"] }
   ],
@@ -133,9 +144,9 @@ window.phailRanking = {
     { name: "Robustness gap", why: "Clean-scene scores overstate what survives a new layout.", data: "RoboTwin easy / hard; RoboDojo standard / random.", status: "beside" },
     { name: "Cross-embodiment", why: "A policy that works on one arm only is not general.", data: "RoboDojo Real per-arm scores.", status: "beside" },
     { name: "Model size", why: "The only public proxy for inference cost.", data: "Stated for 13 models, a minority of those ranked.", status: "beside" },
-    { name: "Latency / control rate", why: "Asked for as the x-axis on 19 Sep; decides whether a model can close a fast loop.", data: "None of the six benchmark-run boards publishes it.", status: "missing" },
+    { name: "Latency / control rate", why: "Asked for as the x-axis on 19 Sep; decides whether a model can close a fast loop.", data: "No board publishes model latency or hardware. PAW-GEN-10 publishes task time and speed, at a fixed 30 Hz control rate.", status: "missing" },
     { name: "Compute and cost", why: "What a success costs to run.", data: "Only agent harness write-ups (tokens, dollars per trial).", status: "missing" },
     { name: "Post-training budget", why: "Separates a better model from a bigger fine-tune on the board's own demos.", data: "Rarely published.", status: "missing" },
-    { name: "Safety", why: "A capable policy that ignores harm should not top a ranking unqualified.", data: "RoboHarm (3 models); RoboDojo's halted real run.", status: "missing" }
+    { name: "Safety", why: "A capable policy that ignores harm should not top a ranking unqualified.", data: "RoboHarm (3 models); PAW-GEN-10's safe-failure share and contact force (4 models); RoboDojo's halted real run.", status: "missing" }
   ]
 };

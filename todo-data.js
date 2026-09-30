@@ -7,7 +7,7 @@
    ========================================================================== */
 
 window.phailTodo = {
-  updated: "2026-09-28",
+  updated: "2026-09-30",
 
   groups: [
     {
@@ -25,7 +25,9 @@ window.phailTodo = {
         { title: "Reviewers in each domain", detail: "One or two researchers per domain check the domain definitions, whether the benchmark list is complete, and whether the ranking matches their sense of the models; record where and why it does not.", status: "next", added: "2026-09-28" },
         { title: "Internal cross-check", detail: "A second person re-reads every transcribed number against its source and recomputes the index independently.", status: "next", added: "2026-09-28" },
         { title: "Held-out and blinded checks", detail: "Held-out board accuracy is live. Next: blinded re-runs of the pairs the boards disagree on.", status: "doing" },
-        { title: "Weights from the data", detail: "Fit board difficulty and discrimination (IRT) instead of 1 − best score.", status: "later" }
+        { title: "Weights from the data", detail: "Weight each board by how well the other boards predict it, or fit difficulty and discrimination (IRT), instead of 1 − best score.", status: "later" },
+        { title: "Anchor models", detail: "Ask each operator to run the same 3-5 reference models, so every pair of boards shares enough models to measure agreement.", status: "next", added: "2026-09-30" },
+        { title: "Why RoboChallenge T30 disagrees", detail: "Other boards predict it at a coin flip. Re-check agreement on its generalist (multi-task) entries only, and on entries submitted by the model's own team.", status: "next", added: "2026-09-30" }
       ]
     },
     {
@@ -40,7 +42,7 @@ window.phailTodo = {
     {
       name: "New indices",
       items: [
-        { title: "Design index", detail: "Frontier models on CAD and PCB boards, ranked the same way.", status: "later" },
+        { title: "CAD Index", detail: "Live on its own tab: 5 operator-run CAD boards, same engine. Next: CADEngBench and MARB into the Ledger, then PCB boards.", status: "doing", added: "2026-09-30" },
         { title: "Driving index", detail: "Once two or more driving boards are transcribed.", status: "later" }
       ]
     },

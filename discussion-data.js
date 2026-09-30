@@ -57,13 +57,18 @@ window.phailDiscussion = {
     },
     {
       title: "Board weights",
-      detail: "Now: difficulty × family share × evidence. Next: estimate difficulty and discrimination from the results themselves (IRT).",
+      detail: "Now: difficulty × family share × evidence. Next: weight each board by how well the other boards predict it (RoboChallenge T30: 48%, a coin flip), or estimate difficulty and discrimination from the results themselves (IRT).",
       decide: "The rule, and a premium for real robots?"
     },
     {
       title: "Boards that disagree",
-      detail: "RoboChallenge T30 and RoboDojo Real order their shared models almost oppositely (τ = −0.47 on 27 Sep); the other boards predict RoboChallenge below chance.",
+      detail: "RoboChallenge T30 and RoboDojo Real order their 6 shared models mostly oppositely (τ = −0.47, 11 of 15 pairs reversed) - with so few models that alone could be chance, but the other boards also predict T30 no better than a coin flip (held-out check). The other measurable board pairs agree (τ +0.49 to +0.67).",
       decide: "Keep, down-weight, or report beside the index?"
+    },
+    {
+      title: "Anchor models on every board",
+      detail: "10 of the 16 board pairs that share any model share fewer than 4, so whether they agree cannot be measured, and the common scale rests on 22 models that sit on two or more boards. pi-0.5 is already on 6 of the 7 boards. Asking every operator to run the same 3-5 reference models would make agreement measurable and the index steadier.",
+      decide: "Which reference models, and who asks the operators?"
     },
     {
       title: "A composite benchmark",
@@ -77,13 +82,36 @@ window.phailDiscussion = {
     },
     {
       title: "Latency and cost",
-      detail: "No benchmark-run board publishes latency or hardware, so model size is the only proxy.",
+      detail: "No benchmark-run board publishes model latency or hardware, so model size is the only proxy. PAW-GEN-10 reports task time and speed, but at a fixed 30 Hz control rate.",
       decide: "What to ask operators for?"
     },
     {
       title: "Validation",
       detail: "Live now: drop-one-board ranges, held-out accuracy, board agreement. Next: expert sanity check, internal cross-check, blinded re-runs.",
       decide: "What result would count as a failure?"
+    }
+  ],
+
+  cad: [
+    {
+      title: "One entry per model, or per model and harness",
+      detail: "CAD boards list a model several times, with different agent harnesses (Claude Code, Codex, mini-swe-agent) and effort levels. The index keeps each model's best entry, as it keeps a robot model's best checkpoint - so a model is credited with its best harness.",
+      decide: "Rank models, or model + harness pairs?"
+    },
+    {
+      title: "The CAD boards agree poorly",
+      detail: "Fitted without it, the pooled index orders Parametric CAD Bench's clear pairs no better than a coin flip, and BenchCAD's and MIT CADBench's worse; only CAD Arena is predicted well. Part of it is generations: older boards test older models, linked only through a few shared ones.",
+      decide: "Report the index anyway, or per board until more models overlap?"
+    },
+    {
+      title: "The hardest board carries the most weight",
+      detail: "CADWorld (computer-use agents in FreeCAD, best 17.5%) gets the largest weight with 7 models - the same pattern as PAW-GEN-10 on the Robotics Index.",
+      decide: "Cap the weight of small boards?"
+    },
+    {
+      title: "What the CAD Index does not measure yet",
+      detail: "Editing as experts judge it (best model 25% accepted, human edits 78%), assemblies, physics and manufacturability, tolerances and standard parts. CADEngBench and MARB exist but are not in the Ledger.",
+      decide: "Which boards next?"
     }
   ],
 
@@ -112,7 +140,7 @@ window.phailDiscussion = {
     },
     {
       title: "What to chart next",
-      detail: "No board publishes latency, cost or safety next to success; RoboDojo's capability axes are the richest data today."
+      detail: "Only PAW-GEN-10 publishes safety (safe failures, contact force) and speed next to success, for 4 models; no board publishes latency or cost. RoboDojo's capability axes are the richest data today."
     }
   ],
 

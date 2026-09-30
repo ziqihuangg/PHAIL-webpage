@@ -39,7 +39,7 @@
    ========================================================================== */
 
 window.phailScope = {
-  updated: "2026-09-29",
+  updated: "2026-09-30",
 
   layers: [
     {
@@ -73,6 +73,9 @@ window.phailScope = {
                 { name: "RoboTwin 2.0", url: "https://robotwin-platform.github.io/leaderboard", mode: "Sim", board: "live", tests: "policy", ledger: "robotwin", added: "2026-09-27",
                   plain: "Dual-arm tasks in simulation, tested on clean scenes and again on randomised ones; the drop between the two is the point.",
                   tasks: "50", models: "20 on the board", usage: "Standard dual-arm board; listing needs public code and weights." },
+                { name: "PAW-GEN-10", url: "https://pokeandwiggle.com/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "paw_gen_10", added: "2026-09-30",
+                  plain: "Two real Franka FR3 arms at one station do 10 workshop jobs - sort screws, plug in a DC jack, route a cable through hoops, open a toolbox with a screwdriver. The operator fine-tunes every model itself on ~10, ~100 and ~300 demonstrations and tests on seen and unseen object placements.",
+                  tasks: "10 environments, 5 of them held out", models: "4 (Sep 2026); best 28% success", usage: "Poke & Wiggle's Reality Check board; also reports speed, smoothness, contact force and safe failures." },
                 { name: "LIBERO", url: "https://libero-project.github.io/main.html", mode: "Sim", board: "paper", tests: "policy", ledger: "libero", flag: "saturated",
                   plain: "A single simulated arm follows language instructions in kitchen and table scenes, grouped into four suites (spatial, object, goal, long).",
                   tasks: "130 (four 10-task suites are standard)", usage: "Reported in almost every VLA paper; top scores now above 97%, so it no longer separates models." },
@@ -466,16 +469,16 @@ window.phailScope = {
               icon: "box",
               define: "Create one part from text, an engineering drawing, an image or a point cloud. Output: an editable (parametric) CAD model, or the code that builds it. Checked by building the part in a CAD kernel and comparing its geometry and dimensions with a reference. The most measured mechanical task, and the closest to saturated: narrow protocols are near full marks.",
               benchmarks: [
-                { name: "BenchCAD", url: "https://benchcad.com/leaderboard", mode: "Offline", board: "live", tests: "agent",
+                { name: "BenchCAD", url: "https://benchcad.com/leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "benchcad",
                   plain: "Models turn four views of an industrial part into CadQuery code, answer questions about the part and edit it; the generated part is built and compared with the reference. BenchCAD 2.0 (preview) adds assembly drawings and circuit boards.",
                   tasks: "17,900 parts in 106 families; 4 leaderboard tasks", usage: "OpenAI and Anthropic quote it in model launches." },
-                { name: "Parametric CAD Bench", url: "https://cadbench.ai/leaderboard", mode: "Offline", board: "live", tests: "agent",
+                { name: "Parametric CAD Bench", url: "https://cadbench.ai/leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "paramcad",
                   plain: "Agents build parts in FreeCAD from text or engineering drawings, and some tasks then ask for an edit; geometry and every stated dimension are scored.",
                   tasks: "100 in V3: 30 from text, 30 create-then-edit, 40 from drawings", usage: "V3 since Sep 2026; best overall 61%, V1 and V2 kept as historical boards." },
-                { name: "CAD Arena", url: "https://normal.ai/leaderboard/cad-arena", mode: "Offline", board: "live", tests: "agent",
+                { name: "CAD Arena", url: "https://normal.ai/leaderboard/cad-arena", mode: "Offline", board: "live", tests: "agent", ledger: "cadarena",
                   plain: "Agents rebuild real engineering drawings natively in five commercial CAD tools; scored on geometry and on whether the model stays editable.",
                   tasks: "18 drawings x 5 CAD platforms", models: "12 (Sep 2026)" },
-                { name: "CADBench", url: "https://anniedoris.github.io/CADBench/#Leaderboard", mode: "Offline", board: "live", tests: "agent",
+                { name: "CADBench", url: "https://anniedoris.github.io/CADBench/#Leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "cadbench_mit",
                   plain: "Rebuild CAD models from different kinds of input - images, point clouds, text - at large scale (MIT).",
                   tasks: "18,000 samples, 6 families, 5 input types" },
                 { name: "CadQueryEval", url: "https://danwahl.net/cadqueryeval/", mode: "Offline", board: "archived", tests: "agent", flag: "saturated", added: "2026-09-27",
@@ -492,7 +495,7 @@ window.phailScope = {
               icon: "wrench",
               define: "Start from an existing CAD model and a change request - enlarge a bore, move a hole, carry out a designer's note. Output: the modified model. Scored on whether the change was made and nothing else broke: the rest of the geometry, the constraints and the design intent must survive. Far from saturated.",
               benchmarks: [
-                { name: "neuralCAD-Edit", url: "https://autodeskailab.github.io/neuralCAD-Edit/", mode: "Offline", board: "live", tests: "agent",
+                { name: "neuralCAD-Edit", url: "https://autodeskailab.github.io/neuralCAD-Edit/", mode: "Offline", board: "live", tests: "agent", ledger: "neuralcad_edit",
                   plain: "Carry out designers' edit requests on existing CAD models, judged against edits made by experts (Autodesk Research).",
                   tasks: "192 requests, 384 expert edits", usage: "Expert edits are accepted 78% of the time, the best model's 25%." },
                 { name: "CAD-Preserve", url: "https://huggingface.co/datasets/harrrshall/cad-preserve", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-29",
@@ -523,7 +526,7 @@ window.phailScope = {
               icon: "cog",
               define: "An agent drives real CAD software through its interface for a whole job - sketch, model, assemble, generate a toolpath, run a simulation, make a drawing - and the saved project file is checked. Mixes the categories above, like Embodied agent suites in Robotics.",
               benchmarks: [
-                { name: "CADWorld", url: "https://cad-world.github.io", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-29",
+                { name: "CADWorld", url: "https://cad-world.github.io", mode: "Offline", board: "paper", tests: "agent", ledger: "cadworld", added: "2026-09-29",
                   plain: "Computer-use agents operate FreeCAD through screenshots, mouse and keyboard to sketch, model, assemble, make toolpaths, run simulations and draw; the saved project file is checked by executable rules.",
                   tasks: "200 in 11 workflow categories", models: "7 agents; best 17.5%, experts 87%" }
               ]
