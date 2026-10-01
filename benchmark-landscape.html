@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Mobile Manipulation Platforms - PhAIL</title>
+  <link rel="icon" href="assets/favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/style.css?v=1" />
+  <link rel="stylesheet" href="assets/benchmark-landscape.css?v=2" />
+</head>
+<body>
+  <header class="site-header" id="top"></header>
+  <main class="landscape-page">
+    <section class="database-intro">
+      <p class="section-kicker">Research inventory · <span data-landscape-date></span></p>
+      <h1>Mobile Manipulation Platforms <span class="h1-tag">internal research</span></h1>
+      <p>Tasks, evaluated robots and models, simulation assets, and what we can reuse.</p>
+    </section>
+    <nav class="landscape-jumps" aria-label="On this page"><a href="#moving-table">Mobile / Loco table</a><a href="#dexterous-table">Dexterous table</a><a href="#reuse">Asset reuse guide</a><a href="#coverage">Coverage audit</a></nav>
+    <div class="landscape-overview" data-landscape-overview></div>
+    <section id="inventory" class="landscape-section">
+      <div class="landscape-heading"><h2>Benchmark comparison</h2><button type="button" data-landscape-export>Download filtered CSV</button></div>
+      <p class="landscape-help">Counts retain their units: tasks, scene layouts, object meshes and demonstrations are different things. “Pending” means the field still needs verification. Models are tied to the cited protocol, not an exhaustive list of later papers. Object counts exclude robots and robot joints. “Yes — count not reported” differs from “Not established”; neither means zero. Articulation means simulated moving links; a soft-looking rigid mesh is not a deformable object. Upstream library counts are labeled separately from evaluated subsets. Asset purchases are marked only when disclosed. Filters apply to both tables.</p>
+      <div class="landscape-filters">
+        <label>Domain<select data-landscape-domain><option value="all">All domains</option><option value="moving">Mobile / Loco-Manipulation</option><option value="mobile">Mobile manipulation</option><option value="loco">Loco-manipulation</option><option value="dexterous">Dexterous manipulation</option></select></label>
+        <label>Simulator<select data-landscape-sim><option value="all">All simulators</option></select></label>
+        <label class="landscape-search">Search<input type="search" data-landscape-search placeholder="Task, robot, model, dataset…" /></label>
+        <label class="landscape-reference"><input type="checkbox" data-landscape-references /> Include adjacent references</label>
+        <button type="button" data-landscape-reset>Reset</button>
+      </div>
+      <p data-landscape-count role="status" aria-live="polite"></p>
+      <section id="moving-table" class="landscape-section"><h3>Mobile / Loco Manipulation</h3><p data-table-count="moving" role="status"></p><div class="landscape-table-wrap" tabindex="0" role="region" aria-label="Mobile / Loco Manipulation comparison, horizontally scrollable"><table class="landscape-table"><caption class="landscape-sr-only">Mobile / Loco Manipulation: benchmarks and simulation assets</caption><thead><tr><th scope="col">Benchmark / version</th><th scope="col">Task categories</th><th scope="col">Robots / embodiment</th><th scope="col">Evaluated models</th><th scope="col">Simulator</th><th scope="col">Asset source / acquisition</th><th scope="col">Asset quantity</th><th scope="col">Deformable objects</th><th scope="col">Articulated objects</th><th scope="col">Reuse & limitations</th></tr></thead><tbody data-landscape-rows="moving"></tbody></table></div></section>
+      <section id="dexterous-table" class="landscape-section"><h3>Dexterous Manipulation</h3><p data-table-count="dexterous" role="status"></p><div class="landscape-table-wrap" tabindex="0" role="region" aria-label="Dexterous Manipulation comparison, horizontally scrollable"><table class="landscape-table"><caption class="landscape-sr-only">Dexterous Manipulation: benchmarks and simulation assets</caption><thead><tr><th scope="col">Benchmark / version</th><th scope="col">Task categories</th><th scope="col">Robots / embodiment</th><th scope="col">Evaluated models</th><th scope="col">Simulator</th><th scope="col">Asset source / acquisition</th><th scope="col">Asset quantity</th><th scope="col">Deformable objects</th><th scope="col">Articulated objects</th><th scope="col">Reuse & limitations</th></tr></thead><tbody data-landscape-rows="dexterous"></tbody></table></div></section>
+      <noscript>This comparison requires JavaScript. The complete inventory is in data/benchmark-landscape.js.</noscript>
+    </section>
+    <section id="reuse" class="landscape-section"><h2>Where to start reusing assets</h2><p>Research recommendations based on the linked inventories. A simulator port still needs collision geometry, joints, materials, controller and success-check validation. Public code does not automatically grant the same license to every mesh.</p><div class="landscape-reuse" data-landscape-reuse></div></section>
+    <section id="coverage" class="landscape-section"><h2>Coverage audit</h2><div data-landscape-audit></div></section>
+    <section class="talk"><div data-notes="benchmark-landscape"></div></section>
+  </main>
+  <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
+  <script src="js/common/selfcheck.js?v=1"></script>
+  <script src="js/common/site.js?v=3"></script>
+  <script src="data/benchmark-landscape.js?v=2"></script>
+  <script src="js/pages/benchmark-landscape.js?v=2"></script>
+  <script src="data/notes.js?v=1"></script>
+  <script src="js/common/notes.js?v=3"></script>
+</body>
+</html>

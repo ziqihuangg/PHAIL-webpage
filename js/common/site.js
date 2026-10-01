@@ -18,16 +18,20 @@ const pageKey = path === "index.html" ? "home" : path.replace(".html", "");
    but carries a small "Not ready" mark so no one reads it as finished. */
 const pageLinks = [
   ["Scope", "index.html", "home", true],
-  ["Robotics Index", "ranking.html", "ranking", true],
+  ["Robotics Index", "robotics-index.html", "robotics-index", true],
   ["Ledger", "tasks.html", "tasks", true]
 ];
 const internalLinks = [
+  ["Mobile Manipulation Platforms", "benchmark-landscape.html", "benchmark-landscape", true],
   ["CAD Index", "cad-index.html", "cad-index", false],
   ["Charts", "charts.html", "charts", false],
   ["GPT-6 Astra", "gpt-6-astra.html", "gpt-6-astra", false],
   ["Related work", "related.html", "related", false],
-  ["TODO", "todo.html", "todo", true]
+  ["TODO", "todo.html", "todo", true],
+  ["Checks", "check.html", "check", true]
 ];
+/* every tab, for check.html (it scans each page and knows which are not ready) */
+window.phailPages = pageLinks.concat(internalLinks).map(([label, file, key, ready]) => ({ label: label, file: file, key: key, ready: ready }));
 const header = document.querySelector("header.site-header");
 
 if (header) {
@@ -35,7 +39,7 @@ if (header) {
   const tab = ([label, href, key, ready]) => `<a href="${href}"${pageKey === key ? ' aria-current="page"' : ""}${ready ? "" : ' class="tab-not-ready" title="Not ready yet"'}>${label}${ready ? "" : '<span class="tab-flag">Not ready</span>'}</a>`;
   const internalCurrent = internalLinks.some(([, , key]) => key === pageKey);
   header.outerHTML = `<header class="site-header" id="top"><div class="header-row">`
-    + `<a class="site-name" href="${homeHref}" title="${siteConfig.fullName}"><img class="site-mark" src="physical-ai-mark.svg" alt="" /><span>${siteConfig.acronym}</span></a>`
+    + `<a class="site-name" href="${homeHref}" title="${siteConfig.fullName}"><img class="site-mark" src="assets/physical-ai-mark.svg" alt="" /><span>${siteConfig.acronym}</span></a>`
     + `<nav aria-label="Primary navigation">${pageLinks.map(tab).join("")}`
     + `<div class="nav-more${internalCurrent ? " is-current" : ""}">`
     + `<button type="button" class="nav-more-button" aria-expanded="false" aria-controls="nav-internal">Internal Work in Progress</button>`

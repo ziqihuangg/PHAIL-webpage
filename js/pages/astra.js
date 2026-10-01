@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - GPT-6-Astra spotlight: rendering
    -----------------------------------------------------------------------------
-   Reads astra-data.js, writes into the placeholders in gpt-6-astra.html. Charts
+   Reads data/astra.js, writes into the placeholders in gpt-6-astra.html. Charts
    go through window.phailCharts, the same dependency-free SVG primitives the
    Charts page uses, so this page cannot drift from the site's chart language.
 

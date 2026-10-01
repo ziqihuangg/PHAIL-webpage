@@ -1,9 +1,9 @@
 /* =============================================================================
    PhAIL - CAD Index configuration (data only)
    -----------------------------------------------------------------------------
-   The same engine as the Robotics Index (ranking-engine.js), with its own
-   boards and knobs. cad-index.html draws it with ranking-app.js; everything
-   the fields mean is documented in ranking-data.js.
+   The same engine as the Robotics Index (js/engine/ranking-engine.js), with its own
+   boards and knobs. cad-index.html draws it with js/pages/ranking.js; everything
+   the fields mean is documented in data/ranking-robotics.js.
 
    CAD-specific choices
      - One entry is one model. Boards list a model several times with other
@@ -51,29 +51,29 @@ window.phailCadRanking = {
 
   capabilities: [
     { id: "text", name: "Create from text", short: "Text", icon: "pencil-ruler", definedBy: "Parametric CAD Bench (its own task category)",
-      sources: [{ board: "paramcad-v3", field: "create", trials: 30, what: "Parametric CAD Bench \u201cCreate\u201d: 30 parts described in words" }] },
+      sources: [{ board: "paramcad-v3", field: "create", trials: 30, what: "Parametric CAD Bench \u201cCreate\u201d: {!30} parts described in words" }] },
     { id: "edit", name: "Create, then edit", short: "Edit", icon: "wrench", definedBy: "Parametric CAD Bench (its own task category)",
-      sources: [{ board: "paramcad-v3", field: "createEdit", trials: 30, what: "Parametric CAD Bench \u201cCreate + Edit\u201d: 30 tasks, build a part then change it" }] },
+      sources: [{ board: "paramcad-v3", field: "createEdit", trials: 30, what: "Parametric CAD Bench \u201cCreate + Edit\u201d: {!30} tasks, build a part then change it" }] },
     { id: "drawings", name: "From drawings or views", short: "Drawings", icon: "drafting-compass", definedBy: "PhAIL, joining four boards' drawing- or image-to-CAD tasks",
       sources: [
-        { board: "paramcad-v3", field: "image", trials: 40, what: "Parametric CAD Bench \u201cImage-to-CAD\u201d: 40 engineering drawings" },
-        { board: "cad-arena", what: "CAD Arena: 18 drawings rebuilt in 5 commercial CAD tools" },
+        { board: "paramcad-v3", field: "image", trials: 40, what: "Parametric CAD Bench \u201cImage-to-CAD\u201d: {!40} engineering drawings" },
+        { board: "cad-arena", what: "CAD Arena: {!18} drawings rebuilt in {!5} commercial CAD tools" },
         { board: "benchcad-vision2code", what: "BenchCAD Vision2Code: four orthographic views to CadQuery code" },
-        { board: "cadbench-mit-image", what: "CADBench (MIT): images to CAD programs, 6 families" }] },
+        { board: "cadbench-mit-image", what: "CADBench (MIT): images to CAD programs, {!6} families" }] },
     { id: "workflow", name: "Whole workflow in the CAD program", short: "Workflow", icon: "cog", definedBy: "CADWorld (the whole board)",
-      sources: [{ board: "cadworld", what: "CADWorld: 200 FreeCAD tasks operated through the screen" }] }
+      sources: [{ board: "cadworld", what: "CADWorld: {cad.trials:cadworld} FreeCAD tasks operated through the screen" }] }
   ],
 
   gaps: [
-    { kind: "level", name: "Create a part from text", asks: "30 FreeCAD parts described in words; every stated dimension is checked.",
+    { kind: "level", name: "Create a part from text", asks: "{!30} FreeCAD parts described in words; every stated dimension is checked.",
       boards: ["paramcad-v3"], field: "create" },
-    { kind: "level", name: "Create, then edit", asks: "30 tasks: build a part, then carry out a requested change to it.",
+    { kind: "level", name: "Create, then edit", asks: "{!30} tasks: build a part, then carry out a requested change to it.",
       boards: ["paramcad-v3"], field: "createEdit" },
     { kind: "level", name: "Rebuild from a drawing", asks: "Engineering drawings or rendered views in, a CAD model or CAD code out.",
       boards: ["paramcad-v3", "cad-arena", "benchcad-vision2code", "cadbench-mit-image"], fields: { "paramcad-v3": "image", "cad-arena": "score", "benchcad-vision2code": "iou", "cadbench-mit-image": "iou" } },
     { kind: "level", name: "Whole workflow in the CAD program", asks: "Sketch, model, assemble, make toolpaths, run simulations and drawings in FreeCAD through the screen.",
       boards: ["cadworld"], field: "success" },
-    { kind: "level", name: "Edits an expert would accept", asks: "Designers' edit requests on existing models, judged by experts (human edits: 78% accepted).",
+    { kind: "level", name: "Edits an expert would accept", asks: "Designers' edit requests on existing models, judged by experts (human edits: {!78%} accepted).",
       boards: ["neuralcad-edit"], field: "accept" }
   ],
 
@@ -82,7 +82,7 @@ window.phailCadRanking = {
 
   factors: [
     { name: "Board difficulty", why: "A win on a board the field has nearly solved says little.", data: "Best published score on every board.", status: "used" },
-    { name: "Sampling noise", why: "A 2-point gap over 100 tasks is a tie.", data: "Parametric CAD Bench's own 95% intervals; task counts elsewhere (stand-ins where unstated).", status: "used" },
+    { name: "Sampling noise", why: "A {!2}-point gap over {cad.trials:paramcad-v3} tasks is a tie.", data: "Parametric CAD Bench's own {!95%} intervals; task counts elsewhere (stand-ins where unstated).", status: "used" },
     { name: "Harness and effort", why: "The same model scores differently with another agent harness or effort level.", data: "Every Ledger row records both; the index keeps each model's best.", status: "used" },
     { name: "Evidence class", why: "A vendor's own number on its own subset is a different claim from a re-graded one.", data: "BenchCAD's vendor-reported rows, kept apart.", status: "toggle" },
     { name: "Cost", why: "What a result costs to get.", data: "Parametric CAD Bench (per run), CAD Arena (per trial).", status: "beside" },

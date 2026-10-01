@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A draft cross-board index for robot manipulation models, built only from within-board comparisons, with its weights, checks and open questions." />
   <title>Robotics Index - PhAIL</title>
-  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-  <link rel="stylesheet" href="vendor/katex/katex.min.css" />
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="icon" href="assets/favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="mask-icon" href="assets/physical-ai-mark.svg" color="#14171b" />
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css" />
+  <link rel="stylesheet" href="assets/style.css?v=1" />
 </head>
 <body data-ranking="robotics">
   <header class="site-header" id="top"></header>
@@ -35,63 +35,63 @@
     <section class="slide" id="method">
       <h2>Index method</h2>
       <dl class="method-intro method-intro--short">
-        <div><dt>What</dt><dd>One number per model, 0-100: how often it would beat the other ranked models. <b data-m="models">86</b> models from <b data-m="boards">7</b> boards.</dd></div>
+        <div><dt>What</dt><dd>One number per model, <span data-fact>0-100</span>: how often it would beat the other ranked models. <b data-m="models"></b> models from <b data-m="boards"></b> boards.</dd></div>
         <div><dt>Why</dt><dd>No single board tests every model, and each board alone is noisy, so the boards are pooled.</dd></div>
-        <div><dt>How</dt><dd>Inside each board, count who beat whom - scores are never added across boards. Pool all these results into one strength per model, as Elo does for chess players, then turn the strengths into the 0-100 index.</dd></div>
+        <div><dt>How</dt><dd>Inside each board, count who beat whom - scores are never added across boards. Pool all these results into one strength per model, as Elo does for chess players, then turn the strengths into the <span data-fact>0-100</span> index.</dd></div>
       </dl>
       <p class="method-note">Each point opens for details; the numbers there are for the default settings and are recomputed from the Ledger on every load.</p>
       <ol class="slide-steps">
-        <li><b>Seven boards, each run by its operator</b><span>RoboDojo Sim and Real, RoboChallenge T30 and T30-v2, RoboTwin 2.0, RoboArena, PAW-GEN-10. Paper tables join only when switched on, at half weight. RoboChallenge's closed competitions stay in the Ledger only; the reasons are under Boards and weights.</span>
+        <li><b><span data-m="boardsWord"></span> boards, each run by its operator</b><span><span data-m="boardList"></span>. Paper tables join only when switched on, at <span data-m="paperWeightWord"></span> weight. RoboChallenge's closed competitions stay in the Ledger only; the reasons are under Boards and weights.</span>
           <details class="step-more"><summary>Details</summary>
             <h4 class="step-sub">Why pool several boards</h4>
             <div data-why></div>
             <h4 class="step-sub">What goes in</h4>
-            <p><b data-m="results">125</b> published results for <b data-m="models">86</b> models from <b data-m="boards">7</b> boards, copied unchanged from the Ledger. We measure nothing ourselves; the models' own paper tables are off by default.</p>
+            <p><b data-m="results"></b> published results for <b data-m="models"></b> models from <b data-m="boards"></b> boards, copied unchanged from the Ledger. We measure nothing ourselves; the models' own paper tables are off by default.</p>
             <p><i>Intuition.</i> Only tables where one operator ran every model under one protocol - the same tasks, robots and number of trials - are comparable within the table. A number a model's own authors published on their own set-up is a different kind of claim, so it stays out unless the Evidence switch is on.</p>
             <ul>
               <li>Each model's <i>best</i> entry on a board is used, as the board itself shows it.</li>
-              <li>RoboChallenge T30-v2 entries that ran fewer than 15 of its 30 tasks stay in the Ledger only (the board counts unrun tasks as zero).</li>
-              <li>With Evidence = "+ paper tables", each benchmark's paper tables are pooled into one extra board, at half weight and an assumed 500 trials.</li>
+              <li>RoboChallenge T30-v2 entries that ran fewer than <span data-m="minTasks:robochallenge-t30v2"></span> of its <span data-m="taskTotal:robochallenge-t30v2"></span> tasks stay in the Ledger only (the board counts unrun tasks as zero).</li>
+              <li>With Evidence = "+ paper tables", each benchmark's paper tables are pooled into one extra board, at <span data-m="paperWeightWord"></span> weight and an assumed <span data-m="paperTrials"></span> trials.</li>
             </ul>
             <div data-method="boards"></div>
           </details></li>
-        <li><b>Never add scores across boards</b><span>A board only says who beat whom. 34 on RoboDojo and 64 on RoboChallenge are different scales.</span>
+        <li><b>Never add scores across boards</b><span>A board only says who beat whom. <span data-m="bestRound:robodojo-sim"></span> on RoboDojo and <span data-m="bestRound:robochallenge-t30"></span> on RoboChallenge are different scales.</span>
           <details class="step-more"><summary>Details</summary>
             <p><i>Intuition.</i> Boards differ in tasks, robots, number of trials and in what a point is worth: a success rate, a progress score, an Elo rating. The top of one board can sit at the bottom of another. So a raw score is only read against the other scores on the same board - which model is above which, and by how much relative to the noise (next step).</p>
             <div data-method="raw"></div>
             <p>The Method switch's "Raw mean" does exactly what this step forbids - a weighted average of raw scores - so the difference can be seen.</p>
           </details></li>
-        <li><b>Small gaps count as ties</b><span>P(A beats B) = &Phi;(gap / noise), with noise from the board's trial count. A 1-point gap over 180 real trials is only about 60/40.</span>
+        <li><b>Small gaps count as ties</b><span>P(A beats B) = &Phi;(gap / noise), with noise from the board's trial count. A <span data-fact>1</span>-point gap over <span data-m="onePointTrials"></span> real trials is only about <span data-m="onePointOdds"></span>.</span>
           <details class="step-more"><summary>Details</summary>
             <p><i>Intuition.</i> A board runs each model a limited number of times, so every score carries sampling noise. A gap smaller than that noise is close to a coin flip, so it counts as a near-tie rather than a clean win; a gap several times the noise counts as a full win.</p>
             <div class="step-math">
               <div class="eq"><span class="eq-label">noise of one score</span><span class="eq-body">\(\displaystyle \mathrm{SE} = 100\,\sqrt{\frac{p\,(1-p)}{n}}\)</span></div>
-              <div class="eq-note">\(p\) = score / 100, kept between 0.02 and 0.98; \(n\) = trials per model</div>
+              <div class="eq-note">\(p\) = score / 100, kept between <span data-m="pMin"></span> and <span data-m="pMax"></span>; \(n\) = trials per model</div>
               <div class="eq"><span class="eq-label">noise of a gap</span><span class="eq-body">\(\displaystyle \sigma = \sqrt{\mathrm{SE}_A^{2} + \mathrm{SE}_B^{2}}\)</span></div>
               <div class="eq"><span class="eq-label">win share</span><span class="eq-body">\(\displaystyle \Pr(A \text{ beats } B) = \Phi\!\left(\frac{\text{score}_A - \text{score}_B}{\sigma}\right)\)</span></div>
               <div class="eq-note">B gets \(1 - \Pr(A \text{ beats } B)\)</div>
-              <div class="eq"><span class="eq-label">normal curve</span><span class="eq-body">\(\displaystyle \Phi(0) = 0.50, \quad \Phi(1) \approx 0.84, \quad \Phi(2) \approx 0.98\)</span></div>
+              <div class="eq"><span class="eq-label">normal curve</span><span class="eq-body">\(\displaystyle \Phi(0) = 0.50, \quad \Phi(1) \approx \cfgphione, \quad \Phi(2) \approx \cfgphitwo\)</span></div>
             </div>
             <div data-method="noise"></div>
             <h4 class="step-sub">Reading an Elo rating (RoboArena)</h4>
-            <p><i>Intuition.</i> RoboArena has no success rate. Evaluators run two anonymous policies on a task of their choice and say which did better; every vote is one match. Ratings are fitted so that the gap between two ratings predicts which policy is preferred, as in chess. Only gaps mean anything: the level (around 1,500) is arbitrary, so there is no ceiling and no best score to compute a difficulty from - step 4 gives Elo boards a neutral 0.5.</p>
+            <p><i>Intuition.</i> RoboArena has no success rate. Evaluators run two anonymous policies on a task of their choice and say which did better; every vote is one match. Ratings are fitted so that the gap between two ratings predicts which policy is preferred, as in chess. Only gaps mean anything: the level (around <span data-m="eloLevel"></span>) is arbitrary, so there is no ceiling and no best score to compute a difficulty from - step 4 gives Elo boards a neutral <span data-m="neutralDifficulty"></span>.</p>
             <div class="step-math">
               <div class="eq"><span class="eq-label">preferred</span><span class="eq-body">\(\displaystyle \Pr(A \text{ preferred over } B) = \frac{1}{1 + 10^{-(R_A - R_B)/400}}\)</span></div>
-              <div class="eq"><span class="eq-label">rules of thumb</span><span class="eq-body">\(\displaystyle R_A - R_B = 0 \;\Rightarrow\; 0.50, \qquad 100 \;\Rightarrow\; 0.64, \qquad 400 \;\Rightarrow\; 0.91 \;\; (10 \text{ to } 1)\)</span></div>
+              <div class="eq"><span class="eq-label">rules of thumb</span><span class="eq-body">\(\displaystyle R_A - R_B = 0 \;\Rightarrow\; 0.50, \qquad 100 \;\Rightarrow\; \cfgeloone, \qquad 400 \;\Rightarrow\; \cfgelofour \;\; (10 \text{ to } 1)\)</span></div>
               <div class="eq"><span class="eq-label">link to step 6</span><span class="eq-body">\(\displaystyle s = 10^{R/400}\)</span></div>
               <div class="eq-note">the same Bradley-Terry curve, with strength written on a base-10 scale</div>
             </div>
             <p>RoboArena also publishes a standard deviation per policy - the uncertainty of its own fit - and the index uses it as SE in the formulas above.</p>
             <div data-method="elo"></div>
           </details></li>
-        <li><b>Harder boards count more</b><span>Weight = 1 &minus; best score / 100: LIBERO (best 97%) &asymp; 0, RoboDojo Sim (best 34%) &asymp; 0.66. One operator's boards share one weight.</span>
+        <li><b>Harder boards count more</b><span>Difficulty = <span data-fact>1 &minus; best score / 100</span>: <span data-m="saturatedName"></span> (best <span data-m="saturatedBestPct"></span>) &asymp; <span data-m="saturatedD"></span>, RoboDojo Sim (best <span data-m="bestRound:robodojo-sim"></span>%) &asymp; <span data-m="d:robodojo-sim"></span>. One operator's boards share one weight.</span>
           <details class="step-more"><summary>Details</summary>
-            <p><i>Intuition.</i> A board whose best model already scores 97% can no longer tell good models apart; one whose best scores 34% still has room. Two boards from the same operator measure much the same thing, so they share one vote. An operator-run table counts twice as much as a paper's table.</p>
+            <p><i>Intuition.</i> A board whose best model already scores <span data-m="saturatedBestPct"></span> can no longer tell good models apart; one whose best scores <span data-m="bestRound:robodojo-sim"></span>% still has room. Two boards from the same operator measure much the same thing, so they share one vote. An operator-run table counts <span data-m="evidenceRatioWord"></span> as much as a paper's table.</p>
             <div class="step-math">
               <div class="eq"><span class="eq-label">difficulty</span><span class="eq-body">\(\displaystyle d = 1 - \frac{\text{best score}}{100}\)</span></div>
-              <div class="eq-note">kept between 0.02 and 1; Elo boards have no ceiling, so \(d = 0.5\)</div>
+              <div class="eq-note">kept between <span data-m="minDifficulty"></span> and 1; Elo boards have no ceiling, so \(d = \cfgdneutral\)</div>
               <div class="eq"><span class="eq-label">family share</span><span class="eq-body">\(\displaystyle f = \frac{1}{\text{number of boards from the same operator in view}}\)</span></div>
-              <div class="eq"><span class="eq-label">evidence</span><span class="eq-body">\(\displaystyle e = \begin{cases} 1 &amp; \text{operator-run board} \\ 0.5 &amp; \text{pooled paper tables} \end{cases}\)</span></div>
+              <div class="eq"><span class="eq-label">evidence</span><span class="eq-body">\(\displaystyle e = \begin{cases} \cfgebench &amp; \text{operator-run board} \\ \cfgepaper &amp; \text{pooled paper tables} \end{cases}\)</span></div>
               <div class="eq"><span class="eq-label">weight</span><span class="eq-body">\(\displaystyle w = d \cdot f \cdot e, \qquad \text{share of the index} = \frac{w}{\sum_{\text{boards}} w}\)</span></div>
             </div>
             <div data-method="weights"></div>
@@ -117,17 +117,17 @@
               <div class="eq"><span class="eq-label">data</span><span class="eq-body">\(\displaystyle \omega_{ij} = \frac{w}{k - 1} \;\text{(steps 4-5)}, \qquad W_{ij} = \text{win share (step 3)}\)</span></div>
               <div class="eq"><span class="eq-label">fit</span><span class="eq-body">\(\displaystyle \max_{s} \; \sum_{\text{pairs}} \omega_{ij} \left[ W_{ij} \ln \frac{s_i}{s_i + s_j} + (1 - W_{ij}) \ln \frac{s_j}{s_i + s_j} \right]\)</span></div>
               <div class="eq"><span class="eq-label">start</span><span class="eq-body">\(\displaystyle s_i = 1 \quad \text{for every model}\)</span></div>
-              <div class="eq"><span class="eq-label">update</span><span class="eq-body">\(\displaystyle s_i \;\leftarrow\; \frac{\tfrac{\pi}{2} + \sum_j \omega_{ij} W_{ij}}{\tfrac{\pi}{s_i + 1} + \sum_j \dfrac{\omega_{ij}}{s_i + s_j}}, \qquad \pi = 0.1\)</span></div>
+              <div class="eq"><span class="eq-label">update</span><span class="eq-body">\(\displaystyle s_i \;\leftarrow\; \frac{\tfrac{\pi}{2} + \sum_j \omega_{ij} W_{ij}}{\tfrac{\pi}{s_i + 1} + \sum_j \dfrac{\omega_{ij}}{s_i + s_j}}, \qquad \pi = \cfgprior\)</span></div>
               <div class="eq-note">top: the wins the model actually collected (weighted); bottom: how many wins each unit of strength earns against its current opponents. A model that wins more than its strength predicts moves up, one that wins less moves down. The \(\pi\) terms are a weak tie against a fixed reference of strength 1, so a model that lost - or won - every comparison still gets a finite strength (Hunter's MM algorithm, 2004)</div>
-              <div class="eq"><span class="eq-label">stop</span><span class="eq-body">\(\displaystyle \max_i \big|\ln s_i^{\text{new}} - \ln s_i^{\text{old}}\big| &lt; 10^{-9} \quad \text{(at most 4,000 rounds)}\)</span></div>
+              <div class="eq"><span class="eq-label">stop</span><span class="eq-body">\(\displaystyle \max_i \big|\ln s_i^{\text{new}} - \ln s_i^{\text{old}}\big| &lt; \cfgtol \quad \text{(at most } \cfgrounds \text{ rounds)}\)</span></div>
             </div>
             <div data-method="bt"></div>
             <h4 class="step-sub">Worked example: one model's strength</h4>
             <div data-strength-example></div>
           </details></li>
-        <li><b>From strengths to the index</b><span>0-100: the model's average chance of beating each other ranked model, one at a time, computed from the strengths. Not a success rate, and not the share of models it is ranked above.</span>
+        <li><b>From strengths to the index</b><span><span data-fact>0-100</span>: the model's average chance of beating each other ranked model, one at a time, computed from the strengths. Not a success rate, and not the share of models it is ranked above.</span>
           <details class="step-more"><summary>Details</summary>
-            <p>A "match" here means the mix of tasks these boards test, weighted as in step 4 - not one particular task. 50 is the middle of this field. <span data-meaning-example></span></p>
+            <p>A "match" here means the mix of tasks these boards test, weighted as in step 4 - not one particular task. <span data-fact>50</span> is the middle of this field. <span data-meaning-example></span></p>
             <p><i>Intuition.</i> Strengths have no natural unit. To make them readable, pair the model with every other ranked model in turn, take its chance of winning each pair from the strengths, and average those chances.</p>
             <div class="step-math">
               <div class="eq"><span class="eq-label">index</span><span class="eq-body">\(\displaystyle \text{Index}_i = \frac{100}{N - 1} \sum_{j \neq i} \frac{s_i}{s_i + s_j}\)</span></div>
@@ -144,7 +144,7 @@
             <ul data-strength-why></ul>
             <ul>
               <li>Relative to this field: adding many weak models raises everyone's index. That is why RoboChallenge T30-v2 entries that ran few tasks are left out (step 1).</li>
-              <li>Not a success rate: an index of 94 does not mean 94% of tasks done.</li>
+              <li>Not a success rate: an index of <span data-m="topIndexRound"></span> does not mean <span data-m="topIndexRound"></span>% of tasks done.</li>
             </ul>
           </details></li>
         <li><b>Error bars: drop one board at a time</b><span>Each whisker runs from the lowest to the highest index the model gets when the whole index is recomputed without one of the boards. It shows how much the ranking leans on any single board; it is not a confidence interval.</span>
@@ -161,7 +161,7 @@
             <div data-method="doubt-example"></div>
             <ul>
               <li><i>Drop-one range</i> (whiskers, table column) and <i>rank range</i> are these two intervals.</li>
-              <li><i>Held-out accuracy</i> (Boards and weights): fit without board X, take the pairs on X whose gap exceeds their noise, and count how often the refit orders them the same way. 50% is a coin flip.</li>
+              <li><i>Held-out accuracy</i> (Boards and weights): fit without board X, take the pairs on X whose gap exceeds their noise, and count how often the refit orders them the same way. <span data-fact>50%</span> is a coin flip.</li>
               <li><i>Boards</i> column: a model on one board rests entirely on that board. <i>Board agreement</i> (below) compares the order two boards give their shared models.</li>
             </ul>
             <div data-method="doubt"></div>
@@ -174,7 +174,7 @@
       <h2>Boards and weights</h2>
       <ul class="slide-points">
         <li><b>Weight</b> = difficulty &times; family share &times; evidence.</li>
-        <li><b>Held-out accuracy:</b> fit without the board, then check its clearly separated pairs. 50% is a coin flip; red is below 60%.</li>
+        <li><b>Held-out accuracy:</b> fit without the board, then check its clearly separated pairs. <span data-fact>50%</span> is a coin flip; red is below <span data-m="weakHeldOutPct"></span>.</li>
       </ul>
       <div class="data-table-wrap" data-rank-boards tabindex="0" aria-label="Boards and weights"></div>
       <div class="rank-out" data-rank-out></div>
@@ -183,7 +183,7 @@
     <section class="chart-block" id="capabilities">
       <h2>Capabilities, decoupled</h2>
       <ul class="slide-points">
-        <li>Each column is its own small index: the same method (steps 2-7) run only on the sub-scores that measure that capability. A cell is the model's chance of beating the other models on that capability (0-100), not a raw score; &middot; means the model has no such score.</li>
+        <li>Each column is its own small index: the same method (steps 2-7) run only on the sub-scores that measure that capability. A cell is the model's chance of beating the other models on that capability (<span data-fact>0-100</span>), not a raw score; &middot; means the model has no such score.</li>
         <li data-cap-summary></li>
       </ul>
       <details class="step-more">
@@ -208,7 +208,7 @@
     <section class="chart-block" id="agreement">
       <h2>Board agreement</h2>
       <ul class="slide-points">
-        <li><b>In short:</b> when two boards test the same models, do they put them in the same order? Kendall's &tau; scores that from <b>+1</b> (same order) through 0 (no relation) to <b>&minus;1</b> (reversed), using only the models both boards share (four or more).</li>
+        <li><b>In short:</b> when two boards test the same models, do they put them in the same order? Kendall's &tau; scores that from <b><span data-fact>+1</span></b> (same order) through <span data-fact>0</span> (no relation) to <b><span data-fact>&minus;1</span></b> (reversed), using only the models both boards share (<span data-m="minSharedWord"></span> or more).</li>
         <li>Red cells lean towards reversed; the details show which &tau; could be chance.</li>
         <li data-agree-reading></li>
       </ul>
@@ -222,10 +222,10 @@
           <div class="eq"><span class="eq-label">with no ties</span><span class="eq-body">\(\displaystyle \tau = \frac{C - D}{n(n - 1)/2}, \qquad \text{share of pairs in the same order} = \frac{1 + \tau}{2}\)</span></div>
         </div>
         <ul>
-          <li><b>+1</b>: identical order. <b>0</b>: no relation - whether the boards agree on a pair is a coin flip. <b>&minus;1</b>: exactly reversed.</li>
-          <li>&tau; = 0.5 means the boards order about 3 pairs in 4 the same way; &tau; = &minus;0.5, about 3 in 4 the opposite way.</li>
-          <li>Few shared models make &tau; very uncertain: with 4 models there are only 6 pairs, and one flipped pair moves &tau; by 0.33. Even for two unrelated boards &tau; scatters by about \(\pm\sqrt{\tfrac{2(2n + 5)}{9n(n - 1)}}\) - the chance level below. A &tau; inside twice that could be luck.</li>
-          <li>Computed on each board's published values (each model's best entry), not on the index. Boards need 4 or more shared models to get a &tau;.</li>
+          <li><b><span data-fact>+1</span></b>: identical order. <b><span data-fact>0</span></b>: no relation - whether the boards agree on a pair is a coin flip. <b><span data-fact>&minus;1</span></b>: exactly reversed.</li>
+          <li>&tau; = <span data-fact>0.5</span> means the boards order about <span data-fact>3 pairs in 4</span> the same way; &tau; = <span data-fact>&minus;0.5</span>, about <span data-fact>3 in 4</span> the opposite way.</li>
+          <li>Few shared models make &tau; very uncertain: with <span data-m="minShared"></span> models there are only <span data-m="minSharedPairs"></span> pairs, and one flipped pair moves &tau; by <span data-m="flipStep"></span>. Even for two unrelated boards &tau; scatters by about \(\pm\sqrt{\tfrac{2(2n + 5)}{9n(n - 1)}}\) - the chance level below. A &tau; inside twice that could be luck.</li>
+          <li>Computed on each board's published values (each model's best entry), not on the index. Boards need <span data-m="minShared"></span> or more shared models to get a &tau;.</li>
         </ul>
         <div data-tau-details></div>
       </details>
@@ -244,7 +244,7 @@
     <section class="chart-block" id="efficiency">
       <h2>Index against model size</h2>
       <ul class="slide-points">
-        <li>No board publishes model latency or hardware; PAW-GEN-10 fixes control at 30 Hz and reports task time, not inference time.</li>
+        <li>No board publishes model latency or hardware; PAW-GEN-10 fixes control at <span data-fact>30 Hz</span> and reports task time, not inference time.</li>
         <li>Parameter count is the only proxy, and most models do not state it.</li>
       </ul>
       <div class="chart-surface" data-rank-size></div>
@@ -260,19 +260,29 @@
   </main>
 
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-  <script src="script.js?v=12"></script>
-  <script src="icons.js?v=1"></script>
-  <script src="charts.js?v=6"></script>
-  <script src="tasks-data-new.js?v=17"></script>
-  <script src="scope-data.js?v=14"></script>
-  <script src="ranking-data.js?v=8"></script>
-  <script src="ranking-engine.js?v=4"></script>
-  <script src="vendor/katex/katex.min.js"></script>
-  <script src="vendor/katex/contrib/auto-render.min.js"></script>
-  <script src="ranking-app.js?v=25"></script>
-  <script src="discussion-data.js?v=12"></script>
-  <script src="discussion.js?v=3"></script>
-  <script src="notes-data.js?v=1"></script>
-  <script src="notes.js?v=2"></script>
+  <script src="js/common/selfcheck.js?v=1"></script>
+  <script src="js/common/site.js?v=3"></script>
+  <script src="js/common/facts.js?v=1"></script>
+  <script src="js/common/icons.js?v=1"></script>
+  <script src="js/common/charts.js?v=1"></script>
+  <script src="data/ledger.js?v=1"></script>
+  <script src="data/raw/sources.js?v=1"></script>
+  <script src="data/raw/robochallenge-t30.js?v=1"></script>
+  <script src="data/raw/robochallenge-t30v2.js?v=1"></script>
+  <script src="data/raw/robochallenge-cvpr26.js?v=1"></script>
+  <script src="data/raw/robochallenge-icra26.js?v=1"></script>
+  <script src="data/raw/paw-gen-10.js?v=1"></script>
+  <script src="js/engine/raw-sources.js?v=1"></script>
+  <script src="data/scope.js?v=1"></script>
+  <script src="data/ranking-robotics.js?v=1"></script>
+  <script src="js/engine/ranking-engine.js?v=1"></script>
+  <script src="js/engine/ranking-analysis.js?v=1"></script>
+  <script src="assets/vendor/katex/katex.min.js?v=1"></script>
+  <script src="assets/vendor/katex/contrib/auto-render.min.js?v=1"></script>
+  <script src="js/pages/ranking.js?v=1"></script>
+  <script src="data/discussion.js?v=1"></script>
+  <script src="js/common/discussion.js?v=1"></script>
+  <script src="data/notes.js?v=1"></script>
+  <script src="js/common/notes.js?v=3"></script>
 </body>
 </html>

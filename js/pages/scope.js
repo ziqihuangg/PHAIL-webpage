@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - Scope tab: the tree, the counts, the directory and the metric glossary
    -----------------------------------------------------------------------------
-   Reads window.phailScope (scope-data.js) and window.phailIcon (icons.js).
+   Reads window.phailScope (data/scope.js) and window.phailIcon (js/common/icons.js).
    The tree is plain nested flex boxes; the connector lines are CSS, so there is
    nothing to measure or redraw on resize. Below ~1000px it folds into an
    indented list. Every node with children opens and closes on click; the
@@ -65,7 +65,7 @@
     both: "Tests both trained policies and general models through a harness."
   };
 
-  /* --- counts: one line, counted from scope-data.js on every load --------------
+  /* --- counts: one line, counted from data/scope.js on every load --------------
      The same set as the tree's root node and the directory: every board in
      every layer, so the page never shows two different totals. */
   const statsMount = document.querySelector("[data-scope-stats]");
@@ -164,7 +164,7 @@
       )),
       1
     ));
-    const root = `<div class="st-node st-node--root"><img class="st-root-mark" src="physical-ai-mark.svg" alt="" /><span class="st-text"><span class="st-name">Physical AI</span></span><span class="st-count">${countIn(scope)}</span></div>`;
+    const root = `<div class="st-node st-node--root"><img class="st-root-mark" src="assets/physical-ai-mark.svg" alt="" /><span class="st-text"><span class="st-name">Physical AI</span></span><span class="st-count">${countIn(scope)}</span></div>`;
     treeMount.innerHTML = `<div class="st-tree">${branch(root, layers, 0)}</div>`;
 
     const setOpen = (branchEl, open) => {

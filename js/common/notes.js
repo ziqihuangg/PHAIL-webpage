@@ -1,8 +1,8 @@
 /* =============================================================================
    PhAIL - meeting notes at the foot of every tab
    -----------------------------------------------------------------------------
-   Type a note, press Enter: under `bash preview.sh` it is POSTed to
-   preview_server.py, which appends it to notes-data.js - so the note is in the
+   Type a note, press Enter: under `bash tools/preview.sh` it is POSTed to
+   tools/preview_server.py, which appends it to data/notes.js - so the note is in the
    repo and ships with the next commit. Anywhere else (GitHub Pages, file://)
    there is no API: saved notes are shown read-only and the box is hidden.
 
@@ -12,7 +12,7 @@
    ========================================================================== */
 
 (function () {
-  const labels = { scope: "Scope", ranking: "Ranking", ledger: "Ledger", charts: "Charts", astra: "GPT-6 Astra", related: "Related work", todo: "TODO" };
+  const labels = { "benchmark-landscape": "Mobile Manipulation Platforms", scope: "Scope", ranking: "Ranking", ledger: "Ledger", charts: "Charts", astra: "GPT-6 Astra", related: "Related work", todo: "TODO" };
   const escape = (text) => String(text === undefined || text === null ? "" : text)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   let notes = window.phailNotes || [];
@@ -47,7 +47,7 @@
       mount.classList.add("notes");
       mount.innerHTML = `<h3 class="notes-title">Meeting notes${all ? " from every tab" : ""}</h3>`
         + (list.length ? `<ul class="notes-list">${list.map((note) => item(note, all)).join("")}</ul>` : "")
-        + (live ? `<input class="notes-input" type="text" maxlength="2000" data-notes-page="${escape(target)}" placeholder="Type a note, press Enter - saved into notes-data.js" aria-label="Add a meeting note" />` : "")
+        + (live ? `<input class="notes-input" type="text" maxlength="2000" data-notes-page="${escape(target)}" placeholder="Type a note, press Enter - saved into data/notes.js" aria-label="Add a meeting note" />` : "")
         + `<p class="notes-status" aria-live="polite"></p>`;
       if (mount === focusMount) { const input = mount.querySelector(".notes-input"); if (input) input.focus(); }
     });
@@ -61,7 +61,7 @@
         const input = mount && mount.querySelector(".notes-input");
         if (input) { input.disabled = false; input.focus(); }
         const status = mount && mount.querySelector(".notes-status");
-        if (status) status.textContent = "Not saved (" + error.message + "). Is bash preview.sh running?";
+        if (status) status.textContent = "Not saved (" + error.message + "). Is bash tools/preview.sh running?";
       });
   }
 

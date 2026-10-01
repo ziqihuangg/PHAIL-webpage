@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - Ranking tab
    -----------------------------------------------------------------------------
-   Draws whatever ranking-engine.js returns for the current switches. The
+   Draws whatever js/engine/ranking-engine.js returns for the current switches. The
    switches live in the URL (?track=Real&method=naive), so a particular view can
    be linked in a meeting and reloads the same.
 
@@ -14,7 +14,8 @@
 (function () {
   const db = window.phailDatabase;
   /* One renderer, two indices: the page says which with <body data-ranking>. */
-  const cfg = { robotics: window.phailRanking, cad: window.phailCadRanking }[document.body.dataset.ranking || "robotics"] || window.phailRanking;
+  const rankingKey = document.body.dataset.ranking === "cad" ? "cad" : "robotics";
+  const cfg = { robotics: window.phailRanking, cad: window.phailCadRanking }[rankingKey];
   const engine = window.phailRankingEngine;
   const charts = window.phailCharts;
   const icon = window.phailIcon || (() => "");
@@ -25,6 +26,8 @@
 
   const escape = (text) => String(text === undefined || text === null ? "" : text)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  /* config prose may carry {tokens} (js/common/facts.js) */
+  const prose = (text, where) => window.phailFacts.fill(escape(text), where);
   const models = new Map(db.models.map((model) => [model.id, model]));
   const nameOf = (id) => (models.get(id) || { name: id }).name;
   const orgOf = (id) => db.organisations[(models.get(id) || {}).org] || db.organisations.unconfirmed;
@@ -39,7 +42,7 @@
     { key: "evidence", label: "Evidence", options: [["benchmark", "Benchmark-run"], ["all", "+ paper tables"]] },
     { key: "method", label: "Method", options: [["bt", "Pairwise"], ["percentile", "Percentile mean"], ["naive", "Raw mean"]] }
   ].filter((control) => !cfg.controls || cfg.controls.indexOf(control.key) !== -1);
-  const defaults = { track: "all", agents: "true", coverage: "1", weighting: "difficulty", evidence: "benchmark", method: "bt" };
+  const defaults = window.phailRankingAnalysis.defaults;
   const state = Object.assign({}, defaults);
   const params = new URLSearchParams(window.location.search);
   controls.forEach((control) => {
@@ -162,14 +165,14 @@
     const rows = result.boards.map((board) => {
       const held = board.heldOut;
       const heldText = state.method !== "bt" ? "pairwise only"
-        : held ? `<span class="${held.accuracy < 0.6 ? "held-weak" : ""}">${Math.round(held.accuracy * 100)}%</span> <small>of ${held.pairs} pair${held.pairs === 1 ? "" : "s"}</small>` : "<small>no overlap</small>";
+        : held ? `<span class="${held.accuracy < reading.weakHeldOut ? "held-weak" : ""}">${Math.round(held.accuracy * 100)}%</span> <small>of ${held.pairs} pair${held.pairs === 1 ? "" : "s"}</small>` : "<small>no overlap</small>";
       const url = board.group && board.group.sourceUrl;
       return `<tr><td>${url ? `<a href="${escape(url)}" target="_blank" rel="noreferrer">${escape(board.label)}</a>` : escape(board.label)}`
         + `<small>${escape(board.provenance === "benchmark" ? "benchmark-run" : board.provenance === "thirdParty" ? "third-party tables" : "paper tables")}${board.assumedTrials ? ", trials assumed" : ""}</small>`
         + (board.leftOut ? `<small>${board.leftOut} more ran under ${board.minTasks} tasks: Ledger only</small>` : "") + "</td>"
         + `<td>${escape(board.track)}</td><td class="num">${board.rows.length}</td>`
         + `<td class="num">${board.scale === "elo" ? fixed(board.best, 0) + " Elo" : fixed(board.best)}</td>`
-        + `<td class="num">${board.scale === "elo" ? "0.50 <small>(no ceiling)</small>" : fixed(board.difficulty, 2)}</td>`
+        + `<td class="num">${fixed(board.difficulty, 2)}${board.scale === "elo" ? " <small>(no ceiling)</small>" : ""}</td>`
         + `<td class="num">${board.share === 1 ? "1" : fixed(board.share, 2)}</td>`
         + `<td class="num">${fixed(board.evidence, 1)}</td>`
         + `<td class="num"><span class="rank-bar rank-bar--narrow"><span style="width:${(board.weightShare * 100).toFixed(1)}%;background:${VIOLET}"></span></span>${(board.weightShare * 100).toFixed(0)}%</td>`
@@ -297,12 +300,22 @@
       `${points.length} of the ${shown.length} models shown have a published cost there; the cost is the one of the run the index uses.`;
   }
 
+  /* --- explanations: one analysis at the default settings --------------------------------------
+     Every number below the switches that does not follow them - worked
+     examples, counts, agreement, gaps - comes from js/engine/ranking-analysis.js,
+     which uses only the engine's own formulas. This file formats it. */
+  const analysis = window.phailRankingAnalysis.explain(db, cfg, defaults);
+  const base = analysis.base;
+  window.phailFacts.set(rankingKey, window.phailRankingAnalysis.facts(analysis, db, cfg));
+  const reading = window.phailRankingAnalysis.reading;
+  const chance = (a, b) => base.strengths.get(a) / (base.strengths.get(a) + base.strengths.get(b));
+  const numberWord = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n);
+
   /* --- model gaps (static: raw published scores, not the index) ----------------------------------
-     The rules come from cfg.gaps; every number is computed here from the
-     ledger, so nothing in this section is typed by hand. */
+     The rules come from cfg.gaps; the numbers from the analysis, so nothing in
+     this section is typed by hand. */
   const gapMount = document.querySelector("[data-rank-gaps]");
   if (gapMount && cfg.gaps) {
-    const agentSet = new Set(cfg.agents || []);
     const groupOf = (id) => db.resultGroups.filter((group) => group.id === id)[0];
     const boardName = (id) => {
       if (cfg.boards[id]) return cfg.boards[id].label;
@@ -310,125 +323,68 @@
       const meta = group && (db.benchmarks || []).filter((item) => item.id === group.benchmark)[0];
       return meta ? meta.name : id;
     };
-    const num = (value) => typeof value === "number" && !Number.isNaN(value);
-    const median = (values) => {
-      const sorted = values.slice().sort((a, b) => a - b);
-      const mid = Math.floor(sorted.length / 2);
-      return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-    };
-    /* one row per model - its best on this column - sorted high to low;
-       entries under a board's minTasks are left out, as in the index */
-    const bestPerModel = (group, valueOf) => {
-      const best = new Map();
-      const setup = group ? cfg.boards[group.id] || {} : {};
-      (group ? group.rows : []).forEach((row) => {
-        if (setup.minTasks && num(row.tasks) && row.tasks < setup.minTasks) return;
-        const value = valueOf(row);
-        if (!num(value)) return;
-        const current = best.get(row.model);
-        if (!current || value > current.value) best.set(row.model, { model: row.model, value: value, row: row });
-      });
-      return Array.from(best.values()).sort((a, b) => b.value - a.value);
-    };
     const who = (entry) => `<small>${escape(nameOf(entry.model))}</small>`;
     const agentTag = '<span class="rank-tag rank-tag--agent">agent</span>';
+    const unitOf = (cell) => (cell.field === "success" || (groupOf(cell.id) || {}).unit === "%" ? "%" : "");
+    const axes = analysis.gaps.filter((item) => item && item.gap.kind === "axis").length;
 
-    const axisMedians = new Map();
-    cfg.gaps.forEach((gap) => {
-      if (gap.kind !== "axis") return;
-      const values = bestPerModel(groupOf(gap.board), (row) => (row.d ? row.d[gap.dim] : null))
-        .filter((entry) => !agentSet.has(entry.model)).map((entry) => entry.value);
-      if (values.length) axisMedians.set(gap, median(values));
-    });
-    const medianList = Array.from(axisMedians.values());
-    const strongest = Math.max.apply(null, medianList);
-    const weakest = Math.min.apply(null, medianList);
-
-    const rowFor = (gap) => {
+    const rowFor = (item) => {
+      const gap = item.gap;
       if (gap.kind === "level") {
-        const fieldOf = (id) => (gap.fields ? gap.fields[id] : gap.field);
-        const unitOf = (id) => (fieldOf(id) === "success" || (groupOf(id) || {}).unit === "%" ? "%" : "");
-        const cells = gap.boards.map((id) => {
-          const rows = bestPerModel(groupOf(id), (row) => row[fieldOf(id)]);
-          return rows.length ? { id: id, rows: rows, best: rows[0], med: median(rows.map((entry) => entry.value)), unit: unitOf(id) } : null;
-        }).filter(Boolean);
-        const successLike = gap.boards.every((id) => fieldOf(id) === "success");
-        if (!cells.length) return null;
+        const cells = item.cells;
         const many = cells.length > 1;
         const tag = (cell) => (many ? `<span class="gap-board">${escape(boardName(cell.id))}</span>` : "");
-        const fails = cells.map((cell) => Math.round(100 - cell.best.value));
+        const fails = cells.map((cell) => cell.fails);
         return {
           board: many ? "" : boardName(cells[0].id),
-          best: cells.map((cell) => `<div>${tag(cell)}<b>${fixed(cell.best.value)}${cell.unit}</b> ${who(cell.best)}</div>`).join(""),
-          typical: cells.map((cell) => `<div>${tag(cell)}${fixed(cell.med)}${cell.unit}</div>`).join(""),
-          reading: !successLike
+          best: cells.map((cell) => `<div>${tag(cell)}<b>${fixed(cell.best.value)}${unitOf(cell)}</b> ${who(cell.best)}</div>`).join(""),
+          typical: cells.map((cell) => `<div>${tag(cell)}${fixed(cell.median)}${unitOf(cell)}</div>`).join(""),
+          reading: !item.successLike
             ? (many
-              ? `The best entry reaches ${cells.map((cell) => `${fixed(cell.best.value)}${cell.unit}`).join(", ")} on these boards (0-100 each). They score differently, so their bests are not compared with each other.`
-              : `The best entry reaches ${fixed(cells[0].best.value)}${cells[0].unit} of 100; half of the ${cells[0].rows.length} entries stay below ${fixed(cells[0].med)}${cells[0].unit}.`)
+              ? `The best entry reaches ${cells.map((cell) => `${fixed(cell.best.value)}${unitOf(cell)}`).join(", ")} on these boards (0-100 each). They score differently, so their bests are not compared with each other.`
+              : `The best entry reaches ${fixed(cells[0].best.value)}${unitOf(cells[0])} of 100; half of the ${cells[0].rows} entries stay below ${fixed(cells[0].median)}${unitOf(cells[0])}.`)
             : many
             ? `Even the best entry on each board fails ${Math.min.apply(null, fails)}-${Math.max.apply(null, fails)}% of its trials. The boards differ in difficulty, so their bests are not compared with each other.`
-            : `Even the best entry fails ${fails[0]}% of episodes; half of the ${cells[0].rows.length} entries succeed in fewer than ${fixed(cells[0].med)}%.`
+            : `Even the best entry fails ${fails[0]}% of episodes; half of the ${cells[0].rows} entries succeed in fewer than ${fixed(cells[0].median)}%.`
         };
       }
       if (gap.kind === "axis") {
-        const rows = bestPerModel(groupOf(gap.board), (row) => (row.d ? row.d[gap.dim] : null));
-        const policies = rows.filter((entry) => !agentSet.has(entry.model));
-        const agent = rows.filter((entry) => agentSet.has(entry.model))[0];
-        if (!policies.length) return null;
-        const top = policies[0];
-        const below = policies.filter((entry) => entry.value < gap.low).length;
-        const agentWins = agent && agent.value > top.value;
-        const med = axisMedians.get(gap);
         return {
           board: boardName(gap.board),
-          best: `<div><b>${fixed(top.value)}</b> ${who(top)}</div>`
-            + (agentWins ? `<div><b>${fixed(agent.value)}</b> ${who(agent)} ${agentTag}</div>` : ""),
-          typical: fixed(med),
-          reading: `${below} of ${policies.length} trained policies score below ${gap.low} out of 100.`
-            + (med === strongest ? " The strongest of the five axes." : med === weakest ? " The weakest of the five axes." : "")
-            + (agentWins ? ` ${escape(nameOf(agent.model))}, an LLM driving the arm through a harness, beats every trained policy here.` : "")
+          best: `<div><b>${fixed(item.top.value)}</b> ${who(item.top)}</div>`
+            + (item.agent ? `<div><b>${fixed(item.agent.value)}</b> ${who(item.agent)} ${agentTag}</div>` : ""),
+          typical: fixed(item.median),
+          reading: `${item.below} of ${item.policies} trained policies score below ${gap.low} out of 100.`
+            + (item.strongest ? ` The strongest of the ${numberWord(axes)} axes.` : item.weakest ? ` The weakest of the ${numberWord(axes)} axes.` : "")
+            + (item.agent ? ` ${escape(nameOf(item.agent.model))}, an LLM driving the arm through a harness, beats every trained policy here.` : "")
         };
       }
       if (gap.kind === "drop") {
-        const rows = bestPerModel(groupOf(gap.board), (row) => (num(row[gap.from]) && num(row[gap.to]) ? row[gap.to] : null))
-          .map((entry) => ({ model: entry.model, from: entry.row[gap.from], to: entry.row[gap.to] }));
-        if (!rows.length) return null;
-        const halved = rows.filter((entry) => entry.to < entry.from / 2).length;
-        const worst = rows.reduce((a, b) => (b.from - b.to > a.from - a.to ? b : a));
-        const top = rows[0];
         return {
           board: boardName(gap.board),
-          best: `<div><b>${fixed(top.to)}%</b> ${escape(gap.labels[1])} ${who(top)}</div>`,
-          typical: `${fixed(median(rows.map((entry) => entry.from)))}% ${escape(gap.labels[0])} &rarr; ${fixed(median(rows.map((entry) => entry.to)))}% ${escape(gap.labels[1])}`,
-          reading: `${halved} of ${rows.length} policies lose more than half of their ${escape(gap.labels[0])} score. Largest fall: ${escape(nameOf(worst.model))}, ${fixed(worst.from)}% &rarr; ${fixed(worst.to)}%.`
+          best: `<div><b>${fixed(item.top.to)}%</b> ${escape(gap.labels[1])} ${who(item.top)}</div>`,
+          typical: `${fixed(item.medianFrom)}% ${escape(gap.labels[0])} &rarr; ${fixed(item.medianTo)}% ${escape(gap.labels[1])}`,
+          reading: `${item.halved} of ${item.rows} policies lose more than half of their ${escape(gap.labels[0])} score. Largest fall: ${escape(nameOf(item.worst.model))}, ${fixed(item.worst.from)}% &rarr; ${fixed(item.worst.to)}%.`
         };
       }
       if (gap.kind === "arms") {
-        const group = groupOf(gap.board);
-        const rows = bestPerModel(group, (row) => (gap.fields.every((key) => num(row[key])) ? Math.min.apply(null, gap.fields.map((key) => row[key])) : null))
-          .map((entry) => ({ model: entry.model, min: entry.value, max: Math.max.apply(null, gap.fields.map((key) => entry.row[key])), row: entry.row }));
-        if (!rows.length) return null;
-        const zero = rows.filter((entry) => entry.min === 0).length;
-        const weakCount = gap.fields.map((key) => rows.filter((entry) => entry.max > 0 && entry.row[key] === entry.min).length);
-        const weakIndex = weakCount.indexOf(Math.max.apply(null, weakCount));
         return {
           board: boardName(gap.board),
-          best: `<div><b>${fixed(rows[0].min)}</b> on its weakest arm ${who(rows[0])}</div>`,
-          typical: `weakest arm ${fixed(median(rows.map((entry) => entry.min)))}, best arm ${fixed(median(rows.map((entry) => entry.max)))}`,
-          reading: `${escape(gap.labels[weakIndex])} is the weakest arm for ${weakCount[weakIndex]} of ${rows.length} policies; ${zero} score zero on at least one arm. A policy's score depends on which arm it runs on.`
+          best: `<div><b>${fixed(item.top.min)}</b> on its weakest arm ${who(item.top)}</div>`,
+          typical: `weakest arm ${fixed(item.medianMin)}, best arm ${fixed(item.medianMax)}`,
+          reading: `${escape(item.weakLabel)} is the weakest arm for ${item.weakCount} of ${item.rows} policies; ${item.zero} score zero on at least one arm. A policy's score depends on which arm it runs on.`
         };
       }
       return null;
     };
 
-    const body = cfg.gaps.map((gap) => {
-      const row = rowFor(gap);
+    const body = analysis.gaps.map((item) => {
+      const row = item && rowFor(item);
       if (!row) return "";
-      return `<tr><td>${escape(gap.name)}</td><td>${escape(gap.asks)}${row.board ? `<small>${escape(row.board)}</small>` : ""}</td>`
+      return `<tr><td>${escape(item.gap.name)}</td><td>${prose(item.gap.asks, "gaps")}${row.board ? `<small>${escape(row.board)}</small>` : ""}</td>`
         + `<td class="gap-best">${row.best}</td><td class="gap-typical">${row.typical}</td><td>${row.reading}</td></tr>`;
     }).join("");
     gapMount.innerHTML = `<table class="data-table gap-table"><thead><tr><th>Capability</th><th>What is tested</th><th>Best</th><th>Median</th><th>Reading</th></tr></thead><tbody>${body}</tbody></table>`;
-
     /* Everything on the Scope tab whose boards the ledger holds no numbers
        for yet: whole domains by name, else task categories and capability
        boards listed apart (a capability row above can come from RoboDojo's
@@ -455,23 +411,16 @@
   }
 
   /* --- Index method: overview counts and the numbers inside each step's details -------------------
-     Static: always the default settings, so the explanation does not change
-     when a reader flips a switch. Every number comes from a fresh build. */
-  /* One build at the default settings, shared by every static explanation. */
-  const base = engine.build(db, cfg, defaults);
-
+     Static: always the default settings (the analysis above), so the
+     explanation does not change when a reader flips a switch. */
   function drawMethod() {
     const boards = base.boards;
-    const setText = (key, value) => document.querySelectorAll(`[data-m="${key}"]`).forEach((node) => { node.textContent = value; });
-    setText("boards", boards.length);
-    setText("results", boards.reduce((sum, board) => sum + board.rows.length, 0));
-    setText("models", base.entries.length);
+    window.phailFacts.applyTo(document, rankingKey);
     const mount = (key, html) => { const node = document.querySelector(`[data-method="${key}"]`); if (node) node.innerHTML = html; };
     const table = (head, rows) => `<div class="method-table-wrap"><table class="method-table"><thead><tr>${head.map((cell) => `<th>${cell}</th>`).join("")}</tr></thead><tbody>`
       + rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("") + "</tbody></table></div>";
     const unitOf = (board) => (board.scale === "elo" ? " Elo" : board.metric === "success" ? "%" : "");
     const columnName = { success: "success rate", score: "score (0-100)", elo: "Elo rating" };
-    const se = (value, n) => { const p = Math.min(0.98, Math.max(0.02, value / 100)); return 100 * Math.sqrt(p * (1 - p) / n); };
     const shown = (board, value) => fixed(value, board.scale === "elo" ? 0 : 1) + unitOf(board);
 
     /* 1. boards */
@@ -483,84 +432,56 @@
       columnName[board.metric] || escape(board.metric), escape(board.group.retrieved || "")])));
 
     /* 2. one model's raw scores across boards */
-    const widest = base.entries.slice().sort((a, b) => b.coverage - a.coverage || a.rank - b.rank)[0];
+    const widest = analysis.pivot;
     if (widest) {
       mount("raw", `<p>Example: <b>${escape(nameOf(widest.id))}</b> is on ${widest.coverage} boards.</p>`
         + table(["Board", "Its score", "Its place"], widest.boards.map((item) => [escape(item.board.label), shown(item.board, item.row.value), `${item.rank} of ${item.of}`]))
         + `<p>Averaged, these raw numbers would mostly say which boards it happened to enter. The index uses only its places, and how clearly it won or lost each pair.</p>`);
     }
 
-    /* 3. noise */
-    const percentBoards = boards.filter((board) => board.scale !== "elo");
-    const noiseRows = percentBoards.map((board) => {
-      const middle = board.rows[Math.floor(board.rows.length / 2)].value;
-      const sigma = Math.SQRT2 * se(middle, board.trials);
-      return [escape(board.label), board.trials.toLocaleString("en"), fixed(middle), fixed(sigma, 2), fixed(engine.phi(1 / sigma), 2), fixed(sigma * 2, 1)];
-    });
-    let noiseExample = "";
-    const realBoard = boards.filter((board) => board.track === "Real" && board.scale !== "elo")[0];
-    if (realBoard && realBoard.rows.length > 1) {
-      const a = realBoard.rows[0];
-      const b = realBoard.rows[1];
-      const sigma = Math.sqrt(Math.pow(se(a.value, realBoard.trials), 2) + Math.pow(se(b.value, realBoard.trials), 2));
-      noiseExample = `<p>Example on ${escape(realBoard.label)}: ${escape(nameOf(a.model))} ${fixed(a.value)} against ${escape(nameOf(b.model))} ${fixed(b.value)}. &sigma; = ${fixed(sigma, 1)}, so P = &Phi;(${fixed((a.value - b.value) / sigma, 1)}) = ${fixed(engine.phi((a.value - b.value) / sigma), 2)}: close to a full win.</p>`;
-    }
+    /* 3. noise; a board that publishes its own interval uses it instead of the trial count */
+    const noiseRows = analysis.noise.map((item) => [escape(item.board.label),
+      item.published ? "<small>own 95% interval</small>" : item.board.trials.toLocaleString("en"),
+      fixed(item.median), fixed(item.sigma, 2), fixed(item.pOnePoint, 2), fixed(item.gapFor98, 1)]);
+    const ex = analysis.noiseExample;
+    const noiseExample = ex
+      ? `<p>Example on ${escape(ex.board.label)}: ${escape(nameOf(ex.a.model))} ${fixed(ex.a.value)} against ${escape(nameOf(ex.b.model))} ${fixed(ex.b.value)}. &sigma; = ${fixed(ex.sigma, 1)}, so P = &Phi;(${fixed(ex.z, 1)}) = ${fixed(ex.p, 2)}: close to a full win.</p>`
+      : "";
     mount("noise", table(["Board", "Trials n", "Median score", "&sigma; for two models at the median", "A 1-point gap gives P =", "Gap for P &asymp; 0.98"], noiseRows) + noiseExample);
 
     /* Elo: the head-to-head preference a rating gap implies, against the
        confidence in the order that the index uses */
-    const eloBoard = boards.filter((board) => board.scale === "elo")[0];
-    if (eloBoard && eloBoard.rows.length > 1) {
-      const a = eloBoard.rows[0];
-      const b = eloBoard.rows[1];
-      const gap = a.value - b.value;
-      const sdA = typeof a.row.sd === "number" ? a.row.sd : eloBoard.eloSd || 30;
-      const sdB = typeof b.row.sd === "number" ? b.row.sd : eloBoard.eloSd || 30;
-      const preferred = 1 / (1 + Math.pow(10, -gap / 400));
-      const z = gap / Math.sqrt(sdA * sdA + sdB * sdB);
+    const elo = analysis.elo;
+    if (elo) {
       const row = (label, tex, note) => `<div class="eq"><span class="eq-label">${label}</span><span class="eq-body">\\(\\displaystyle ${tex}\\)</span></div>` + (note ? `<div class="eq-note">${note}</div>` : "");
-      mount("elo", `<p>Example from the Ledger: ${escape(nameOf(a.model))} ${fixed(a.value, 0)} &plusmn; ${fixed(sdA, 1)} against ${escape(nameOf(b.model))} ${fixed(b.value, 0)} &plusmn; ${fixed(sdB, 1)} on ${escape(eloBoard.label)}, a gap of ${fixed(gap, 0)} points.</p>`
+      const a = nameOf(elo.a.model);
+      mount("elo", `<p>Example from the Ledger: ${escape(a)} ${fixed(elo.a.value, 0)} &plusmn; ${fixed(elo.sdA, 1)} against ${escape(nameOf(elo.b.model))} ${fixed(elo.b.value, 0)} &plusmn; ${fixed(elo.sdB, 1)} on ${escape(elo.board.label)}, a gap of ${fixed(elo.gap, 0)} points.</p>`
         + `<div class="step-math">`
-        + row("Elo's question", `\\Pr(\\text{preferred}) = \\frac{1}{1 + 10^{-${fixed(gap, 0)}/400}} \\approx ${preferred.toFixed(2)}`, `how often evaluators should prefer ${escape(nameOf(a.model))} in one head-to-head`)
-        + row("the index's question", `\\Phi\\!\\left(\\frac{${fixed(gap, 0)}}{\\sqrt{${fixed(sdA, 1)}^{2} + ${fixed(sdB, 1)}^{2}}}\\right) = \\Phi(${z.toFixed(1)}) \\approx ${engine.phi(z).toFixed(2)}`, `how sure we are that ${escape(nameOf(a.model))}'s rating really is the higher one - the question the index asks on every board`)
+        + row("Elo's question", `\\Pr(\\text{preferred}) = \\frac{1}{1 + 10^{-${fixed(elo.gap, 0)}/400}} \\approx ${elo.preferred.toFixed(2)}`, `how often evaluators should prefer ${escape(a)} in one head-to-head`)
+        + row("the index's question", `\\Phi\\!\\left(\\frac{${fixed(elo.gap, 0)}}{\\sqrt{${fixed(elo.sdA, 1)}^{2} + ${fixed(elo.sdB, 1)}^{2}}}\\right) = \\Phi(${elo.z.toFixed(1)}) \\approx ${elo.p.toFixed(2)}`, `how sure we are that ${escape(a)}'s rating really is the higher one - the question the index asks on every board`)
         + `</div>`);
     }
 
     /* 4. weights */
     const weightRows = boards.map((board) => [escape(board.label), `${fixed(board.best, board.scale === "elo" ? 0 : 1)}${unitOf(board)} <small>${escape(nameOf(board.rows[0].model))}</small>`,
-      board.scale === "elo" ? "0.50 <small>no ceiling</small>" : fixed(board.difficulty, 2), fixed(board.share, 2), fixed(board.evidence, 1), fixed(board.weight, 3), `${(board.weightShare * 100).toFixed(1)}%`]);
-    const withPapers = engine.build(db, cfg, Object.assign({}, defaults, { evidence: "all" }));
-    const saturated = withPapers.boards.filter((board) => board.provenance !== "benchmark" && board.scale !== "elo").sort((a, b) => a.difficulty - b.difficulty)[0];
+      board.scale === "elo" ? `${fixed(board.difficulty, 2)} <small>no ceiling</small>` : fixed(board.difficulty, 2), fixed(board.share, 2), fixed(board.evidence, 1), fixed(board.weight, 3), `${(board.weightShare * 100).toFixed(1)}%`]);
+    const saturated = analysis.saturated;
     mount("weights", table(["Board", "Best score", "<i>d</i>", "<i>f</i>", "<i>e</i>", "<i>w</i>", "Share"], weightRows)
-      + (saturated && saturated.difficulty < 0.1 ? `<p>With paper tables switched on, ${escape(saturated.label)} has a best of ${fixed(saturated.best)}, so <i>d</i> = ${fixed(saturated.difficulty, 2)} and, at half evidence, it barely counts.</p>` : ""));
+      + (saturated && saturated.difficulty < reading.saturated ? `<p>With paper tables switched on, ${escape(saturated.label)} has a best of ${fixed(saturated.best)}, so <i>d</i> = ${fixed(saturated.difficulty, 2)} and, at half evidence, it barely counts.</p>` : ""));
 
     /* 5. pairs */
-    mount("pairs", table(["Board", "Models <i>k</i>", "Pairs", "Weight per pair", "Total per model"], boards.map((board) => {
-      const k = board.rows.length;
-      return [escape(board.label), k, (k * (k - 1) / 2).toLocaleString("en"), fixed(board.weight / (k - 1), 4), fixed(board.weight, 3)];
-    })));
+    mount("pairs", table(["Board", "Models <i>k</i>", "Pairs", "Weight per pair", "Total per model"], analysis.pairs.map((item) =>
+      [escape(item.board.label), item.k, item.pairs.toLocaleString("en"), fixed(item.perPair, 4), fixed(item.weight, 3)])));
 
     /* 6. Bradley-Terry: how much evidence, and one chain of comparisons */
-    const boardsOf = new Map(base.entries.map((entry) => [entry.id, new Set(entry.boards.map((item) => item.board.id))]));
-    const pairCount = boards.reduce((sum, board) => sum + board.rows.length * (board.rows.length - 1) / 2, 0);
-    const bridges = base.entries.filter((entry) => entry.coverage >= 2).length;
-    let chain = "";
-    const shares = (a, c) => Array.from(boardsOf.get(a)).some((id) => boardsOf.get(c).has(id));
-    const first = base.entries.find((entry) => entry.coverage === 1);
-    const other = first && base.entries.find((entry) => entry.id !== first.id && !shares(first.id, entry.id));
-    const bridge = other && base.entries.filter((entry) => shares(first.id, entry.id) && shares(other.id, entry.id) && entry.id !== first.id && entry.id !== other.id)
-      .sort((a, b) => b.coverage - a.coverage)[0];
-    if (bridge) {
-      const on = (entry, peer) => entry.boards.filter((item) => boardsOf.get(peer.id).has(item.board.id))[0];
-      const firstBoard = on(first, bridge);
-      const otherBoard = on(other, bridge);
-      const valueOn = (entry, item) => entry.boards.filter((own) => own.board.id === item.board.id)[0].row.value;
-      chain = `<p>Example of a chain: ${escape(nameOf(first.id))} (only on ${escape(firstBoard.board.label)}) and ${escape(nameOf(other.id))} (on ${escape(other.boards.map((item) => item.board.label).join(", "))}) never met. `
-        + `${escape(nameOf(bridge.id))} is on both of their boards: ${shown(firstBoard.board, valueOn(bridge, firstBoard))} against ${escape(nameOf(first.id))}'s ${shown(firstBoard.board, firstBoard.row.value)} on ${escape(firstBoard.board.label)}, `
-        + `${shown(otherBoard.board, valueOn(bridge, otherBoard))} against ${escape(nameOf(other.id))}'s ${shown(otherBoard.board, otherBoard.row.value)} on ${escape(otherBoard.board.label)}. `
-        + `How clearly each beat ${escape(nameOf(bridge.id))} - and every other shared rival - decides their order: ${escape(nameOf(first.id))} ${fixed(first.index)}, ${escape(nameOf(other.id))} ${fixed(other.index)}.</p>`;
-    }
-    mount("bt", `<p>Default view: ${pairCount.toLocaleString("en")} weighted pairs from ${boards.length} boards; ${bridges} of ${base.entries.length} models sit on two or more boards and link the boards into one scale.</p>` + chain);
+    const c = analysis.chain;
+    const chain = c
+      ? `<p>Example of a chain: ${escape(nameOf(c.first.id))} (only on ${escape(c.firstBoard.board.label)}) and ${escape(nameOf(c.other.id))} (on ${escape(c.other.boards.map((item) => item.board.label).join(", "))}) never met. `
+        + `${escape(nameOf(c.bridge.id))} is on both of their boards: ${shown(c.firstBoard.board, c.bridgeOnFirst)} against ${escape(nameOf(c.first.id))}'s ${shown(c.firstBoard.board, c.firstBoard.row.value)} on ${escape(c.firstBoard.board.label)}, `
+        + `${shown(c.otherBoard.board, c.bridgeOnOther)} against ${escape(nameOf(c.other.id))}'s ${shown(c.otherBoard.board, c.otherBoard.row.value)} on ${escape(c.otherBoard.board.label)}. `
+        + `How clearly each beat ${escape(nameOf(c.bridge.id))} - and every other shared rival - decides their order: ${escape(nameOf(c.first.id))} ${fixed(c.first.index)}, ${escape(nameOf(c.other.id))} ${fixed(c.other.index)}.</p>`
+      : "";
+    mount("bt", `<p>Default view: ${analysis.pairCount.toLocaleString("en")} weighted pairs from ${boards.length} boards; ${analysis.coverage.multi} of ${base.entries.length} models sit on two or more boards and link the boards into one scale.</p>` + chain);
 
     /* boards in this index, by Scope category (under the page title) */
     const scopeLine = document.querySelector("[data-index-scope]");
@@ -582,88 +503,48 @@
         + (others.length ? `<span class="index-scope-rest">Not in this index yet: ${escape(others.join(", "))}. Boards of these kinds are either not transcribed or left out for a stated reason (Boards and weights).</span>` : "");
     }
 
-    /* the index as win chances: one model against the field (Meaning line and step 7) */
-    const strengthOf = (id) => base.strengths.get(id);
-    const chance = (a, b) => strengthOf(a) / (strengthOf(a) + strengthOf(b));
-    const pivot = base.entries.slice().sort((a, b) => b.coverage - a.coverage || a.rank - b.rank)[0];
-    if (pivot && base.strengths) {
-      const others = base.entries.filter((entry) => entry.id !== pivot.id);
-      const above = others.filter((entry) => entry.index < pivot.index).length;
-      const picks = [others[0], others[Math.floor(others.length / 2)], others[others.length - 1]];
+    /* the index as win chances: one model against the field (step 7) */
+    const ix = analysis.index;
+    if (ix) {
+      const pivot = ix.pivot;
       const meaning = document.querySelector("[data-meaning-example]");
       if (meaning) {
         meaning.innerHTML = `Example: ${escape(nameOf(pivot.id))} (index ${fixed(pivot.index)}) would beat `
-          + picks.map((entry, i) => `${i === picks.length - 1 ? "and " : ""}${escape(nameOf(entry.id))} with probability ${chance(pivot.id, entry.id).toFixed(2)}`).join(", ")
-          + `; averaged over all ${others.length} other models that is ${(pivot.index / 100).toFixed(3)}, hence ${fixed(pivot.index)}. It is ranked above ${above} of the ${others.length} (${Math.round(100 * above / others.length)}%) - close to its index, but a count, not an average of chances.`;
+          + ix.picks.map((pick, i) => `${i === ix.picks.length - 1 ? "and " : ""}${escape(nameOf(pick.entry.id))} with probability ${pick.chance.toFixed(2)}`).join(", ")
+          + `; averaged over all ${ix.opponents} other models that is ${ix.meanChance.toFixed(3)}, hence ${fixed(pivot.index)}. It is ranked above ${ix.above} of the ${ix.opponents} (${Math.round(100 * ix.above / ix.opponents)}%) - close to its index, but a count, not an average of chances.`;
       }
-      const spreadPicks = [0, 0.25, 0.5, 0.75, 1].map((q) => others[Math.min(others.length - 1, Math.round(q * (others.length - 1)))]);
-      mount("index", `<p><i>N</i> = ${base.entries.length}. Worked example, ${escape(nameOf(pivot.id))} (index ${fixed(pivot.index)}) against five of the other ${others.length}:</p>`
-        + table(["Opponent", "Its index", `Chance ${escape(nameOf(pivot.id))} wins`], spreadPicks.map((entry) => [escape(nameOf(entry.id)), fixed(entry.index), chance(pivot.id, entry.id).toFixed(2)]))
-        + `<p>Averaging this chance over all ${others.length} opponents gives ${(pivot.index / 100).toFixed(3)}, so the index is ${fixed(pivot.index)}. The top model, ${escape(nameOf(base.entries[0].id))}, scores ${fixed(base.entries[0].index)}; the last, ${escape(nameOf(base.entries[base.entries.length - 1].id))}, ${fixed(base.entries[base.entries.length - 1].index)}.</p>`);
+      mount("index", `<p><i>N</i> = ${base.entries.length}. Worked example, ${escape(nameOf(pivot.id))} (index ${fixed(pivot.index)}) against five of the other ${ix.opponents}:</p>`
+        + table(["Opponent", "Its index", `Chance ${escape(nameOf(pivot.id))} wins`], ix.spread.map((pick) => [escape(nameOf(pick.entry.id)), fixed(pick.entry.index), pick.chance.toFixed(2)]))
+        + `<p>Averaging this chance over all ${ix.opponents} opponents gives ${ix.meanChance.toFixed(3)}, so the index is ${fixed(pivot.index)}. The top model, ${escape(nameOf(ix.top.id))}, scores ${fixed(ix.top.index)}; the last, ${escape(nameOf(ix.last.id))}, ${fixed(ix.last.index)}.</p>`);
     }
 
     /* 8. error bars, worked through for the widest one in the top 15 */
-    const widestBar = base.entries.slice(0, 15).map((entry) => ({ entry: entry, width: entry.range[1] - entry.range[0] })).sort((a, b) => b.width - a.width)[0];
-    if (widestBar && widestBar.entry.drops) {
-      const entry = widestBar.entry;
+    const doubt = analysis.doubt;
+    const entry = doubt.widest;
+    if (entry && entry.drops) {
       const mark = (value) => (value === entry.range[0] ? " <small>lowest</small>" : value === entry.range[1] ? " <small>highest</small>" : "");
-      const oneBoard = base.entries.filter((item) => item.coverage === 1);
-      const several = base.entries.filter((item) => item.coverage >= 2);
-      const meanWidth = (list) => list.reduce((sum, item) => sum + item.range[1] - item.range[0], 0) / (list.length || 1);
-      mount("doubt-example", `<p>Worked example, the widest error bar in the top 15: ${escape(nameOf(entry.id))}, index ${fixed(entry.index)} (rank ${entry.rank}) with all boards.</p>`
+      mount("doubt-example", `<p>Worked example, the widest error bar in the top ${reading.topForSpread}: ${escape(nameOf(entry.id))}, index ${fixed(entry.index)} (rank ${entry.rank}) with all boards.</p>`
         + table(["Board removed", "Its index", "Its rank"], entry.drops.map((drop) => [escape(drop.board),
           drop.index === null ? "not ranked" : fixed(drop.index) + mark(drop.index), drop.rank === null ? "-" : drop.rank]))
-        + `<p>So its error bar is ${fixed(entry.range[0])}-${fixed(entry.range[1])} and its rank range ${entry.rankRange[0]}-${entry.rankRange[1]}. A short bar is not proof of certainty: a model on one board is simply dropped when that board is removed, so its bar only shows how the other boards move it. The ${oneBoard.length} one-board models have bars ${fixed(meanWidth(oneBoard))} points wide on average; the ${several.length} models on two or more boards, ${fixed(meanWidth(several))}. Read the bar together with the Boards column.</p>`);
+        + `<p>So its error bar is ${fixed(entry.range[0])}-${fixed(entry.range[1])} and its rank range ${entry.rankRange[0]}-${entry.rankRange[1]}. A short bar is not proof of certainty: a model on one board is simply dropped when that board is removed, so its bar only shows how the other boards move it. The ${doubt.oneBoard} one-board models have bars ${fixed(doubt.oneBoardWidth)} points wide on average; the ${doubt.several} models on two or more boards, ${fixed(doubt.severalWidth)}. Read the bar together with the Boards column.</p>`);
     }
-
-    /* 8. doubt */
-    const spread = base.entries.slice(0, 15).map((entry) => ({ entry: entry, width: entry.range[1] - entry.range[0] })).sort((a, b) => b.width - a.width)[0];
-    mount("doubt", (spread ? `<p>Widest spread in the top 15: ${escape(nameOf(spread.entry.id))}, index ${fixed(spread.entry.range[0])}-${fixed(spread.entry.range[1])}, rank ${spread.entry.rankRange[0]}-${spread.entry.rankRange[1]} depending on which board is dropped.</p>` : "")
+    mount("doubt", (entry ? `<p>Widest spread in the top ${reading.topForSpread}: ${escape(nameOf(entry.id))}, index ${fixed(entry.range[0])}-${fixed(entry.range[1])}, rank ${entry.rankRange[0]}-${entry.rankRange[1]} depending on which board is dropped.</p>` : "")
       + table(["Board left out", "Held-out accuracy", "Pairs checked"], boards.map((board) => [escape(board.label),
-        board.heldOut ? `<span class="${board.heldOut.accuracy < 0.6 ? "held-weak" : ""}">${Math.round(board.heldOut.accuracy * 100)}%</span>` : "-",
+        board.heldOut ? `<span class="${board.heldOut.accuracy < reading.weakHeldOut ? "held-weak" : ""}">${Math.round(board.heldOut.accuracy * 100)}%</span>` : "-",
         board.heldOut ? board.heldOut.pairs : "none: fewer than two of its models are on another board"])));
   }
   drawMethod();
 
-  /* --- Board agreement: tau, pair by pair (default settings) ----------------------------------------
-     Counts C, D and one-sided ties the same way ranking-engine.js kendallTau
-     does, so the table reproduces the matrix below at the default view. */
-  const minShared = cfg.minSharedForTau || 4;
-  function tauRows() {
-    const rows = [];
-    base.boards.forEach((a, i) => base.boards.forEach((b, j) => {
-      if (j <= i) return;
-      const other = new Map(b.rows.map((row) => [row.model, row.value]));
-      const shared = a.rows.filter((row) => other.has(row.model)).map((row) => [row.value, other.get(row.model)]);
-      const n = shared.length;
-      if (n < 1) return;
-      let same = 0;
-      let opposite = 0;
-      let ties = 0;
-      for (let x = 0; x < n; x += 1) {
-        for (let y = x + 1; y < n; y += 1) {
-          const da = shared[x][0] - shared[y][0];
-          const db = shared[x][1] - shared[y][1];
-          if (da === 0 || db === 0) { if (da !== db) ties += 1; continue; }
-          if (da * db > 0) same += 1; else opposite += 1;
-        }
-      }
-      const tau = n >= minShared ? engine.kendallTau(shared) : null;
-      const chance = n >= minShared ? Math.sqrt(2 * (2 * n + 5) / (9 * n * (n - 1))) : null;
-      rows.push({ a: a.label, b: b.label, n: n, pairs: n * (n - 1) / 2, same: same, opposite: opposite, ties: ties, tau: tau, chance: chance,
-        beyond: tau !== null && Math.abs(tau) >= 2 * chance });
-    }));
-    rows.sort((x, y) => (y.tau === null ? -2 : y.tau) - (x.tau === null ? -2 : x.tau) || y.n - x.n);
-    return rows;
-  }
-  const tauTable = tauRows();
+  /* --- Board agreement: tau, pair by pair (default settings) ---------------------------------------- */
+  const minShared = analysis.minShared;
+  const tauTable = analysis.tau;
+  const signed = (value) => (value >= 0 ? "+" : "&minus;") + Math.abs(value).toFixed(2);
 
   function drawTauDetails() {
     const node = document.querySelector("[data-tau-details]");
     if (!node) return;
     const rows = tauTable;
     const measured = rows.filter((row) => row.tau !== null);
-    const signed = (value) => (value >= 0 ? "+" : "&minus;") + Math.abs(value).toFixed(2);
     const verdict = (row) => {
       if (row.tau === null) return `<small>under ${minShared} shared: no &tau;</small>`;
       if (!row.beyond) return "could be chance";
@@ -686,111 +567,48 @@
   }
   drawTauDetails();
 
-  /* --- Why an index: coverage, noise, and pooled vs single-board prediction -------------------------
-     All at the default settings. A "clear" pair on a board is one whose gap
-     exceeds its noise (same test as the engine's held-out check). */
+  /* --- Why an index: coverage, noise, and pooled vs single-board prediction ------------------------- */
   function drawEvidence() {
-    const seOf = (row, board) => {
-      if (board.scale === "elo") return typeof row.row.sd === "number" ? row.row.sd : board.eloSd || 30;
-      const p = Math.min(0.98, Math.max(0.02, row.value / 100));
-      return 100 * Math.sqrt(p * (1 - p) / board.trials);
-    };
-    const clearPair = (a, b, board) => Math.abs(a.value - b.value) > Math.sqrt(Math.pow(seOf(a, board), 2) + Math.pow(seOf(b, board), 2));
-
-    /* coverage */
-    const onBoards = new Map(base.entries.map((entry) => [entry.id, new Set(entry.boards.map((item) => item.board.id))]));
-    const ids = base.entries.map((entry) => entry.id);
-    let modelPairs = 0;
-    let met = 0;
-    for (let i = 0; i < ids.length; i += 1) {
-      for (let j = i + 1; j < ids.length; j += 1) {
-        modelPairs += 1;
-        const other = onBoards.get(ids[j]);
-        if (Array.from(onBoards.get(ids[i])).some((id) => other.has(id))) met += 1;
-      }
-    }
-    const single = base.entries.filter((entry) => entry.coverage === 1).length;
-
-    /* noise: neighbouring places that are statistical ties */
-    let neighbours = 0;
-    let ties = 0;
-    base.boards.forEach((board) => {
-      for (let i = 0; i + 1 < board.rows.length; i += 1) {
-        neighbours += 1;
-        if (!clearPair(board.rows[i], board.rows[i + 1], board)) ties += 1;
-      }
-    });
-
-    /* pooled (engine's held-out check) against the best-overlapping single board */
-    const rows = base.boards.map((board) => {
-      const clear = [];
-      for (let i = 0; i < board.rows.length; i += 1) {
-        for (let j = i + 1; j < board.rows.length; j += 1) {
-          if (clearPair(board.rows[i], board.rows[j], board)) clear.push([board.rows[i], board.rows[j]]);
-        }
-      }
-      const singles = base.boards.filter((other) => other !== board).map((other) => {
-        const values = new Map(other.rows.map((row) => [row.model, row.value]));
-        let judged = 0;
-        let correct = 0;
-        clear.forEach(([a, b]) => {
-          if (!values.has(a.model) || !values.has(b.model) || values.get(a.model) === values.get(b.model)) return;
-          judged += 1;
-          if ((values.get(a.model) > values.get(b.model)) === (a.value > b.value)) correct += 1;
-        });
-        return { label: other.label, judged: judged, correct: correct };
-      }).filter((item) => item.judged).sort((x, y) => y.judged - x.judged || y.correct / y.judged - x.correct / x.judged);
-      const pooled = board.heldOut ? { judged: board.heldOut.pairs, correct: Math.round(board.heldOut.accuracy * board.heldOut.pairs) } : null;
-      return { board: board, clear: clear.length, pooled: pooled, single: singles[0] || null };
-    });
+    const cov = analysis.coverage;
+    const ties = analysis.neighbours;
+    const pooled = analysis.pooled;
     const pct = (part, whole) => (whole ? Math.round(100 * part / whole) : 0);
-    const reading = (row) => {
-      if (!row.pooled) return "cannot be checked: fewer than two of its models are on other boards";
-      if (!row.single) return "no other single board shares two of its models";
-      const pooledAcc = row.pooled.correct / row.pooled.judged;
-      const singleAcc = row.single.correct / row.single.judged;
-      if (pooledAcc < 0.6 && singleAcc < 0.6) return '<span class="held-weak">other boards predict it poorly</span>';
-      const more = row.pooled.judged / row.single.judged;
-      const accuracy = pooledAcc - singleAcc >= 0.03 ? "higher accuracy" : singleAcc - pooledAcc >= 0.03 ? "lower accuracy" : "about the same accuracy";
-      return `${more >= 1.1 ? `${more.toFixed(1)}&times; the pairs` : "the same pairs"}, ${accuracy}`;
+    const readingOf = (row) => {
+      if (row.verdict === "unchecked") return "cannot be checked: fewer than two of its models are on other boards";
+      if (row.verdict === "nosingle") return "no other single board shares two of its models";
+      if (row.verdict === "poor") return '<span class="held-weak">other boards predict it poorly</span>';
+      const accuracy = { higher: "higher accuracy", lower: "lower accuracy", same: "about the same accuracy" }[row.verdict];
+      return `${row.more >= reading.morePairs ? `${row.more.toFixed(1)}&times; the pairs` : "the same pairs"}, ${accuracy}`;
     };
     const pooledMount = document.querySelector("[data-rank-pooled]");
     if (pooledMount) {
       pooledMount.innerHTML = `<table class="data-table method-table pooled-table"><thead><tr><th>Board left out</th><th>Clear pairs on it</th><th>Pooled index: judged</th><th>Correct</th><th>Single board with most overlap</th><th>Judged</th><th>Correct</th><th>Reading</th></tr></thead><tbody>`
-        + rows.map((row) => `<tr><td>${escape(row.board.label)}</td><td>${row.clear}</td>`
+        + pooled.rows.map((row) => `<tr><td>${escape(row.board.label)}</td><td>${row.clear}</td>`
           + (row.pooled ? `<td>${row.pooled.judged}</td><td>${pct(row.pooled.correct, row.pooled.judged)}%</td>` : "<td>-</td><td>-</td>")
           + (row.single ? `<td>${escape(row.single.label)}</td><td>${row.single.judged}</td><td>${pct(row.single.correct, row.single.judged)}%</td>` : "<td>-</td><td>-</td><td>-</td>")
-          + `<td>${reading(row)}</td></tr>`).join("") + "</tbody></table>";
+          + `<td>${readingOf(row)}</td></tr>`).join("") + "</tbody></table>";
     }
-    const both = rows.filter((row) => row.pooled && row.single);
-    const sum = (list, pick) => list.reduce((total, row) => total + pick(row), 0);
-    const pooledJudged = sum(both, (row) => row.pooled.judged);
-    const pooledCorrect = sum(both, (row) => row.pooled.correct);
-    const singleJudged = sum(both, (row) => row.single.judged);
-    const singleCorrect = sum(both, (row) => row.single.correct);
+    const t = pooled.total;
     const totalMount = document.querySelector("[data-rank-pooled-total]");
-    if (totalMount && both.length) {
-      totalMount.innerHTML = `<span><b>All ${both.length} checkable boards</b> pooled index ${pct(pooledCorrect, pooledJudged)}% correct on ${pooledJudged} pairs; best-overlapping single board ${pct(singleCorrect, singleJudged)}% on ${singleJudged} pairs.</span>`;
+    if (totalMount && t.boards) {
+      totalMount.innerHTML = `<span><b>All ${t.boards} checkable boards</b> pooled index ${pct(t.pooledCorrect, t.pooledJudged)}% correct on ${t.pooledJudged} pairs; best-overlapping single board ${pct(t.singleCorrect, t.singleJudged)}% on ${t.singleJudged} pairs.</span>`;
     }
 
-    /* the Why line in the method overview: three facts, every number named */
+    /* the Why line in step 1: three facts, every number named */
     const why = document.querySelector("[data-why]");
-    if (why && both.length) {
-      const pooledAcc = pooledCorrect / pooledJudged;
-      const singleAcc = singleCorrect / singleJudged;
-      const third = pooledAcc >= singleAcc - 0.03
-        ? `<b>Pooling adds evidence.</b> Leave one board out, fit the index on the other ${base.boards.length - 1}, and check the left-out board's clearly separated pairs (gap larger than the board's noise). Over the ${both.length} boards this can be done for, the index orders <b>${pct(pooledCorrect, pooledJudged)}%</b> of ${pooledJudged} such pairs correctly; the single other board that shares the most models with each one orders ${pct(singleCorrect, singleJudged)}% of the ${singleJudged} it can judge.`
-        : `<b>But the boards agree poorly.</b> Leave one board out, fit the index on the other ${base.boards.length - 1}, and check the left-out board's clearly separated pairs (gap larger than the board's noise). Over the ${both.length} boards this can be done for, the index orders only <b>${pct(pooledCorrect, pooledJudged)}%</b> of ${pooledJudged} such pairs correctly, while the single other board that shares the most models with each one orders ${pct(singleCorrect, singleJudged)}% of the ${singleJudged} it can judge. Read this index as provisional.`;
+    if (why && t.boards) {
+      const third = !t.agreePoorly
+        ? `<b>Pooling adds evidence.</b> Leave one board out, fit the index on the other ${base.boards.length - 1}, and check the left-out board's clearly separated pairs (gap larger than the board's noise). Over the ${t.boards} boards this can be done for, the index orders <b>${pct(t.pooledCorrect, t.pooledJudged)}%</b> of ${t.pooledJudged} such pairs correctly; the single other board that shares the most models with each one orders ${pct(t.singleCorrect, t.singleJudged)}% of the ${t.singleJudged} it can judge.`
+        : `<b>But the boards agree poorly.</b> Leave one board out, fit the index on the other ${base.boards.length - 1}, and check the left-out board's clearly separated pairs (gap larger than the board's noise). Over the ${t.boards} boards this can be done for, the index orders only <b>${pct(t.pooledCorrect, t.pooledJudged)}%</b> of ${t.pooledJudged} such pairs correctly, while the single other board that shares the most models with each one orders ${pct(t.singleCorrect, t.singleJudged)}% of the ${t.singleJudged} it can judge. Read this index as provisional.`;
       why.innerHTML = `<ul class="why-list">`
-        + `<li><b>No single board ranks the field.</b> The index ranks ${ids.length} models from the ${base.boards.length} boards listed at the top. Taking them two at a time gives ${modelPairs.toLocaleString("en")} pairs (${ids.length} &times; ${ids.length - 1} / 2); <b>${pct(modelPairs - met, modelPairs)}%</b> of these pairs never appear together on any board, so no board says which of the two is better. ${single} of the ${ids.length} models appear on one board only.</li>`
-        + `<li><b>Each board alone is noisy.</b> Going down each board's own order, <b>${ties} of the ${neighbours}</b> steps from one model to the next are smaller than the board's noise - statistically a tie.</li>`
+        + `<li><b>No single board ranks the field.</b> The index ranks ${cov.models} models from the ${base.boards.length} boards listed at the top. Taking them two at a time gives ${cov.pairs.toLocaleString("en")} pairs (${cov.models} &times; ${cov.models - 1} / 2); <b>${pct(cov.never, cov.pairs)}%</b> of these pairs never appear together on any board, so no board says which of the two is better. ${cov.single} of the ${cov.models} models appear on one board only.</li>`
+        + `<li><b>Each board alone is noisy.</b> Going down each board's own order, <b>${ties.ties} of the ${ties.steps}</b> steps from one model to the next are smaller than the board's noise - statistically a tie.</li>`
         + `<li>${third} Details under <a href="#agreement">Board agreement</a>.</li></ul>`;
     }
 
     /* one reading line above the agreement matrix */
     const readingLine = document.querySelector("[data-agree-reading]");
     if (readingLine) {
-      const signed = (value) => (value >= 0 ? "+" : "&minus;") + Math.abs(value).toFixed(2);
       const name = (row) => `${escape(row.a)} &times; ${escape(row.b)} (${signed(row.tau)}, ${row.n} shared)`;
       const beyond = tauTable.filter((row) => row.beyond);
       const opposite = tauTable.filter((row) => row.tau !== null && row.tau < 0);
@@ -808,17 +626,11 @@
     const fitted = new Map((base.capabilities || []).map((item) => [item.capability.id, item]));
     const labelOf = (id) => (cfg.boards[id] || {}).label || id;
     const summary = document.querySelector("[data-cap-summary]");
-    if (summary && caps.length) {
-      const boardsOf = (cap) => Array.from(new Set(cap.sources.map((source) => source.board)));
-      const single = caps.filter((cap) => boardsOf(cap).length === 1);
-      const byBoard = new Map();
-      single.forEach((cap) => {
-        const board = labelOf(boardsOf(cap)[0]);
-        byBoard.set(board, (byBoard.get(board) || []).concat(cap.short));
-      });
-      summary.innerHTML = `${single.length} of the ${caps.length} columns rest on a single board (`
-        + Array.from(byBoard.entries()).map(([board, list]) => `${escape(list.join(", "))}: ${escape(board)}`).join("; ")
-        + `); ${caps.length - single.length === 0 ? "none combines" : caps.length - single.length === 1 ? "1 combines" : `${caps.length - single.length} combine`} several boards. Who defines each one is in the details.`;
+    const s = analysis.capabilities;
+    if (summary && s.total) {
+      summary.innerHTML = `${s.single} of the ${s.total} columns rest on a single board (`
+        + Array.from(s.byBoard.entries()).map(([id, list]) => `${escape(list.join(", "))}: ${escape(labelOf(id))}`).join("; ")
+        + `); ${s.combined === 0 ? "none combines" : s.combined === 1 ? "1 combines" : `${s.combined} combine`} several boards. Who defines each one is in the details.`;
     }
     const node = document.querySelector("[data-cap-details]");
     if (!node || !caps.length) return;
@@ -826,9 +638,9 @@
       const item = fitted.get(cap.id);
       const sources = cap.sources.map((source) => {
         const trials = source.trials || (cfg.boards[source.board] || {}).trials;
-        return `<div><b>${escape(labelOf(source.board))}</b> ${escape(source.what || "")}${trials ? ` <small>(${trials.toLocaleString("en")} trials per model${source.trials ? "" : ", the board's own count"})</small>` : ""}</div>`;
+        return `<div><b>${escape(labelOf(source.board))}</b> ${prose(source.what || "", "capabilities")}${trials ? ` <small>(${trials.toLocaleString("en")} trials per model${source.trials ? "" : ", the board's own count"})</small>` : ""}</div>`;
       }).join("");
-      return `<tr><td>${escape(cap.name)}</td><td>${escape(cap.definedBy || "")}</td><td class="cap-sources">${sources}</td><td>${item ? item.index.size : 0}</td></tr>`;
+      return `<tr><td>${escape(cap.name)}</td><td>${prose(cap.definedBy || "", "capabilities")}</td><td class="cap-sources">${sources}</td><td>${item ? item.index.size : 0}</td></tr>`;
     }).join("");
     node.innerHTML = `<p>Each column is fitted exactly like the index (noise from the trial count, difficulty weights, Bradley-Terry, expected win rate), but only on the columns listed for it. Where the trial count is not published per sub-score, the number shown is our conservative stand-in.</p>`
       + `<div class="method-table-wrap"><table class="method-table cap-table"><thead><tr><th>Capability</th><th>Defined by</th><th>Measured by (board and what it scores)</th><th>Models scored</th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -839,54 +651,33 @@
   function drawSimReal() {
     const node = document.querySelector("[data-simreal]");
     if (!node) return;
-    const trackOf = new Map(base.boards.map((board) => [board.label, board.track]));
-    const kinds = [["Sim", "Sim"], ["Sim", "Real"], ["Real", "Real"]];
-    if (!base.boards.some((board) => board.track === "Sim") || !base.boards.some((board) => board.track === "Real")) { node.innerHTML = ""; return; }
-    const kindOf = (row) => [trackOf.get(row.a), trackOf.get(row.b)].sort().join("-");
-    const signed = (value) => (value >= 0 ? "+" : "&minus;") + Math.abs(value).toFixed(2);
-    const groups = kinds.map(([x, y]) => {
-      const key = [x, y].sort().join("-");
-      const rows = tauTable.filter((row) => kindOf(row) === key);
-      return { label: `${x.toLowerCase()}&ndash;${y.toLowerCase()}`, measured: rows.filter((row) => row.tau !== null), unmeasured: rows.filter((row) => row.tau === null).length };
-    });
-    const tableRows = groups.map((group) => `<tr><td>${group.label}</td><td>${group.measured.length}${group.unmeasured ? ` <small>(+${group.unmeasured} sharing too few)</small>` : ""}</td>`
+    const sr = analysis.simReal;
+    if (!sr) { node.innerHTML = ""; return; }
+    const tableRows = sr.groups.map((group) => `<tr><td>${group.x.toLowerCase()}&ndash;${group.y.toLowerCase()}</td><td>${group.measured.length}${group.unmeasured ? ` <small>(+${group.unmeasured} sharing too few)</small>` : ""}</td>`
       + `<td>${group.measured.map((row) => `${escape(row.a)} &times; ${escape(row.b)} ${signed(row.tau)} <small>(${row.n} shared${row.beyond ? ", beyond chance" : ", could be chance"})</small>`).join("<br>") || "-"}</td></tr>`).join("");
-
-    /* the whole index on sim boards only against real boards only */
-    const sim = engine.build(db, cfg, Object.assign({}, defaults, { track: "Sim" }));
-    const real = engine.build(db, cfg, Object.assign({}, defaults, { track: "Real" }));
-    const simIndex = new Map(sim.entries.map((entry) => [entry.id, entry.index]));
-    const realEntry = new Map(real.entries.map((entry) => [entry.id, entry]));
-    const shared = Array.from(simIndex.keys()).filter((id) => realEntry.has(id));
-    const pairs = shared.map((id) => [simIndex.get(id), realEntry.get(id).index]);
-    const tau = shared.length >= minShared ? engine.kendallTau(pairs) : null;
-    const chanceLevel = shared.length >= minShared ? Math.sqrt(2 * (2 * shared.length + 5) / (9 * shared.length * (shared.length - 1))) : null;
-    const gaps = shared.map((id) => ({ id: id, sim: simIndex.get(id), real: realEntry.get(id).index, boards: realEntry.get(id).boards.map((item) => item.board.label) }))
-      .sort((x, y) => Math.abs(y.real - y.sim) - Math.abs(x.real - x.sim)).slice(0, 3);
-
-    const simReal = groups[1].measured;
-    const realReal = groups[2].measured;
-    const negatives = tauTable.filter((row) => row.tau !== null && row.tau < 0);
+    const simRealPairs = sr.groups[1].measured;
+    const realReal = sr.groups[2].measured;
+    const negatives = sr.negatives;
     const sentences = [];
-    if (simReal.length) {
-      const values = simReal.map((row) => row.tau);
+    if (simRealPairs.length) {
+      const values = simRealPairs.map((row) => row.tau);
       sentences.push(values.every((value) => value > 0)
         ? `Every sim&ndash;real pair that can be measured leans the same way (${signed(Math.min.apply(null, values))} to ${signed(Math.max.apply(null, values))}).`
         : `Sim&ndash;real pairs range from ${signed(Math.min.apply(null, values))} to ${signed(Math.max.apply(null, values))}.`);
     }
     sentences.push(realReal.length
-      ? `Real&ndash;real agreement can be measured for only ${realReal.length} pair${realReal.length === 1 ? "" : "s"}${groups[2].unmeasured ? `; ${groups[2].unmeasured} other real&ndash;real pairs share too few models` : ""}.`
+      ? `Real&ndash;real agreement can be measured for only ${realReal.length} pair${realReal.length === 1 ? "" : "s"}${sr.groups[2].unmeasured ? `; ${sr.groups[2].unmeasured} other real&ndash;real pairs share too few models` : ""}.`
       : "No real&ndash;real pair shares enough models to measure.");
-    if (tau !== null) {
-      sentences.push(`Fitted on sim boards only and on real boards only, the two indices order their ${shared.length} shared models with &tau; = ${signed(tau)} (${Math.abs(tau) >= 2 * chanceLevel ? "beyond chance" : "could be chance"}).`);
+    if (sr.tau !== null) {
+      sentences.push(`Fitted on sim boards only and on real boards only, the two indices order their ${sr.shared} shared models with &tau; = ${signed(sr.tau)} (${sr.beyond ? "beyond chance" : "could be chance"}).`);
     }
-    if (simReal.length && simReal.every((row) => row.tau > 0) && tau !== null && tau > 0) {
+    if (simRealPairs.length && simRealPairs.every((row) => row.tau > 0) && sr.tau !== null && sr.tau > 0) {
       sentences.push(`So the data do not show real boards disagreeing with sim boards as a group.`
-        + (negatives.length ? ` The pair${negatives.length === 1 ? " that leans" : "s that lean"} reversed - ${negatives.map((row) => `${escape(row.a)} &times; ${escape(row.b)} (${row.beyond ? "beyond chance" : "within chance on its own"})`).join(", ")} - ${negatives.every((row) => trackOf.get(row.a) === "Real" && trackOf.get(row.b) === "Real") ? (negatives.length === 1 ? "sits between two real boards" : "sit between real boards") : (negatives.length === 1 ? "involves a sim board" : "involve a sim board")}.` : ""));
+        + (negatives.length ? ` The pair${negatives.length === 1 ? " that leans" : "s that lean"} reversed - ${negatives.map((row) => `${escape(row.a)} &times; ${escape(row.b)} (${row.beyond ? "beyond chance" : "within chance on its own"})`).join(", ")} - ${negatives.every((row) => row.trackA === "Real" && row.trackB === "Real") ? (negatives.length === 1 ? "sits between two real boards" : "sit between real boards") : (negatives.length === 1 ? "involves a sim board" : "involve a sim board")}.` : ""));
     }
     node.innerHTML = `<div class="method-table-wrap"><table class="method-table simreal-table"><thead><tr><th>Board pair</th><th>Pairs with a &tau;</th><th>&tau; per pair</th></tr></thead><tbody>${tableRows}</tbody></table></div>`
       + `<p class="simreal-reading">${sentences.join(" ")}</p>`
-      + (gaps.length ? `<p class="simreal-reading">Single models can still differ a lot between the two: ${gaps.map((gap) => `${escape(nameOf(gap.id))} ${fixed(gap.sim)} on sim against ${fixed(gap.real)} on real <small>(real: ${escape(gap.boards.join(", "))})</small>`).join("; ")}.</p>` : "");
+      + (sr.gaps.length ? `<p class="simreal-reading">Single models can still differ a lot between the two: ${sr.gaps.map((gap) => `${escape(nameOf(gap.id))} ${fixed(gap.sim)} on sim against ${fixed(gap.real)} on real <small>(real: ${escape(gap.boards.join(", "))})</small>`).join("; ")}.</p>` : "");
   }
   drawSimReal();
 
@@ -899,7 +690,7 @@
     const entries = base.entries;
     const n = entries.length;
     const strength = (id) => base.strengths.get(id);
-    const pivot = entries.slice().sort((a, b) => b.coverage - a.coverage || a.rank - b.rank)[0];
+    const pivot = analysis.pivot;
     /* few labels, placed where they do not collide: the steep top of the
        strength curve, and the ends and middle of the index curve */
     const labelled = {
@@ -943,60 +734,29 @@
     if (tableNode) {
       tableNode.innerHTML = `<div class="method-table-wrap"><table class="method-table"><thead><tr><th>Rank</th><th>Model</th><th>Strength</th><th>Index</th><th>Chance of beating ${escape(nameOf(pivot.id))}</th></tr></thead><tbody>`
         + picks.map((entry) => `<tr><td>${entry.rank}</td><td>${escape(nameOf(entry.id))}</td><td>${strength(entry.id).toPrecision(3)}</td><td>${fixed(entry.index)}</td>`
-          + `<td>${entry.id === pivot.id ? "-" : (strength(entry.id) / (strength(entry.id) + strength(pivot.id))).toFixed(2)}</td></tr>`).join("")
+          + `<td>${entry.id === pivot.id ? "-" : chance(entry.id, pivot.id).toFixed(2)}</td></tr>`).join("")
         + "</tbody></table></div>";
     }
 
-    const values = entries.map((entry) => strength(entry.id));
-    const high = Math.max.apply(null, values);
-    const low = Math.min.apply(null, values);
-    const belowOne = values.filter((value) => value < 1).length;
+    const st = analysis.strengths;
     const top = entries[0];
     const why = document.querySelector("[data-strength-why]");
     if (why) {
       why.innerHTML = `<li><b>Strengths have no unit.</b> Only their ratios matter: multiply every strength by 10 and every predicted head-to-head stays the same. Our scale is pinned only by the weak tie to a reference of strength 1.</li>`
-        + `<li><b>They are hard to read on a chart.</b> They run from ${low.toPrecision(2)} to ${high.toPrecision(3)}, a factor of ${Math.round(high / low).toLocaleString("en")}; ${belowOne} of the ${n} models sit below 1, squeezed near zero, while the top few stretch the axis.</li>`
+        + `<li><b>They are hard to read on a chart.</b> They run from ${st.low.toPrecision(2)} to ${st.high.toPrecision(3)}, a factor of ${Math.round(st.ratio).toLocaleString("en")}; ${st.belowOne} of the ${st.n} models sit below 1, squeezed near zero, while the top few stretch the axis.</li>`
         + `<li><b>The index answers a plain question</b> on a fixed 0-100 scale: how often would this model beat the others? It is computed from the strengths and keeps their order exactly - same ranking, readable numbers.</li>`
-        + `<li><b>What strengths are still best for:</b> one direct match. ${escape(nameOf(top.id))} against ${escape(nameOf(pivot.id))}: ${strength(top.id).toPrecision(3)} / (${strength(top.id).toPrecision(3)} + ${strength(pivot.id).toPrecision(3)}) = ${(strength(top.id) / (strength(top.id) + strength(pivot.id))).toFixed(2)}. The index averages such chances over the whole field, so it moves when models are added or removed; the ratio of two strengths hardly does.</li>`;
+        + `<li><b>What strengths are still best for:</b> one direct match. ${escape(nameOf(top.id))} against ${escape(nameOf(pivot.id))}: ${strength(top.id).toPrecision(3)} / (${strength(top.id).toPrecision(3)} + ${strength(pivot.id).toPrecision(3)}) = ${chance(top.id, pivot.id).toFixed(2)}. The index averages such chances over the whole field, so it moves when models are added or removed; the ratio of two strengths hardly does.</li>`;
     }
 
     /* the worked update: the fitted strength balances the update rule */
     const exampleNode = document.querySelector("[data-strength-example]");
-    if (exampleNode) {
-      const seOf = (item, board) => {
-        if (board.scale === "elo") return typeof item.row.sd === "number" ? item.row.sd : board.eloSd || 30;
-        if (typeof item.row.se === "number") return item.row.se;
-        const p = Math.min(0.98, Math.max(0.02, item.value / 100));
-        return 100 * Math.sqrt(p * (1 - p) / board.trials);
-      };
-      const prior = cfg.prior || 0.1;
-      const si = strength(pivot.id);
-      let wins = 0;
-      let exposure = 0;
-      const perBoard = [];
-      base.boards.forEach((board) => {
-        const mine = board.rows.filter((item) => item.model === pivot.id)[0];
-        if (!mine) return;
-        const perPair = board.weight / (board.rows.length - 1);
-        let boardWins = 0;
-        let boardExposure = 0;
-        board.rows.forEach((other) => {
-          if (other === mine) return;
-          const sigma = Math.sqrt(Math.pow(seOf(mine, board), 2) + Math.pow(seOf(other, board), 2)) || 1;
-          boardWins += perPair * engine.phi((mine.value - other.value) / sigma);
-          boardExposure += perPair / (si + strength(other.model));
-        });
-        wins += boardWins;
-        exposure += boardExposure;
-        perBoard.push([board.label, board.rows.length - 1, boardWins, boardExposure]);
-      });
-      const top = prior / 2 + wins;
-      const bottom = prior / (si + 1) + exposure;
-      exampleNode.innerHTML = `<p>${escape(nameOf(pivot.id))} is on ${perBoard.length} boards. On each, every opponent contributes its pair weight \\(\\omega\\) (step 5) times the win share \\(W\\) (step 3) to the top of the update, and \\(\\omega / (s_i + s_j)\\) to the bottom, using the final strengths:</p>`
+    const b = analysis.balance;
+    if (exampleNode && b) {
+      exampleNode.innerHTML = `<p>${escape(nameOf(pivot.id))} is on ${b.perBoard.length} boards. On each, every opponent contributes its pair weight \\(\\omega\\) (step 5) times the win share \\(W\\) (step 3) to the top of the update, and \\(\\omega / (s_i + s_j)\\) to the bottom, using the final strengths:</p>`
         + `<div class="method-table-wrap"><table class="method-table"><thead><tr><th>Board</th><th>Opponents</th><th>Weighted wins \\(\\sum \\omega W\\)</th><th>\\(\\sum \\omega / (s_i + s_j)\\)</th></tr></thead><tbody>`
-        + perBoard.map(([label, opponents, w, x]) => `<tr><td>${escape(label)}</td><td>${opponents}</td><td>${w.toFixed(4)}</td><td>${x.toFixed(4)}</td></tr>`).join("")
+        + b.perBoard.map((item) => `<tr><td>${escape(item.board.label)}</td><td>${item.opponents}</td><td>${item.wins.toFixed(4)}</td><td>${item.exposure.toFixed(4)}</td></tr>`).join("")
         + `</tbody></table></div>`
-        + `<div class="step-math"><div class="eq"><span class="eq-label">balance</span><span class="eq-body">\\(\\displaystyle \\frac{${(prior / 2).toFixed(2)} + ${wins.toFixed(4)}}{${(prior / (si + 1)).toFixed(4)} + ${exposure.toFixed(4)}} = \\frac{${top.toFixed(4)}}{${bottom.toFixed(4)}} = ${(top / bottom).toFixed(3)} \\approx s = ${si.toFixed(3)}\\)</span></div>`
+        + `<div class="step-math"><div class="eq"><span class="eq-label">balance</span><span class="eq-body">\\(\\displaystyle \\frac{${(b.prior / 2).toFixed(2)} + ${b.wins.toFixed(4)}}{${(b.prior / (b.strength + 1)).toFixed(4)} + ${b.exposure.toFixed(4)}} = \\frac{${b.top.toFixed(4)}}{${b.bottom.toFixed(4)}} = ${b.update.toFixed(3)} \\approx s = ${b.strength.toFixed(3)}\\)</span></div>`
         + `<div class="eq-note">at the fitted strengths the update returns the same value: that is what "fitted" means. Starting from 1 for every model, the rounds walk towards this point.</div></div>`;
     }
   }
@@ -1020,7 +780,7 @@
         const label = (entry && entry.label) || meta.name || group.id;
         return `<li><a href="${escape(group.sourceUrl)}" target="_blank" rel="noreferrer">${escape(label)}</a>`
           + `<small>${entrants.length} entrants${overlap.length ? " · " + overlap.map((item) => `${item.count} also on ${escape(item.label)}`).join(" · ") : " · none on an index board"} · in the Ledger</small>`
-          + `<span>${escape((entry && (entry.reason || entry)) || "No reason recorded yet.")}</span></li>`;
+          + `<span>${prose((entry && (entry.reason || entry)) || "No reason recorded yet.", "outOfIndex")}</span></li>`;
       }).join("") + "</ul>" : "";
   }
 
@@ -1029,7 +789,7 @@
   if (factorMount) {
     const statusText = { used: "In the index", toggle: "Switch above", beside: "Shown beside", missing: "No data yet" };
     factorMount.innerHTML = `<table class="data-table factor-table"><thead><tr><th>Factor</th><th>Why it matters</th><th>What exists today</th><th>Status</th></tr></thead><tbody>`
-      + (cfg.factors || []).map((factor) => `<tr><td>${escape(factor.name)}</td><td>${escape(factor.why)}</td><td>${escape(factor.data)}</td>`
+      + (cfg.factors || []).map((factor) => `<tr><td>${escape(factor.name)}</td><td>${prose(factor.why, "factors")}</td><td>${prose(factor.data, "factors")}</td>`
         + `<td><span class="factor-status factor-status--${factor.status}">${statusText[factor.status]}</span></td></tr>`).join("")
       + "</tbody></table>";
   }
@@ -1039,8 +799,19 @@
   /* Typeset every \( ... \) formula on the page, including those the code
      above has just written. KaTeX is vendored in vendor/katex/. */
   if (window.renderMathInElement) {
+    /* numbers a printed formula quotes from the config or the engine, so the
+       formula changes when the mechanism does: \cfgprior etc. in the HTML */
+    const f = window.phailFacts.namespace(rankingKey);
+    const tex = (value) => String(value).replace(/,/g, "{,}");
     window.renderMathInElement(document.querySelector("main"), {
       delimiters: [{ left: "\\(", right: "\\)", display: false }, { left: "\\[", right: "\\]", display: true }],
+      macros: {
+        "\\cfgprior": f.prior, "\\cfgpmin": f.pMin, "\\cfgpmax": f.pMax,
+        "\\cfgdmin": f.minDifficulty, "\\cfgdneutral": f.neutralDifficulty,
+        "\\cfgebench": f.evidenceBenchmark, "\\cfgepaper": f.evidencePaper,
+        "\\cfgtol": `10^{${f.toleranceExponent}}`, "\\cfgrounds": tex(f.maxRounds.toLocaleString("en")),
+        "\\cfgphione": f.phiOne, "\\cfgphitwo": f.phiTwo, "\\cfgeloone": f.eloHundred, "\\cfgelofour": f.eloFourHundred
+      },
       throwOnError: false
     });
   }

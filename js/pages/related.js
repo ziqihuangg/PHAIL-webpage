@@ -1,4 +1,4 @@
-/* Draws the Related work tab from related-data.js: one card per project. */
+/* Draws the Related work tab from data/related.js: one card per project. */
 (function () {
   const data = window.phailRelated;
   const mount = document.querySelector("[data-related]");

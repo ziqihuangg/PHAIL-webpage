@@ -860,3 +860,21 @@ td:first-child { min-width: 170px; font-weight: 500; }
 .explain-labels b { display: inline-block; min-width: 62px; margin-right: 6px; color: var(--ink); font-weight: 600; }
 
 .database-intro > h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
+
+/* --- Checks tab and the per-page self-check (js/pages/check.js, js/common/selfcheck.js) --- */
+.check-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 4px; }
+.check-action-status { color: var(--muted); font-size: 13px; }
+.check-group { margin-top: 26px; }
+.check-table td { vertical-align: top; font-size: 13.5px; }
+.check-table td:first-child { width: 72px; }
+.check-table small { display: block; color: var(--muted); font-size: 12.5px; }
+.check-status { display: inline-block; min-width: 58px; padding: 1px 7px; border-radius: 999px; font-size: 12px; font-weight: 600; text-align: center; }
+.check-status--pass { background: var(--teal-soft); color: var(--teal); }
+.check-status--fail { background: #f7e3e6; color: #b04a5a; }
+.check-status--warn { background: #fbf0dc; color: #8a5a0a; }
+.check-status--skip { background: #eef0f2; color: var(--muted); }
+.check-list summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+.check-list ul { margin: 4px 0 0; padding-left: 18px; font-size: 12.5px; line-height: 1.45; }
+.selfcheck-note { margin: 6px 0 0; color: #b04a5a; font-size: 12.5px; }
+.selfcheck-note a { color: inherit; }
+.fact-missing { color: #b04a5a; font-weight: 600; }

@@ -1,0 +1,51 @@
+.landscape-page { padding-bottom: 48px; }
+.landscape-page h1 { max-width: none; }
+.landscape-page p { line-height: 1.6; }
+.landscape-jumps { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 0 0 22px; font-size: 14px; }
+.landscape-overview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.landscape-overview article, .landscape-reuse article { background: white; padding: 20px; border: 1px solid var(--line); border-radius: 10px; }
+.landscape-overview article { border-top: 3px solid var(--teal); }
+.landscape-overview strong { display: block; font-size: 28px; margin-bottom: 8px; }
+.landscape-overview p, .landscape-reuse p { font-size: 14px; margin: 10px 0 0; }
+.landscape-section { margin-top: 38px; scroll-margin-top: 20px; }
+.landscape-section h2 { font-size: 25px; }
+.landscape-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.landscape-help { font-size: 14px; color: var(--muted); max-width: 1050px; }
+.landscape-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; background: #f0f2f3; padding: 16px; border-radius: 10px; }
+.landscape-filters label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; }
+.landscape-filters .landscape-search { flex: 1; min-width: 190px; }
+.landscape-page button, .landscape-page select, .landscape-page input[type="search"] { font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid #b8c0c7; border-radius: 5px; background: white; color: var(--ink); }
+.landscape-page button { cursor: pointer; }
+.landscape-page button:hover { background: var(--violet-soft); }
+.landscape-page :focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+.landscape-filters .landscape-reference { flex-direction: row; align-items: center; min-height: 39px; font-weight: 400; }
+[data-landscape-count] { font-size: 13px; color: var(--muted); }
+.landscape-table-wrap { overflow: auto; max-height: 76vh; border: 1px solid var(--line); border-radius: 8px; background: white; }
+.landscape-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 2650px; font-size: 13px; line-height: 1.55; }
+.landscape-table th, .landscape-table td { text-align: left; vertical-align: top; padding: 16px; border-bottom: 1px solid var(--line); }
+.landscape-table thead th { position: sticky; top: 0; background: #eaf0f4; z-index: 3; font-size: 12px; }
+.landscape-table th:first-child, .landscape-table td:first-child { position: sticky; left: 0; width: 205px; min-width: 205px; background: #f7f9fa; z-index: 2; border-right: 1px solid var(--line); }
+.landscape-table thead th:first-child { z-index: 4; background: #eaf0f4; }
+.landscape-table td:nth-child(2) { min-width: 220px; }
+.landscape-table td:nth-child(3) { min-width: 200px; }
+.landscape-table td:nth-child(4) { min-width: 250px; }
+.landscape-table td:nth-child(5) { min-width: 160px; }
+.landscape-table td:nth-child(6) { min-width: 280px; }
+.landscape-table td:nth-child(7) { min-width: 280px; }
+.landscape-table small { display: block; color: var(--muted); margin-top: 8px; font-size: 12px; }
+.landscape-table p { margin: 0 0 10px; }
+.landscape-tag { display: inline-block; padding: 2px 7px; border-radius: 4px; background: var(--teal-soft); color: #075a62; font-size: 11px; margin-bottom: 7px; }
+.landscape-tag--new { background: var(--violet-soft); color: var(--violet); }
+.landscape-sources { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; font-size: 12px; }
+.landscape-reuse { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.landscape-reuse h3 { font-size: 17px; }
+.landscape-audit { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.landscape-audit article { border-top: 1px solid var(--line); padding-top: 18px; }
+.landscape-audit li { margin-bottom: 10px; font-size: 14px; line-height: 1.6; }
+.landscape-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 720px) { .landscape-overview, .landscape-reuse { grid-template-columns: 1fr; } .landscape-audit { grid-template-columns: 1fr; } .landscape-heading { align-items: start; flex-direction: column; } .landscape-filters label { width: 100%; } .landscape-table th:first-child, .landscape-table td:first-child { position: static; min-width: 180px; } }
+@media print { .landscape-filters, .landscape-jumps, .landscape-heading button, .talk { display: none; } .landscape-table-wrap { max-height: none; overflow: visible; } .landscape-table { min-width: 0; font-size: 8px; } .landscape-table th, .landscape-table td { min-width: 0 !important; position: static !important; padding: 5px; } }
+
+.landscape-table td:nth-child(8), .landscape-table td:nth-child(9) { min-width: 220px; }
+.landscape-table td:nth-child(10) { min-width: 280px; }
+[data-table-count] { color: var(--muted); font-size: 13px; }

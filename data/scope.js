@@ -1,5 +1,5 @@
 /* =============================================================================
-   PhAIL - scope of physical AI (data only; scope-app.js draws it)
+   PhAIL - scope of physical AI (data only; js/pages/scope.js draws it)
    -----------------------------------------------------------------------------
    Last updated: 2026-09-30
 
@@ -41,13 +41,13 @@
      url     the page hosting the live leaderboard where there is one; else the
              project page; arXiv / GitHub only when nothing else exists
      mode    "Sim" | "Real" | "Sim + real" | "Offline" (no closed loop)
-     board   "live" | "challenge" | "paper" | "archived"   (scope-app.js explains each)
+     board   "live" | "challenge" | "paper" | "archived"   (js/pages/scope.js explains each)
      tests   "policy" | "agent" | "both"
      plain   one plain-English sentence: what the robot / model has to do
      tasks   size of the task set, as the authors count it
      models  how many models the board or paper compares, when stated
      usage   where it shows up, when that is useful to know
-     ledger  benchmark id in tasks-data-new.js when we transcribe its numbers
+     ledger  benchmark id in data/ledger.js when we transcribe its numbers
      flag    "saturated" when the best published result is above ~95%
      part    the sub-benchmark(s) this entry covers, when a board is split
      placed  why a board that spans categories sits here (shown on hover)
@@ -74,7 +74,7 @@ window.phailScope = {
       measures: "Whether sim ranking predicts real-robot ranking", limit: "Does not score capability directly" },
     { name: "Pairwise preference / Elo", usedIn: ["RoboArena"],
       measures: "Head-to-head human preference across policies. Only gaps mean anything: 100 points higher = preferred in about 64% of head-to-heads, 400 points = 10 to 1",
-      link: ["details", "ranking.html#method"], limit: "Expensive, hard to scale, no absolute success number" },
+      link: ["details", "robotics-index.html#method"], limit: "Expensive, hard to scale, no absolute success number" },
     { name: "Lifelong-learning transfer (FWT / NBT / AUC)", usedIn: ["LIBERO"],
       measures: "Transfer over a task sequence", limit: "Specific to continual-learning setups" },
     { name: "Throughput (units/hour) + MTBF", usedIn: ["PhAIL (Positronic)"],
@@ -169,6 +169,13 @@ window.phailScope = {
               group: "fixed",
               define: "Fixed-base tasks written for a hand with several fingers: turn an object within the hand, use a tool, press piano keys, open a faucet. A parallel gripper cannot do them; a task a gripper could also do stays table-top, even when a hand does it.",
               benchmarks: [
+                {"name": "Shadow Hand (Gymnasium)", "url": "https://robotics.farama.org/envs/shadow_dexterous_hand/", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Fingertip reaching and in-hand block, egg and pen manipulation; dense/sparse and goal variants.", "tasks": "Goal-conditioned hand environment family", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
+                {"name": "DexMimicGen", "url": "https://dexmimicgen.github.io/", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Nine bimanual task families with coordination, sequential manipulation and precision; robot/task variants expand the evaluation.", "tasks": "6 hand tasks of 9 total", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms.", "part": "Dexterous-hand tracks", "placed": "The other 3 tasks use parallel grippers; the humanoid hand track is fixed-base manipulation, not walking."},
+                {"name": "DexJoCo", "url": "https://dexjoco.github.io/", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "11 functional tasks: tool use, reasoning, bimanual coordination and long-horizon execution.", "tasks": "11", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
+                {"name": "DexVerse", "url": "https://arxiv.org/html/2607.08751v1", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "100 task definitions; experiments on 19. Grasp/relocate, articulation, tools, non-prehensile, precision and bimanual skills.", "tasks": "100 definitions; 19 evaluated", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
+                {"name": "Bench2Dex", "url": "https://bench2dex.github.io/", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "26 bimanual tasks: tools/devices, articulated objects and multi-stage manipulation; seven robustness perturbations.", "tasks": "26", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
+                {"name": "DexGraspBench", "url": "https://github.com/JYChen18/DexGraspBench", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Grasp-pose/trajectory replay, lifting, force closure, penetration and diversity. Grasp synthesis evaluation, not long-horizon control.", "tasks": "Grasp synthesis and lifting evaluation", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
+                {"name": "DexGraspNet 2.0", "url": "https://arxiv.org/abs/2410.23004", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Cluttered dexterous grasp proposal from single-view depth, followed by simulated lifting.", "tasks": "Cluttered grasping; 8,270 scene arrangements", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
                 { name: "Bi-DexHands", url: "https://pku-marl.github.io/DexterousHands/", mode: "Sim", board: "paper", tests: "policy",
                   plain: "Two simulated Shadow hands cooperate on bimanual jobs like passing, opening and catching.",
                   tasks: "20 task families" },
@@ -202,12 +209,15 @@ window.phailScope = {
               group: "moving",
               define: "Moving-base tasks on wheels: the robot drives between places and manipulates things there - fetch a mug from the kitchen, tidy a room, restock a shelf. A wheeled base with one or two arms (Stretch, Fetch), or a humanoid upper body on wheels.",
               benchmarks: [
+                {"name": "RoboCasa365", "url": "https://robocasa.ai/leaderboard.html", "mode": "Sim", "board": "live", "tests": "policy", "plain": "365 kitchen tasks: 65 atomic plus composite tasks. Public multi-task board evaluates 50 tasks in three splits.", "tasks": "365 library tasks; 50 on the board", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms.", "models": "14 entries (23 Sep 2026)"},
+                {"name": "MoMaGen", "url": "https://arxiv.org/html/2510.18316v1", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Four household tasks: Pick Cup, Tidy Table, Put Dishes Away, Clean Frying Pan; three randomization levels.", "tasks": "4", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
+                {"name": "MoMani / EchoVLA", "url": "https://arxiv.org/html/2511.18112v2", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Four RoboCasa manipulation tasks with distant starts / follow-up navigation, plus navigation-only tests; real mobile tasks separately.", "tasks": "4 simulation tasks", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
                 { name: "BEHAVIOR-1K", url: "https://huggingface.co/spaces/behavior-1k/2026-challenge-leaderboard", mode: "Sim", board: "challenge", tests: "policy",
                   plain: "Everyday household activities - cleaning, cooking, tidying - done by a simulated mobile robot in realistic homes.",
-                  tasks: "1,000 activities, 50 scenes", usage: "Stanford's household benchmark; runs a public challenge." },
-                { name: "RoboCasa", url: "https://robocasa.ai/leaderboard.html", mode: "Sim", board: "paper", tests: "policy", ledger: "robocasa", added: "2026-09-27",
+                  tasks: "1,000 library activities / 50 scenes; 2026 challenge: 100 tasks / 7 scenes", usage: "2026 challenge uses R1Pro; starter baselines: π0.5 and GR00T N1.7." },
+                { name: "RoboCasa", url: "https://arxiv.org/abs/2406.02523", mode: "Sim", board: "paper", tests: "policy", ledger: "robocasa", added: "2026-09-27",
                   plain: "A simulated mobile manipulator works in many generated kitchens: opening doors, moving food, using appliances.",
-                  tasks: "100", usage: "GR00T and other foundation policies report on a 24-task subset." },
+                  tasks: "100 (original suite)", usage: "Original RoboCasa; GR00T and other policies also report on a 24-task subset. RoboCasa365 and its 50-task board are listed separately." },
                 { name: "HomeRobot OVMM", url: "https://ovmm.github.io/", mode: "Sim + real", board: "challenge", tests: "policy",
                   plain: "Find any named object in an unfamiliar home, pick it up and put it somewhere else.",
                   tasks: "Open-vocabulary pick-and-place, 50 scenes", usage: "Ran as a NeurIPS challenge." },
@@ -215,7 +225,7 @@ window.phailScope = {
                   plain: "A simulated home robot tidies the house, puts away groceries and sets the table.",
                   tasks: "3 composite tasks" },
                 { name: "ManiSkill-HAB", url: "https://maniskill.readthedocs.io/en/latest/tasks/external/", mode: "Sim", board: "paper", tests: "policy",
-                  plain: "The same three Habitat home tasks re-built on fast GPU simulation.",
+                  plain: "The three Habitat home tasks rebuilt for GPU manipulation training; sequential evaluation can use teleport navigation.",
                   tasks: "3 composite tasks" },
                 { name: "M3Bench", url: "https://zeyuzhang.com/papers/m3bench", mode: "Sim", board: "paper", tests: "policy", added: "2026-09-30",
                   plain: "Given a 3D home scene, a wheeled robot with an arm must plan one whole-body motion - base and arm together - to pick up or place an object; the motion is checked in physics simulation.",
@@ -232,16 +242,18 @@ window.phailScope = {
               group: "moving",
               define: "Moving-base tasks on legs: humanoids, and legged robots with an arm. Walking and manipulating often happen at once - carry a box while walking, push a cart, lift from the floor - so the robot must keep its balance while in contact with objects.",
               benchmarks: [
+                {"name": "HumanoidArena", "url": "https://arxiv.org/html/2606.17833v1", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Seven leg-critical human–object / human–scene interaction tasks; balance, posture, foot placement and whole-body reorientation.", "tasks": "7", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
+                {"name": "FetchMan-Bench", "url": "https://arxiv.org/html/2608.17027v1", "mode": "Sim", "board": "paper", "tests": "policy", "plain": "Reach-and-pick; separate terminal manipulation and full locomotion-to-grasp success. 100 held-out initializations.", "tasks": "Reach-and-pick; 100 evaluation initializations", "added": "2026-09-30", "usage": "Detailed robots, evaluated models, assets and sources: Internal Work in Progress → Mobile Manipulation Platforms."},
                 { name: "HumanoidBench", url: "https://humanoid-bench.github.io/", mode: "Sim", board: "paper", tests: "policy",
                   plain: "A simulated humanoid walks, balances and uses both hands on whole-body tasks.",
                   tasks: "27 (12 locomotion, 15 manipulation)",
                   placed: "Listed here for its 15 whole-body manipulation tasks. Its 12 locomotion-only tasks (walk, run, climb stairs...) have no category yet: Navigation is about reaching a goal." },
                 { name: "SIMPLE", url: "https://psi-lab.ai/SIMPLE/", mode: "Sim", board: "paper", tests: "policy",
                   plain: "Whole-body humanoid tasks in indoor scenes, built to train and evaluate humanoid policies in simulation.",
-                  tasks: "60 in 50 scenes" },
+                  tasks: "60 designed tasks / 50 scenes; preliminary model table: 6 tasks" },
                 { name: "GRBench (GRUtopia)", part: "Loco-Manipulation", url: "https://github.com/OpenRobotLab/GRUtopia", mode: "Sim", board: "paper", tests: "policy",
-                  plain: "A humanoid walks to objects in large simulated city-scale scenes and manipulates them.",
-                  tasks: "1 of 3 benchmarks",
+                  plain: "An AlienGo quadruped with a Z1 arm navigates to objects and rearranges them; high-level agents use supplied control APIs.",
+                  tasks: "300 episodes (100 validation / 200 test); 1 of 3 tracks",
                   placed: "GRBench's other two benchmarks, Object and Social Loco-Navigation, sit under Navigation." },
                 { name: "HumanoidMimicGen G1", url: "https://humanoidmimicgen.github.io/", mode: "Sim", board: "paper", tests: "policy",
                   plain: "A Unitree G1 humanoid does factory-style jobs: lifting, pushing, shelving, walking around obstacles.",

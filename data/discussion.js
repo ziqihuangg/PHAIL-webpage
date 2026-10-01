@@ -1,12 +1,14 @@
 /* =============================================================================
-   PhAIL - things to discuss, one list per tab (data only; discussion.js draws it)
+   PhAIL - things to discuss, one list per tab (data only; js/common/discussion.js draws it)
    -----------------------------------------------------------------------------
    Slide-style: a short title, the context in a line or two (enough to follow
    without having seen the page before), and what needs deciding (omit
    `decide` when nothing does). `points` adds labelled lines under the detail.
+   Numbers are {tokens} computed on load (js/common/facts.js); {!text} is a
+   number written on purpose. check.html fails on any other digit.
    Kept public: nothing internal. The whole meeting is 15 minutes, so keep
    each tab's list short. Delete an item once it is settled; running work
-   goes in todo-data.js.
+   goes in data/todo.js.
    ========================================================================== */
 
 window.phailDiscussion = {
@@ -61,17 +63,17 @@ window.phailDiscussion = {
     },
     {
       title: "Board weights",
-      detail: "Now: difficulty × family share × evidence. Next: weight each board by how well the other boards predict it (RoboChallenge T30: 48%, a coin flip), or estimate difficulty and discrimination from the results themselves (IRT).",
+      detail: "Now: difficulty × family share × evidence. Next: weight each board by how well the other boards predict it (RoboChallenge T30: {robotics.heldOutPct:robochallenge-t30}, a coin flip), or estimate difficulty and discrimination from the results themselves (IRT).",
       decide: "The rule, and a premium for real robots?"
     },
     {
       title: "Boards that disagree",
-      detail: "RoboChallenge T30 and RoboDojo Real order their 6 shared models mostly oppositely (τ = −0.47, 11 of 15 pairs reversed) - with so few models that alone could be chance, but the other boards also predict T30 no better than a coin flip (held-out check). The other measurable board pairs agree (τ +0.49 to +0.67).",
+      detail: "RoboChallenge T30 and RoboDojo Real order their {robotics.tauN:robochallenge-t30/robodojo-real} shared models mostly oppositely (τ = {robotics.tau:robochallenge-t30/robodojo-real}, {robotics.tauOpposite:robochallenge-t30/robodojo-real} of {robotics.tauPairs:robochallenge-t30/robodojo-real} pairs reversed) - with so few models that alone could be chance, but the other boards also predict T30 no better than a coin flip (held-out check). The other measurable board pairs agree (τ {robotics.tauPositiveMin} to {robotics.tauPositiveMax}).",
       decide: "Keep, down-weight, or report beside the index?"
     },
     {
       title: "Anchor models on every board",
-      detail: "10 of the 16 board pairs that share any model share fewer than 4, so whether they agree cannot be measured, and the common scale rests on 22 models that sit on two or more boards. pi-0.5 is already on 6 of the 7 boards. Asking every operator to run the same 3-5 reference models would make agreement measurable and the index steadier.",
+      detail: "{robotics.tauUnmeasured} of the {robotics.tauSharing} board pairs that share any model share fewer than {robotics.minShared}, so whether they agree cannot be measured, and the common scale rests on {robotics.multi} models that sit on two or more boards. {robotics.pivotName} is already on {robotics.pivotCoverage} of the {robotics.boards} boards. Asking every operator to run the same {!3-5} reference models would make agreement measurable and the index steadier.",
       decide: "Which reference models, and who asks the operators?"
     },
     {
@@ -86,7 +88,7 @@ window.phailDiscussion = {
     },
     {
       title: "Latency and cost",
-      detail: "No benchmark-run board publishes model latency or hardware, so model size is the only proxy. PAW-GEN-10 reports task time and speed, but at a fixed 30 Hz control rate.",
+      detail: "No benchmark-run board publishes model latency or hardware, so model size is the only proxy. PAW-GEN-10 reports task time and speed, but at a fixed {!30 Hz} control rate.",
       decide: "What to ask operators for?"
     },
     {
@@ -109,12 +111,12 @@ window.phailDiscussion = {
     },
     {
       title: "The hardest board carries the most weight",
-      detail: "CADWorld (computer-use agents in FreeCAD, best 17.5%) gets the largest weight with 7 models - the same pattern as PAW-GEN-10 on the Robotics Index.",
+      detail: "CADWorld (computer-use agents in FreeCAD, best {cad.bestPct:cadworld}) gets the largest weight, {cad.weightPct:cadworld}, with {cad.rows:cadworld} models - the same pattern as PAW-GEN-10 on the Robotics Index.",
       decide: "Cap the weight of small boards?"
     },
     {
       title: "What the CAD Index does not measure yet",
-      detail: "Editing as experts judge it (best model 25% accepted, human edits 78%), assemblies, physics and manufacturability, tolerances and standard parts. CADEngBench and MARB exist but are not in the Ledger.",
+      detail: "Editing as experts judge it (best model {ledger.best:neuralcad-edit}% accepted, human edits {!78%}), assemblies, physics and manufacturability, tolerances and standard parts. CADEngBench and MARB exist but are not in the Ledger.",
       decide: "Which boards next?"
     }
   ],
@@ -132,7 +134,7 @@ window.phailDiscussion = {
     },
     {
       title: "Saturated boards",
-      detail: "LIBERO rows at 95-97% carry almost no ranking signal.",
+      detail: "LIBERO's best rows reach {ledger.best:libero}% and carry almost no ranking signal.",
       decide: "Hide them by default?"
     }
   ],
@@ -144,14 +146,14 @@ window.phailDiscussion = {
     },
     {
       title: "What to chart next",
-      detail: "Only PAW-GEN-10 publishes safety (safe failures, contact force) and speed next to success, for 4 models; no board publishes latency or cost. RoboDojo's capability axes are the richest data today."
+      detail: "Only PAW-GEN-10 publishes safety (safe failures, contact force) and speed next to success, for {ledger.models:paw-gen-10} models; no board publishes latency or cost. RoboDojo's capability axes are the richest data today."
     }
   ],
 
   astra: [
     {
       title: "An agent lane",
-      detail: "4th of 48 in simulation through a harness; the real-robot run was halted for safety.",
+      detail: "{ledger.rank:robodojo-sim:gpt6_astra} in simulation through a harness; the real-robot run was halted for safety.",
       decide: "Should safety gate a ranking?"
     },
     {

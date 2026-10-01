@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - Charts page
    -----------------------------------------------------------------------------
-   Every chart here is built from one resultGroup in tasks-data-new.js, so a chart
+   Every chart here is built from one resultGroup in data/ledger.js, so a chart
    can never silently mix two benchmarks. If a group disappears from the data, its
    section says so instead of rendering an empty box.
    ========================================================================== */

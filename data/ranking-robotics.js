@@ -2,10 +2,10 @@
    PhAIL - ranking configuration (data only)
    -----------------------------------------------------------------------------
    Every knob the cross-board index depends on, in one place. The engine
-   (ranking-engine.js) reads this; the page (ranking.html) lets a reader flip
+   (js/engine/ranking-engine.js) reads this; the page (robotics-index.html) lets a reader flip
    the ones marked "toggle" live. Nothing here is a result.
 
-   Board entries are keyed by resultGroups id in tasks-data-new.js.
+   Board entries are keyed by resultGroups id in data/ledger.js.
 
      trials   rollouts behind one model's number on that board. Drives the noise
               band, and so how big a gap has to be before it counts as a win.
@@ -45,13 +45,13 @@ window.phailRanking = {
   },
 
   /* Operator-run tables that stay in the Ledger but not in the index, and
-     why. Keyed by resultGroups id; ranking-app.js prints each reason under
+     why. Keyed by resultGroups id; js/pages/ranking.js prints each reason under
      "Boards and weights", with entry counts and overlaps computed from the
      ledger. A benchmark-run table in neither `boards` nor here is listed
      there too, as "no reason recorded". */
   outOfIndex: {
     "robochallenge-cvpr26": "A closed competition on RoboChallenge's own \u201cTable30 CVPR version\u201d. Its entrants are the Table30-v2 teams, scored under a different rule, so ranking both would count the same teams twice.",
-    "robochallenge-icra26": "A closed competition with only 2 tasks, in a different category (mobile manipulation in a shop, not table-top). Apart from the organiser's baseline its entrants are on no other board, so it adds no comparison between models."
+    "robochallenge-icra26": "A closed competition with only {ledger.taskTotal:robochallenge-icra26} tasks, in a different category (mobile manipulation in a shop, not table-top). Apart from the organiser's baseline its entrants are on no other board, so it adds no comparison between models."
   },
 
   /* Paper tables (self-reported / third-party), used only when the reader
@@ -107,7 +107,7 @@ window.phailRanking = {
       sources: [{ board: "robodojo-sim", dim: 4, trials: 420, what: "RoboDojo's Open axis: \u201copen-ended or language- / image-conditioned manipulation\u201d" }] },
     { id: "real", name: "Real robot", short: "Real", icon: "bot", definedBy: "PhAIL: every real-robot board's headline score",
       sources: [
-        { board: "robodojo-real", what: "RoboDojo Real score, 18 tasks on three real arms" },
+        { board: "robodojo-real", what: "RoboDojo Real score, {!18} tasks on three real arms" },
         { board: "robochallenge-t30", what: "RoboChallenge Table30 success rate" },
         { board: "robochallenge-t30v2", what: "RoboChallenge Table30-v2 success rate" },
         { board: "roboarena", what: "RoboArena Elo from head-to-head votes" },
@@ -126,7 +126,7 @@ window.phailRanking = {
        arms   per-arm scores on one board (cross-embodiment)
      `low`: an axis score below this counts as failing that capability. */
   gaps: [
-    { kind: "level", name: "Task completion, simulation", asks: "42 two-arm table-top tasks in simulation, 2,100 episodes per policy.",
+    { kind: "level", name: "Task completion, simulation", asks: "{!42} two-arm table-top tasks in simulation, {robotics.trials:robodojo-sim} episodes per policy.",
       boards: ["robodojo-sim"], field: "success" },
     { kind: "level", name: "Task completion, real robots", asks: "Table-top tasks on real arms, run by each board's operator.",
       boards: ["robodojo-real", "robochallenge-t30", "robochallenge-t30v2", "paw-gen-10"], field: "success" },
@@ -137,9 +137,9 @@ window.phailRanking = {
     { kind: "axis", name: "Open-ended instructions", asks: "“Open-ended, language- or image-conditioned” - e.g. Stack Blocks By Language.", board: "robodojo-sim", dim: 4, low: 10 },
     { kind: "drop", name: "Robustness to scene changes", asks: "Trained on clean scenes, tested on clean and on randomised ones (clutter, lighting, textures).",
       board: "robotwin-2", from: "easy", to: "hard", labels: ["clean-scene", "randomised-scene"] },
-    { kind: "drop", name: "Data efficiency", asks: "The same model fine-tuned on ~300 and on ~10 real demonstrations per environment, then tested on the real robot.",
+    { kind: "drop", name: "Data efficiency", asks: "The same model fine-tuned on {!~300} and on {!~10} real demonstrations per environment, then tested on the real robot.",
       board: "paw-gen-10", from: "d300", to: "d10", labels: ["300-demo", "10-demo"] },
-    { kind: "arms", name: "Cross-embodiment", asks: "The same 18 real tasks on three different arms.",
+    { kind: "arms", name: "Cross-embodiment", asks: "The same {!18} real tasks on three different arms.",
       board: "robodojo-real", fields: ["arx", "piper", "piperX"], labels: ["ARX X5", "Piper", "Piper X"] }
   ],
 
@@ -149,16 +149,16 @@ window.phailRanking = {
   factors: [
     { name: "Board difficulty", why: "A win on a board the field has saturated says little.", data: "Best published score on every board.", status: "used" },
     { name: "Evidence class", why: "An operator running every model on one harness beats a baseline column.", data: "Provenance on every ledger row.", status: "used" },
-    { name: "Sampling noise", why: "A 1-point gap over 180 real trials is a tie; over 2,100 sim episodes it is not.", data: "Trial counts per board (stated or conservative).", status: "used" },
+    { name: "Sampling noise", why: "A {!1}-point gap over {robotics.trials:robodojo-real} real trials is a tie; over {robotics.trials:robodojo-sim} sim episodes it is not.", data: "Trial counts per board (stated or conservative).", status: "used" },
     { name: "Sim or real", why: "Sim rankings only partly predict real ones.", data: "Track on every board.", status: "toggle" },
-    { name: "Agent or policy", why: "A harnessed frontier model and a post-trained VLA are different kinds of entry.", data: "Three LLM agents on RoboDojo Sim.", status: "toggle" },
+    { name: "Agent or policy", why: "A harnessed frontier model and a post-trained VLA are different kinds of entry.", data: "{robotics.agentsWord} LLM agents on RoboDojo Sim.", status: "toggle" },
     { name: "Capabilities, decoupled", why: "One number hides whether a model fails at memory, precision or instructions.", data: "RoboDojo's five axes; RoboTwin clean vs randomised.", status: "beside" },
     { name: "Robustness gap", why: "Clean-scene scores overstate what survives a new layout.", data: "RoboTwin easy / hard; RoboDojo standard / random.", status: "beside" },
     { name: "Cross-embodiment", why: "A policy that works on one arm only is not general.", data: "RoboDojo Real per-arm scores.", status: "beside" },
-    { name: "Model size", why: "The only public proxy for inference cost.", data: "Stated for 13 models, a minority of those ranked.", status: "beside" },
-    { name: "Latency / control rate", why: "Asked for as the x-axis on 19 Sep; decides whether a model can close a fast loop.", data: "No board publishes model latency or hardware. PAW-GEN-10 publishes task time and speed, at a fixed 30 Hz control rate.", status: "missing" },
+    { name: "Model size", why: "The only public proxy for inference cost.", data: "Stated for {robotics.sizeStated} of the {robotics.models} ranked models.", status: "beside" },
+    { name: "Latency / control rate", why: "Asked for as the x-axis on 19 Sep; decides whether a model can close a fast loop.", data: "No board publishes model latency or hardware. PAW-GEN-10 publishes task time and speed, at a fixed {!30 Hz} control rate.", status: "missing" },
     { name: "Compute and cost", why: "What a success costs to run.", data: "Only agent harness write-ups (tokens, dollars per trial).", status: "missing" },
     { name: "Post-training budget", why: "Separates a better model from a bigger fine-tune on the board's own demos.", data: "Rarely published.", status: "missing" },
-    { name: "Safety", why: "A capable policy that ignores harm should not top a ranking unqualified.", data: "RoboHarm (3 models); PAW-GEN-10's safe-failure share and contact force (4 models); RoboDojo's halted real run.", status: "missing" }
+    { name: "Safety", why: "A capable policy that ignores harm should not top a ranking unqualified.", data: "RoboHarm ({!3} models); PAW-GEN-10's safe-failure share and contact force ({ledger.models:paw-gen-10} models); RoboDojo's halted real run.", status: "missing" }
   ]
 };

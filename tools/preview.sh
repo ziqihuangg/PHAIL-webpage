@@ -3,7 +3,7 @@
 set -euo pipefail
 
 PORT=4173
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."   # serve the repo root, where the pages are
 
 # python3 on macOS/Linux, python on Windows (Git Bash)
 PY=$(command -v python3 || command -v python || true)
@@ -17,6 +17,6 @@ if command -v lsof >/dev/null 2>&1 && lsof -i ":$PORT" >/dev/null 2>&1; then
   exit 0
 fi
 
-# preview_server.py = http.server with caching off, plus the meeting-notes API
-# that writes notes-data.js. Needs Python 3.7+.
-"$PY" preview_server.py "$PORT"
+# tools/preview_server.py = http.server with caching off, plus the meeting-notes API
+# that writes data/notes.js. Needs Python 3.7+.
+"$PY" tools/preview_server.py "$PORT"

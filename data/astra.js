@@ -1,10 +1,10 @@
 /* =============================================================================
    PhAIL - GPT-6-Astra spotlight: the data
    -----------------------------------------------------------------------------
-   Same contract as tasks-data-new.js: this file holds numbers and citations, and
-   nothing else. No markup, no rendering, no DOM. astra-app.js draws it.
+   Same contract as data/ledger.js: this file holds numbers and citations, and
+   nothing else. No markup, no rendering, no DOM. js/pages/astra.js draws it.
 
-   Why this page has its own file rather than rows in tasks-data-new.js: the
+   Why this page has its own file rather than rows in data/ledger.js: the
    ledger is organised one resultGroup per published table of MODELS. This page
    is the mirror image - one model read across six documents, most of which are
    not leaderboards at all (a safety-stopped diagnostic, a piano program, a demo
@@ -217,7 +217,7 @@ window.astraData = {
   },
 
   /* --- tables ---------------------------------------------------------------
-     Kept here so the HTML carries no numbers. astra-app.js renders each one.  */
+     Kept here so the HTML carries no numbers. js/pages/astra.js renders each one.  */
   tables: {
 
     /* Ranks are read off the LIVE board, not off the report. They are not the

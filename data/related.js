@@ -1,5 +1,5 @@
 /* =============================================================================
-   PhAIL - related work, our internal notes (data only; related-app.js draws it)
+   PhAIL - related work, our internal notes (data only; js/pages/related.js draws it)
    -----------------------------------------------------------------------------
    One entry per closely related project: what it is, how it differs from
    PhAIL, and what we should take from it. Newest first.

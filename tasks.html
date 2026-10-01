@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Physical AI evaluation records, filtered by task, benchmark, model, and who produced the number." />
 <title>Ledger - PhAIL</title>
-<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-<link rel="stylesheet" href="style.css?v=26" />
+<link rel="icon" href="assets/favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="mask-icon" href="assets/physical-ai-mark.svg" color="#14171b" />
+<link rel="stylesheet" href="assets/style.css?v=1" />
 </head>
 <body data-page="tasks">
 <header class="site-header" id="top"></header>
@@ -42,9 +42,9 @@
   </section>
 
   <div class="database-summary">
-    <strong data-result-count>0 records</strong>
+    <strong data-result-count></strong>
     <span data-result-breakdown></span>
-    <span class="database-summary-note">Missing data stays visible as missing. Values are exactly as published; the cross-board index is on <a href="ranking.html">Ranking</a>.</span>
+    <span class="database-summary-note">Missing data stays visible as missing. Values are exactly as published; the cross-board index is on <a href="robotics-index.html">Robotics Index</a>.</span>
   </div>
 
   <div class="recommendation" data-recommendation aria-live="polite"></div>
@@ -69,20 +69,29 @@
     </table>
   </div>
 
-  <p class="table-footnote">Rank is within one source table only. A model ranked #1 here and #30 on another board is not a contradiction - the two boards use different tasks, robots, and rollout counts. See <a href="charts.html#cross-board">Charts</a> for what that looks like plotted, and <a href="ranking.html">Ranking</a> for how the index combines boards without adding their numbers.</p>
+  <p class="table-footnote">Rank is within one source table only. A model ranked <span data-fact>#1</span> here and <span data-fact>#30</span> on another board is not a contradiction - the two boards use different tasks, robots, and rollout counts. See <a href="charts.html#cross-board">Charts</a> for what that looks like plotted, and <a href="robotics-index.html">Robotics Index</a> for how the index combines boards without adding their numbers.</p>
 
 
   <section data-discussion="ledger"></section>
 
 </main>
 <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-<script src="script.js?v=12"></script>
-<script src="charts.js?v=6"></script>
-<script src="tasks-data-new.js?v=17"></script>
-<script src="tasks-app.js?v=15"></script>
-  <script src="discussion-data.js?v=12"></script>
-  <script src="discussion.js?v=3"></script>
-  <script src="notes-data.js?v=1"></script>
-  <script src="notes.js?v=2"></script>
+  <script src="js/common/selfcheck.js?v=1"></script>
+  <script src="js/common/site.js?v=3"></script>
+  <script src="js/common/facts.js?v=1"></script>
+  <script src="js/common/charts.js?v=1"></script>
+  <script src="data/ledger.js?v=1"></script>
+  <script src="data/raw/sources.js?v=1"></script>
+  <script src="data/raw/robochallenge-t30.js?v=1"></script>
+  <script src="data/raw/robochallenge-t30v2.js?v=1"></script>
+  <script src="data/raw/robochallenge-cvpr26.js?v=1"></script>
+  <script src="data/raw/robochallenge-icra26.js?v=1"></script>
+  <script src="data/raw/paw-gen-10.js?v=1"></script>
+  <script src="js/engine/raw-sources.js?v=1"></script>
+  <script src="js/pages/ledger.js?v=1"></script>
+  <script src="data/discussion.js?v=1"></script>
+  <script src="js/common/discussion.js?v=1"></script>
+  <script src="data/notes.js?v=1"></script>
+  <script src="js/common/notes.js?v=3"></script>
 </body>
 </html>

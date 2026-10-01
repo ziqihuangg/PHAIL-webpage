@@ -1,8 +1,8 @@
 /* =============================================================================
    PhAIL - ranking engine (no data, no markup)
    -----------------------------------------------------------------------------
-   Turns the ledger (tasks-data-new.js) into one cross-board index, using the
-   knobs in ranking-data.js. ranking-app.js draws whatever this returns.
+   Turns the ledger (data/ledger.js) into one cross-board index, using the
+   knobs in data/ranking-robotics.js. js/pages/ranking.js draws whatever this returns.
 
    The one rule it keeps from the rest of the site: raw numbers from different
    boards are NEVER added or averaged together (except in the "naive" method,
@@ -25,6 +25,10 @@
      6. checks    leave-one-board-out ranges, held-out pair accuracy, and
                   Kendall tau between every two boards
 
+   Every formula lives here once. js/engine/ranking-analysis.js builds the
+   worked examples from these same functions, and check.html tests them
+   against the formulas the page prints; page scripts only format.
+
    Written to run in the browser and in Node 10 (for checking the numbers), so
    no optional chaining, no flatMap.
    ========================================================================== */
@@ -40,15 +44,30 @@
   function phi(z) { return 0.5 * (1 + erf(z / Math.SQRT2)); }
 
   function clamp(value, low, high) { return Math.min(high, Math.max(low, value)); }
+  function isNum(value) { return typeof value === "number" && !Number.isNaN(value); }
+
+  /* Fixed by the method rather than by an index's config. The page's formulas
+     quote these (as KaTeX macros), so changing one here changes the text. */
+  const constants = {
+    pMin: 0.02, pMax: 0.98,   /* a score's p is held inside these before the binomial error */
+    eloSd: 30,                /* an Elo row that publishes no sd */
+    maxRounds: 4000,          /* Bradley-Terry: stop after this many updates ... */
+    tolerance: 1e-9           /* ... or once no log-strength moves by more than this */
+  };
 
   /* Standard error of one published value. Percent-style boards: a binomial
      error at the board's trial count, with p held away from 0 and 1 so a flat
      zero still carries some doubt. Elo-style boards publish their own sd. */
   function standardError(value, row, board) {
-    if (board.scale === "elo") return typeof row.sd === "number" ? row.sd : board.eloSd || 30;
+    if (board.scale === "elo") return typeof row.sd === "number" ? row.sd : board.eloSd || constants.eloSd;
     if (typeof row.se === "number") return row.se;  /* a board's own published interval, when it gives one */
-    const p = clamp(value / 100, 0.02, 0.98);
+    const p = clamp(value / 100, constants.pMin, constants.pMax);
     return 100 * Math.sqrt(p * (1 - p) / board.trials);
+  }
+
+  /* Noise of the gap between two entries a and b ({ value, row }) on a board. */
+  function pairNoise(a, b, board) {
+    return Math.sqrt(Math.pow(standardError(a.value, a.row, board), 2) + Math.pow(standardError(b.value, b.row, board), 2));
   }
 
   /* A board may set `minTasks`: an entry that ran fewer of its tasks stays in
@@ -62,6 +81,27 @@
     return typeof value === "number" ? value : null;
   }
 
+  /* One entry per model - its best value on this column - sorted high to low.
+     Rows under the board's minTasks, rows `keep` rejects and rows without a
+     number are skipped. Used for the index, the capabilities and the gaps. */
+  function bestPerModel(rows, valueOf, setup, keep) {
+    const best = new Map();
+    (rows || []).forEach((row) => {
+      if ((keep && !keep(row.model)) || !eligible(row, setup)) return;
+      const value = valueOf(row);
+      if (!isNum(value)) return;
+      const current = best.get(row.model);
+      if (!current || value > current.value) best.set(row.model, { model: row.model, value: value, row: row });
+    });
+    return Array.from(best.values()).sort((a, b) => b.value - a.value);
+  }
+
+  function median(values) {
+    const sorted = values.slice().sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  }
+
   /* --- 1. boards ------------------------------------------------------------
      Returns [{ id, label, track, provenance, family, scale, trials, rows }]
      where rows holds ONE entry per model: the best entry that model has on the
@@ -71,17 +111,7 @@
     const keepModel = (id) => opts.agents !== false || !agentSet.has(id);
     const boards = [];
 
-    const bestRows = (rows, valueOf, setup) => {
-      const best = new Map();
-      rows.forEach((row) => {
-        if (!keepModel(row.model) || !eligible(row, setup)) return;
-        const value = valueOf(row);
-        if (value === null || Number.isNaN(value)) return;
-        const current = best.get(row.model);
-        if (!current || value > current.value) best.set(row.model, { model: row.model, value: value, row: row });
-      });
-      return Array.from(best.values()).sort((a, b) => b.value - a.value);
-    };
+    const bestRows = (rows, valueOf, setup) => bestPerModel(rows, valueOf, setup, keepModel);
 
     db.resultGroups.forEach((group) => {
       if (group.provenance !== "benchmark") return;
@@ -165,13 +195,13 @@
 
   /* --- 2. outcomes ----------------------------------------------------------- */
   function winShare(a, b, board) {
-    const noise = Math.sqrt(Math.pow(standardError(a.value, a.row, board), 2) + Math.pow(standardError(b.value, b.row, board), 2));
-    return phi((a.value - b.value) / (noise || 1));
+    return phi((a.value - b.value) / (pairNoise(a, b, board) || 1));
   }
 
+  /* A "clear" pair: the gap is larger than its noise. The held-out check and
+     every count of clear pairs or ties on the page use this one test. */
   function clearOrder(a, b, board) {
-    const noise = Math.sqrt(Math.pow(standardError(a.value, a.row, board), 2) + Math.pow(standardError(b.value, b.row, board), 2));
-    return Math.abs(a.value - b.value) > noise;
+    return Math.abs(a.value - b.value) > pairNoise(a, b, board);
   }
 
   /* --- 4. Bradley-Terry fit ----------------------------------------------------
@@ -202,7 +232,7 @@
     });
 
     let strength = new Float64Array(n).fill(1);
-    for (let iteration = 0; iteration < 4000; iteration += 1) {
+    for (let iteration = 0; iteration < constants.maxRounds; iteration += 1) {
       const denominator = new Float64Array(n);
       for (let i = 0; i < n; i += 1) denominator[i] = prior / (strength[i] + 1);
       for (let p = 0; p < pairs.length; p += 1) {
@@ -218,7 +248,7 @@
         change = Math.max(change, Math.abs(Math.log(next[i] / strength[i])));
       }
       strength = next;
-      if (change < 1e-9) break;
+      if (change < constants.tolerance) break;
     }
     const result = new Map();
     models.forEach((id, i) => result.set(id, strength[i]));
@@ -308,6 +338,17 @@
     return denominator ? (concordant - discordant) / denominator : null;
   }
 
+  /* Spread of tau between two unrelated orders of n items (its sd under
+     independence); a tau inside twice this could be chance. */
+  function chanceLevel(n) {
+    return n > 1 ? Math.sqrt(2 * (2 * n + 5) / (9 * n * (n - 1))) : null;
+  }
+
+  /* Elo: how often A is preferred to B in one head-to-head. */
+  function eloPreferred(gap) {
+    return 1 / (1 + Math.pow(10, -gap / 400));
+  }
+
   function boardAgreement(boards, minShared) {
     const matrix = boards.map((a) => boards.map((b) => {
       if (a === b) return { tau: 1, shared: a.rows.length };
@@ -337,17 +378,8 @@
         const key = source.field || (config.boards[group.id] && config.boards[group.id].metric) || group.primary;
         return typeof row[key] === "number" ? row[key] : null;
       };
-      const best = new Map();
-      group.rows.forEach((row) => {
-        if (opts.agents === false && agentSet.has(row.model)) return;
-        if (!eligible(row, config.boards[group.id])) return;
-        const value = valueOf(row);
-        if (value === null || value === undefined) return;
-        const current = best.get(row.model);
-        if (!current || value > current.value) best.set(row.model, { model: row.model, value: value, row: row });
-      });
       const setup = config.boards[group.id] || {};
-      const rows = Array.from(best.values()).sort((a, b) => b.value - a.value);
+      const rows = bestPerModel(group.rows, valueOf, config.boards[group.id], (id) => opts.agents !== false || !agentSet.has(id));
       if (rows.length < 2) return;
       boards.push({
         id: capability.id + ":" + group.id,
@@ -452,7 +484,23 @@
     };
   }
 
-  const api = { build: build, kendallTau: kendallTau, phi: phi };
+  const api = {
+    build: build,
+    constants: constants,
+    phi: phi,
+    standardError: standardError,
+    pairNoise: pairNoise,
+    winShare: winShare,
+    clearOrder: clearOrder,
+    bestPerModel: bestPerModel,
+    eligible: eligible,
+    median: median,
+    kendallTau: kendallTau,
+    chanceLevel: chanceLevel,
+    eloPreferred: eloPreferred,
+    fitStrengths: fitStrengths,
+    winRateIndex: winRateIndex
+  };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.phailRankingEngine = api;
 })(typeof window !== "undefined" ? window : this);

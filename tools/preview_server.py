@@ -8,8 +8,11 @@ Serves the folder like `python3 -m http.server`, with two differences:
       GET  /api/notes          -> {"notes": [...]}
       POST /api/notes          {"page": "ranking", "text": "..."} -> appends
       POST /api/notes/delete   {"id": "..."}                      -> removes
-    Notes are written to notes-data.js, a plain data file the pages load, so
+    Notes are written to data/notes.js, a plain data file the pages load, so
     they are part of the repo and ship with the next commit.
+  - two buttons on the Checks tab (check.html):
+      POST /api/expected      {"text": "..."} -> data/expected.js (the baseline)
+      POST /api/raw/refresh   {}              -> tools/fetch_raw.py for every live board
 
 Only binds to 127.0.0.1 and only accepts JSON from its own origin.
 """
@@ -23,10 +26,14 @@ import uuid
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-NOTES_FILE = os.path.join(ROOT, "notes-data.js")
-HEADER = ("/* Meeting notes typed into the site during local preview (bash preview.sh).\n"
-          "   Written by preview_server.py - edit by hand only while the server is stopped. */\n")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fetch_raw  # noqa: E402  (tools/fetch_raw.py)
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root: this file is in tools/
+NOTES_FILE = os.path.join(ROOT, "data", "notes.js")
+EXPECTED_FILE = os.path.join(ROOT, "data", "expected.js")
+HEADER = ("/* Meeting notes typed into the site during local preview (bash tools/preview.sh).\n"
+          "   Written by tools/preview_server.py - edit by hand only while the server is stopped. */\n")
 PAGE_KEY = re.compile(r"^[a-z0-9-]{1,32}$")
 LOCK = threading.Lock()
 
@@ -76,12 +83,25 @@ class Handler(SimpleHTTPRequestHandler):
         if "application/json" not in (self.headers.get("Content-Type") or ""):
             return self.send_json(415, {"error": "send JSON"})
         length = int(self.headers.get("Content-Length") or 0)
-        if length > 20000:
-            return self.send_json(413, {"error": "note too long"})
+        if length > (2000000 if path == "/api/expected" else 20000):
+            return self.send_json(413, {"error": "request too long"})
         try:
             body = json.loads(self.rfile.read(length) or b"{}")
         except ValueError:
             return self.send_json(400, {"error": "bad JSON"})
+
+        if path == "/api/expected":
+            text = str(body.get("text", ""))
+            if not text.startswith("/* Baseline for check.html") or "window.phailExpected = " not in text:
+                return self.send_json(400, {"error": "not a baseline file"})
+            with LOCK:
+                with open(EXPECTED_FILE + ".tmp", "w", encoding="utf-8") as handle:
+                    handle.write(text)
+                os.replace(EXPECTED_FILE + ".tmp", EXPECTED_FILE)
+            return self.send_json(200, {"saved": "data/expected.js"})
+        if path == "/api/raw/refresh":
+            with LOCK:
+                return self.send_json(200, {"results": fetch_raw.fetch_all()})
 
         with LOCK:
             notes = load_notes()
@@ -104,7 +124,7 @@ class Handler(SimpleHTTPRequestHandler):
 def main():
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 4173
     server = ThreadingHTTPServer(("127.0.0.1", port), partial(Handler, directory=ROOT))
-    print(f"PhAIL preview at http://127.0.0.1:{port}/ (notes save to notes-data.js; Ctrl+C to stop)")
+    print(f"PhAIL preview at http://127.0.0.1:{port}/ (notes save to data/notes.js; Ctrl+C to stop)")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

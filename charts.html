@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Charts of physical AI benchmark results - one chart per benchmark, each labelled with who produced the numbers." />
 <title>Charts - PhAIL</title>
-<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="mask-icon" href="physical-ai-mark.svg" color="#14171b" />
-<link rel="stylesheet" href="style.css?v=26" />
+<link rel="icon" href="assets/favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="mask-icon" href="assets/physical-ai-mark.svg" color="#14171b" />
+<link rel="stylesheet" href="assets/style.css?v=1" />
 </head>
 <body data-page="charts">
 <header class="site-header" id="top"></header>
@@ -86,7 +86,7 @@
 
   <section class="chart-block" id="cross-board" data-chart="crossBoard">
     <h2>Two boards, one model</h2>
-    <p class="chart-standfirst">This is the chart that explains why the index on <a href="ranking.html">Ranking</a> only ever compares models inside one board, and never adds numbers across them. Each line joins one model's number on one board to its number on another. Both ends are cited. Neither is wrong.</p>
+    <p class="chart-standfirst">This is the chart that explains why the index on <a href="robotics-index.html">Robotics Index</a> only ever compares models inside one board, and never adds numbers across them. Each line joins one model's number on one board to its number on another. Both ends are cited. Neither is wrong.</p>
     <div class="chart-surface" data-chart-mount></div>
     <p class="chart-caption" data-chart-caption></p>
   </section>
@@ -101,13 +101,22 @@
 
 </main>
 <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
-<script src="script.js?v=12"></script>
-<script src="charts.js?v=6"></script>
-<script src="tasks-data-new.js?v=17"></script>
-<script src="charts-page.js?v=5"></script>
-  <script src="discussion-data.js?v=12"></script>
-  <script src="discussion.js?v=3"></script>
-  <script src="notes-data.js?v=1"></script>
-  <script src="notes.js?v=2"></script>
+  <script src="js/common/selfcheck.js?v=1"></script>
+  <script src="js/common/site.js?v=3"></script>
+  <script src="js/common/facts.js?v=1"></script>
+  <script src="js/common/charts.js?v=1"></script>
+  <script src="data/ledger.js?v=1"></script>
+  <script src="data/raw/sources.js?v=1"></script>
+  <script src="data/raw/robochallenge-t30.js?v=1"></script>
+  <script src="data/raw/robochallenge-t30v2.js?v=1"></script>
+  <script src="data/raw/robochallenge-cvpr26.js?v=1"></script>
+  <script src="data/raw/robochallenge-icra26.js?v=1"></script>
+  <script src="data/raw/paw-gen-10.js?v=1"></script>
+  <script src="js/engine/raw-sources.js?v=1"></script>
+  <script src="js/pages/charts.js?v=1"></script>
+  <script src="data/discussion.js?v=1"></script>
+  <script src="js/common/discussion.js?v=1"></script>
+  <script src="data/notes.js?v=1"></script>
+  <script src="js/common/notes.js?v=3"></script>
 </body>
 </html>

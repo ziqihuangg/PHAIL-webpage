@@ -3,29 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TODO - PhAIL</title>
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="Every check on the PhAIL data, formulas, explanations and text, run in the browser." />
+  <title>Checks - PhAIL</title>
   <link rel="icon" href="assets/favicon.svg?v=1" type="image/svg+xml" />
-  <link rel="mask-icon" href="assets/physical-ai-mark.svg" color="#14171b" />
   <link rel="stylesheet" href="assets/style.css?v=1" />
 </head>
 <body>
   <header class="site-header" id="top"></header>
 
-  <main class="todo-page">
+  <main class="check-page">
     <section class="database-intro">
-      <h1>TODO</h1>
+      <h1>Checks</h1>
     </section>
-
-    <div class="todo-grid-groups" data-todo></div>
-
-    <section class="talk"><div data-notes="*" data-notes-input="todo"></div></section>
+    <div class="database-summary" data-check-summary></div>
+    <ul class="slide-points">
+      <li><b>Data</b>: the Ledger, the index configs and the Scope tab refer to things that exist. <b>Formulas</b>: every formula printed on the Index pages, re-implemented from its text, gives what the engine computes. <b>Explanations</b>: worked examples agree with the index. <b>Sources</b>: raw source files parse into the Ledger. <b>Text</b>: no number is typed by hand.</li>
+      <li>Everything runs here, in the browser, from the files the site ships. Through <code>bash tools/preview.sh</code> it also scans every page and page script, saves the baseline, and downloads the raw sources again.</li>
+    </ul>
+    <div class="check-actions" data-check-actions></div>
+    <div data-check-results></div>
   </main>
 
   <footer class="site-footer" aria-label="Author"><a class="author-credit" data-personal-link href="https://ziqihuangg.github.io/" target="_blank" rel="noreferrer">Ziqi Huang</a></footer>
   <script src="js/common/selfcheck.js?v=1"></script>
   <script src="js/common/site.js?v=3"></script>
   <script src="js/common/facts.js?v=1"></script>
-  <script src="data/scope.js?v=1"></script>
   <script src="data/ledger.js?v=1"></script>
   <script src="data/raw/sources.js?v=1"></script>
   <script src="data/raw/robochallenge-t30.js?v=1"></script>
@@ -34,13 +37,15 @@
   <script src="data/raw/robochallenge-icra26.js?v=1"></script>
   <script src="data/raw/paw-gen-10.js?v=1"></script>
   <script src="js/engine/raw-sources.js?v=1"></script>
+  <script src="data/scope.js?v=1"></script>
   <script src="data/ranking-robotics.js?v=1"></script>
   <script src="data/ranking-cad.js?v=1"></script>
+  <script src="data/discussion.js?v=1"></script>
+  <script src="data/todo.js?v=1"></script>
+  <script src="data/expected.js?v=1"></script>
   <script src="js/engine/ranking-engine.js?v=1"></script>
   <script src="js/engine/ranking-analysis.js?v=1"></script>
-  <script src="data/todo.js?v=1"></script>
-  <script src="js/pages/todo.js?v=1"></script>
-  <script src="data/notes.js?v=1"></script>
-  <script src="js/common/notes.js?v=3"></script>
+  <script src="js/check/checks.js?v=1"></script>
+  <script src="js/pages/check.js?v=1"></script>
 </body>
 </html>

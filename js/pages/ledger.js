@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - Ledger page: filtered evaluation records
    -----------------------------------------------------------------------------
-   Reads window.phailDatabase (tasks-data-new.js) and renders the sim/real
+   Reads window.phailDatabase (data/ledger.js) and renders the sim/real
    switch, the filters, a chart of whichever benchmark is in view, and the record
    table. No data lives here.
 
