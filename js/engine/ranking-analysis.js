@@ -409,7 +409,7 @@
 
   /* --- facts: the numbers prose quotes, by name (js/common/facts.js) ------------------------
      Plain keys for the counts the pages use; `$` answers parametric keys
-     such as heldOutPct:robochallenge-t30 or tau:robochallenge-t30/robodojo-real.
+     such as heldOutPct:robochallenge-t30, tau:robochallenge-t30/robodojo-real or rank:<model id>.
      Values are formatted the way the text prints them. */
   const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
   const word = (n) => WORDS[n] || n.toLocaleString("en");
@@ -503,6 +503,12 @@
       if (colon < 0) return undefined;
       const name = key.slice(0, colon);
       const arg = key.slice(colon + 1);
+      if (name === "rank") {   /* rank:<model id> - the model's place in the index, "2nd" */
+        const entry = entries.filter((item) => item.id === arg)[0];
+        if (!entry) return undefined;
+        const n = entry.rank;
+        return n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
+      }
       const board = byId.get(arg);
       if (board) {
         if (name === "best") return fixed(board.best, board.scale === "elo" ? 0 : 1);

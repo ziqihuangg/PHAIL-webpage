@@ -17,7 +17,8 @@
                   best:<group or benchmark>, rows:<group>, models:<group>, taskTotal:<group>,
                   value:<group>:<model>, rank:<group>:<model> ("4th of 48")
      robotics   js/engine/ranking-analysis.js facts() for each index, at the
-     cad        default settings (js/pages/ranking.js sets its own at load)
+     cad        default settings (js/pages/ranking.js sets its own at load),
+                plus rank:<model id> ("2nd") for a model's place in that index
    A token that resolves to nothing is shown as a red "?" and reported by
    js/common/selfcheck.js on the page and by check.html.
    ========================================================================== */

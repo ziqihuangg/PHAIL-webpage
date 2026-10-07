@@ -147,7 +147,8 @@
       const width = Math.max(0, Math.min(100, entry.index));
       return `<tr>`
         + `<td class="rank-cell">${entry.rank}</td>`
-        + `<td><span class="rank-model">${badge}<a href="tasks.html?model=${escape(entry.id)}">${escape(model.name || entry.id)}</a>${entry.agent ? '<span class="rank-tag rank-tag--agent">agent</span>' : ""}</span><small>${escape(model.maker || "")}</small></td>`
+        + `<td><span class="rank-model">${badge}<a href="tasks.html?model=${escape(entry.id)}">${escape(model.name || entry.id)}</a>${entry.agent ? '<span class="rank-tag rank-tag--agent">agent</span>' : ""}`
+          + `${entry.boards.some((on) => on.row.row.harness === "product") ? '<span class="rank-tag" title="A CAD product with its own harness; it does not set its board\'s difficulty">product</span>' : ""}</span><small>${escape(model.maker || "")}</small></td>`
         + `<td class="num"><span class="rank-bar"><span style="width:${width}%;background:${labColor(entry.id)}"></span></span>${fixed(entry.index)}</td>`
         + `<td class="num">${naive ? "-" : `${fixed(entry.range[0])}-${fixed(entry.range[1])}`}</td>`
         + `<td class="num">${naive ? "-" : `${entry.rankRange[0]}-${entry.rankRange[1]}`}</td>`
@@ -161,6 +162,8 @@
   }
 
   /* --- boards and weights -------------------------------------------------------------- */
+  /* CAD boards say how a model is run on them, in place of the track */
+  const runLabel = { agentic: "Agentic", single: "Single shot" };
   function drawBoards(result, naive) {
     const rows = result.boards.map((board) => {
       const held = board.heldOut;
@@ -169,8 +172,8 @@
       const url = board.group && board.group.sourceUrl;
       return `<tr><td>${url ? `<a href="${escape(url)}" target="_blank" rel="noreferrer">${escape(board.label)}</a>` : escape(board.label)}`
         + `<small>${escape(board.provenance === "benchmark" ? "benchmark-run" : board.provenance === "thirdParty" ? "third-party tables" : "paper tables")}${board.assumedTrials ? ", trials assumed" : ""}</small>`
-        + (board.leftOut ? `<small>${board.leftOut} more ran under ${board.minTasks} tasks: Ledger only</small>` : "") + "</td>"
-        + `<td>${escape(board.track)}</td><td class="num">${board.rows.length}</td>`
+        + (board.leftOut ? `<small>${board.leftOut} more ${board.minTasks ? `ran under ${board.minTasks} tasks` : "rows in submitters' own harnesses"}: Ledger only</small>` : "") + "</td>"
+        + `<td>${escape(runLabel[board.run] || board.track)}</td><td class="num">${board.rows.length}</td>`
         + `<td class="num">${board.scale === "elo" ? fixed(board.best, 0) + " Elo" : fixed(board.best)}</td>`
         + `<td class="num">${fixed(board.difficulty, 2)}${board.scale === "elo" ? " <small>(no ceiling)</small>" : ""}</td>`
         + `<td class="num">${board.share === 1 ? "1" : fixed(board.share, 2)}</td>`
@@ -179,7 +182,7 @@
         + `<td class="num">${heldText}</td></tr>`;
     }).join("");
     document.querySelector("[data-rank-boards]").innerHTML = `<table class="data-table rank-boards-table">`
-      + `<thead><tr><th>Board</th><th>Track</th><th>Models</th><th>Best</th><th>Difficulty</th><th>Family share</th><th>Evidence</th><th>Weight</th><th>Held-out accuracy</th></tr></thead>`
+      + `<thead><tr><th>Board</th><th>${result.boards.some((board) => board.run) ? "Run" : "Track"}</th><th>Models</th><th>Best</th><th>Difficulty</th><th>Family share</th><th>Evidence</th><th>Weight</th><th>Held-out accuracy</th></tr></thead>`
       + `<tbody>${rows}</tbody></table>`;
   }
 
@@ -427,7 +430,7 @@
     mount("boards", table(["Board", "Run by", "Track", "Models", "Trials per model", "Ranked by", "Read"], boards.map((board) => [
       `<a href="${escape(board.group.sourceUrl)}" target="_blank" rel="noreferrer">${escape(board.label)}</a>`,
       escape(String(board.group.reporter || "").replace(/\s*\([^)]*\)/g, "").replace(/,.*$/, "")), escape(board.track),
-      board.rows.length + (board.leftOut ? ` <small>(+${board.leftOut} under ${board.minTasks} tasks)</small>` : ""),
+      board.rows.length + (board.leftOut ? ` <small>(+${board.leftOut} ${board.minTasks ? `under ${board.minTasks} tasks` : "in own harnesses"})</small>` : ""),
       board.scale === "elo" ? "own SD per model" : board.trials.toLocaleString("en"),
       columnName[board.metric] || escape(board.metric), escape(board.group.retrieved || "")])));
 
@@ -463,7 +466,7 @@
     }
 
     /* 4. weights */
-    const weightRows = boards.map((board) => [escape(board.label), `${fixed(board.best, board.scale === "elo" ? 0 : 1)}${unitOf(board)} <small>${escape(nameOf(board.rows[0].model))}</small>`,
+    const weightRows = boards.map((board) => [escape(board.label), `${fixed(board.best, board.scale === "elo" ? 0 : 1)}${unitOf(board)} <small>${escape(nameOf(board.bestModel || board.rows[0].model))}</small>`,
       board.scale === "elo" ? `${fixed(board.difficulty, 2)} <small>no ceiling</small>` : fixed(board.difficulty, 2), fixed(board.share, 2), fixed(board.evidence, 1), fixed(board.weight, 3), `${(board.weightShare * 100).toFixed(1)}%`]);
     const saturated = analysis.saturated;
     mount("weights", table(["Board", "Best score", "<i>d</i>", "<i>f</i>", "<i>e</i>", "<i>w</i>", "Share"], weightRows)
@@ -624,7 +627,10 @@
   function drawCapabilityDetails() {
     const caps = cfg.capabilities || [];
     const fitted = new Map((base.capabilities || []).map((item) => [item.capability.id, item]));
-    const labelOf = (id) => (cfg.boards[id] || {}).label || id;
+    /* a board outside the index is named by its capability source's `label` */
+    const sourceLabels = new Map();
+    caps.forEach((cap) => cap.sources.forEach((source) => { if (source.label) sourceLabels.set(source.board, source.label); }));
+    const labelOf = (id) => (cfg.boards[id] || {}).label || sourceLabels.get(id) || id;
     const summary = document.querySelector("[data-cap-summary]");
     const s = analysis.capabilities;
     if (summary && s.total) {
@@ -778,9 +784,9 @@
         const meta = (db.benchmarks || []).filter((item) => item.id === group.benchmark)[0] || {};
         const entry = reasons[group.id];
         const label = (entry && entry.label) || meta.name || group.id;
-        return `<li><a href="${escape(group.sourceUrl)}" target="_blank" rel="noreferrer">${escape(label)}</a>`
+        return `<li><details class="why-more"><summary><a href="${escape(group.sourceUrl)}" target="_blank" rel="noreferrer">${escape(label)}</a>`
           + `<small>${entrants.length} entrants${overlap.length ? " · " + overlap.map((item) => `${item.count} also on ${escape(item.label)}`).join(" · ") : " · none on an index board"} · in the Ledger</small>`
-          + `<span>${prose((entry && (entry.reason || entry)) || "No reason recorded yet.", "outOfIndex")}</span></li>`;
+          + `<em>why</em></summary><p>${prose((entry && (entry.reason || entry)) || "No reason recorded yet.", "outOfIndex")}</p></details></li>`;
       }).join("") + "</ul>" : "";
   }
 

@@ -1,7 +1,7 @@
 /* =============================================================================
    PhAIL - scope of physical AI (data only; js/pages/scope.js draws it)
    -----------------------------------------------------------------------------
-   Last updated: 2026-09-30
+   Last updated: 2026-10-06
 
    Placement rule - by what the benchmark SCORES:
      execution  an action carried out in the world (robot, car, drone)
@@ -59,14 +59,14 @@
    ========================================================================== */
 
 window.phailScope = {
-  updated: "2026-09-30",
+  updated: "2026-10-06",
 
   metrics: [
     { name: "Binary success rate", usedIn: ["Meta-World", "RLBench", "LIBERO", "RoboTwin 2.0", "ManiSkill3"],
       measures: "Did the task complete?", limit: "Coarse - hides near-misses, smoothness, safety" },
     { name: "Chain / sequential success rate", usedIn: ["CALVIN"],
       measures: "Average consecutive subtasks completed (0-5)", limit: "Only for explicitly chained task designs" },
-    { name: "Partial-completion / progress score", usedIn: ["RoboChallenge", "BEHAVIOR-1K", "RoboDojo"],
+    { name: "Partial-completion / progress score", usedIn: ["RoboChallenge", "BEHAVIOR-1K", "RoboDojo", "WEB-1K (RSS 2026 challenge)"],
       measures: "Credit for partial progress, not just pass/fail", limit: "Scoring rubric differs per benchmark" },
     { name: "Success-rate drop under perturbation", usedIn: ["The Colosseum"],
       measures: "Robustness across 14 environment-perturbation axes", limit: "Measures robustness, not raw capability" },
@@ -126,6 +126,9 @@ window.phailScope = {
                 { name: "PAW-GEN-10", url: "https://pokeandwiggle.com/leaderboard", mode: "Real", board: "live", tests: "policy", ledger: "paw_gen_10", added: "2026-09-30",
                   plain: "Two real Franka FR3 arms at one station do 10 workshop jobs - sort screws, plug in a DC jack, route a cable through hoops, open a toolbox with a screwdriver. The operator fine-tunes every model itself on ~10, ~100 and ~300 demonstrations and tests on seen and unseen object placements.",
                   tasks: "10 environments, 5 of them held out", models: "4 (Sep 2026); best 28% success", usage: "Poke & Wiggle's Reality Check board; also reports speed, smoothness, contact force and safe failures." },
+                { name: "WEB-1K (RSS 2026 challenge)", url: "https://posttraining-for-robotics.github.io/#challenge-leaderboard", mode: "Real", board: "challenge", tests: "policy", ledger: "web1k_rss26", added: "2026-10-06",
+                  plain: "Two real YAM arms at a table put a battery into a mouse, play a two-ring Tower of Hanoi and cap and tighten a bottle. Teams train offline on expert demos plus a pi-0.5 baseline's failed and human-corrected rollouts; the organisers run every policy on their own robots and score progress per step and success.",
+                  tasks: "3, taken from WEB-1K's 90 recorded tasks", models: "19 teams single-task, 20 multi-task; best 76.7% and 66.7% average success", usage: "Post-Training for Robotics Foundation Models workshop, RSS 2026 (WorldEngine AI, USC). WEB-1K itself is a dataset: 923 h, 50,266 bimanual episodes, gated on Hugging Face; arXiv not out. Phase 2 lets the top 3 teams post-train on their own rollouts for 3 rounds. Phase 1, both tracks, is in the Ledger, not in the index." },
                 { name: "LIBERO", url: "https://libero-project.github.io/main.html", mode: "Sim", board: "paper", tests: "policy", ledger: "libero", flag: "saturated",
                   plain: "A single simulated arm follows language instructions in kitchen and table scenes, grouped into four suites (spatial, object, goal, long).",
                   tasks: "130 (four 10-task suites are standard)", usage: "Reported in almost every VLA paper; top scores now above 97%, so it no longer separates models." },
@@ -513,9 +516,12 @@ window.phailScope = {
               icon: "box",
               define: "Create one part from text, an engineering drawing, an image or a point cloud. Output: an editable (parametric) CAD model, or the code that builds it. Checked by building the part in a CAD kernel and comparing its geometry and dimensions with a reference. The most measured mechanical task, and the closest to saturated: narrow protocols are near full marks.",
               benchmarks: [
-                { name: "BenchCAD", url: "https://benchcad.com/leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "benchcad",
-                  plain: "Models turn four views of an industrial part into CadQuery code, answer questions about the part and edit it; the generated part is built and compared with the reference. BenchCAD 2.0 (preview) adds assembly drawings and circuit boards.",
-                  tasks: "17,900 parts in 106 families; 4 leaderboard tasks", usage: "OpenAI and Anthropic quote it in model launches." },
+                { name: "BenchCAD", url: "https://benchcad.com/leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "benchcad", part: "Vision2Code and the two QA tasks",
+                  plain: "Models turn four views of an industrial part into CadQuery code, in one shot or with a Python sandbox, and answer questions about the part; the generated part is built and compared with the reference. BenchCAD 2.0 (preview, no scores yet) adds assembly drawings and circuit boards.",
+                  tasks: "17,900 parts in 106 families; 4 leaderboard tasks", usage: "OpenAI and Anthropic quote it in model launches; most frontier rows on the board are vendor-reported." },
+                { name: "CADGenBench", url: "https://huggingface.co/spaces/HuggingAI4Engineering/CADGenBench", mode: "Offline", board: "live", tests: "agent", ledger: "cadgenbench", part: "Generation", added: "2026-10-07",
+                  plain: "From one A2 engineering drawing with no dimensions in text, build the part as a STEP model; scored on shape, on hand-drawn keep-in and keep-out volumes (does the bolt still pass) and on topology. Anyone can submit; the organisers validate some runs by hand.",
+                  tasks: "49 generation + 32 editing fixtures", models: "25 validated runs, about 600 not validated (Oct 2026)", usage: "Hugging Face's board; most runs are submitters' own harnesses around a frontier model, plus CAD products." },
                 { name: "Parametric CAD Bench", url: "https://cadbench.ai/leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "paramcad",
                   plain: "Agents build parts in FreeCAD from text or engineering drawings, and some tasks then ask for an edit; geometry and every stated dimension are scored.",
                   tasks: "100 in V3: 30 from text, 30 create-then-edit, 40 from drawings", usage: "V3 since Sep 2026; best overall 61%, V1 and V2 kept as historical boards." },
@@ -525,6 +531,9 @@ window.phailScope = {
                 { name: "CADBench", url: "https://anniedoris.github.io/CADBench/#Leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "cadbench_mit",
                   plain: "Rebuild CAD models from different kinds of input - images, point clouds, text - at large scale (MIT).",
                   tasks: "18,000 samples, 6 families, 5 input types" },
+                { name: "RealCADBench", url: "https://arxiv.org/abs/2609.03773", mode: "Offline", board: "paper", tests: "agent", ledger: "realcadbench", part: "Parts", added: "2026-10-07",
+                  plain: "Build parts in FreeCAD Python from text, engineering drawings, real photographs or renders; scored on whether the program runs, solid and surface overlap with the reference, and a rubric judge.",
+                  tasks: "1,745 parts in four input regimes", models: "9", usage: "The only set with real product photographs as input." },
                 { name: "CadQueryEval", url: "https://danwahl.net/cadqueryeval/", mode: "Offline", board: "archived", tests: "agent", flag: "saturated", added: "2026-09-27",
                   plain: "Turn a plain-language description into CadQuery code; the part is built and checked against a reference mesh.",
                   tasks: "25", models: "90", usage: "Archived Sep 2026: four models score 1.00 on all 25 tasks." },
@@ -547,7 +556,13 @@ window.phailScope = {
                   tasks: "80 parts x 4 parameter values", usage: "The closest thing to SWE-bench for CAD, still small." },
                 { name: "HistCAD", url: "https://arxiv.org/abs/2602.19171", mode: "Offline", board: "paper", tests: "both", added: "2026-09-29",
                   plain: "Apply parameter edits to CAD models built with explicit constraints; scores whether the edit could be made at all and whether the constraints (concentric, tangent, parallel) still hold afterwards.",
-                  tasks: "170,236 constraint-aware modelling sequences" }
+                  tasks: "170,236 constraint-aware modelling sequences" },
+                { name: "CADGenBench", url: "https://huggingface.co/spaces/HuggingAI4Engineering/CADGenBench", mode: "Offline", board: "live", tests: "agent", ledger: "cadgenbench", part: "Editing", added: "2026-10-07",
+                  plain: "Apply a drawing revision to a supplied STEP model and hand back the edited model; scored like its generation part.",
+                  tasks: "32 editing fixtures" },
+                { name: "BenchCAD", url: "https://benchcad.com/leaderboard", mode: "Offline", board: "live", tests: "agent", ledger: "benchcad", part: "Code Edit",
+                  plain: "Given a CadQuery program and a plain-language edit instruction, return a minimally changed program; scored by how much of the gap to the target part the edit closes.",
+                  tasks: "748 program-edit pairs, 5 edit types" }
               ]
             },
             {
@@ -556,6 +571,12 @@ window.phailScope = {
               icon: "layers",
               define: "Put many parts together: place each part, work out which parts mate and how, or build a whole machine from a kit of parts. Scored today on geometric placement - position, orientation, gaps between mating faces; tolerances and small fasteners are barely checked.",
               benchmarks: [
+                { name: "RealCADBench", url: "https://arxiv.org/abs/2609.03773", mode: "Offline", board: "paper", tests: "agent", ledger: "realcadbench", part: "Assemblies", added: "2026-10-07",
+                  plain: "Build whole assemblies in FreeCAD Python, single shot or as an agent in Codex or Claude Code; scored like its part track.",
+                  tasks: "25 stratified assemblies", models: "6 models, 2 agent set-ups" },
+                { name: "MUSE", url: "https://arxiv.org/abs/2605.28579", mode: "Offline", board: "paper", tests: "agent", ledger: "muse", added: "2026-10-07",
+                  plain: "From a structured product spec, generate an assemblable multi-part design; the code must run and the geometry be valid, then a vision-language model judges function, manufacturability and assembly.",
+                  tasks: "106 design specs", models: "15 in the main table", usage: "The judge (Gemini 3.1 Pro) is also among the models judged." },
                 { name: "MARB", url: "https://huggingface.co/spaces/SunnydayTech/marb-leaderboard", mode: "Offline", board: "live", tests: "agent", added: "2026-09-29",
                   plain: "Build a whole machine from a blind kit of about 100 parts; an open grader (CADCLAW) checks every part's position, orientation and interface gaps against the target. It measures the exported geometry, not whether the machine could really be built.",
                   tasks: "1 founding kit, ~100 parts", usage: "Mechanical Assembly Readiness Benchmark; no submitted run is buildable yet." },
@@ -596,7 +617,7 @@ window.phailScope = {
               kind: "capability",
               define: "Capability board. Checks whether a design works, not just whether it looks right: manufacturability rules (DFM), stress under load (finite-element analysis), stability, and whether parts can move and be assembled along a feasible path. Applies to parts and assemblies alike.",
               benchmarks: [
-                { name: "CADEngBench", url: "https://arxiv.org/abs/2608.09296", mode: "Offline", board: "paper", tests: "agent", added: "2026-09-27",
+                { name: "CADEngBench", url: "https://arxiv.org/abs/2608.09296", mode: "Offline", board: "paper", tests: "agent", ledger: "cadengbench", added: "2026-09-27",
                   plain: "Parametric parts checked for valid geometry, manufacturability rules and stress under load (finite-element analysis), plus assembly pairs checked for joints and motion.",
                   tasks: "600 part tasks on 300 parts + 150 assembly pairs", models: "8" },
                 { name: "AssemblyBench", url: "https://arxiv.org/abs/2605.12845", mode: "Offline", board: "paper", tests: "policy", added: "2026-09-29",

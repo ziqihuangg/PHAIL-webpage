@@ -19,11 +19,11 @@ const pageKey = path === "index.html" ? "home" : path.replace(".html", "");
 const pageLinks = [
   ["Scope", "index.html", "home", true],
   ["Robotics Index", "robotics-index.html", "robotics-index", true],
+  ["CAD Index", "cad-index.html", "cad-index", true],
   ["Ledger", "tasks.html", "tasks", true]
 ];
 const internalLinks = [
   ["Mobile Manipulation Platforms", "benchmark-landscape.html", "benchmark-landscape", true],
-  ["CAD Index", "cad-index.html", "cad-index", false],
   ["Charts", "charts.html", "charts", false],
   ["GPT-6 Astra", "gpt-6-astra.html", "gpt-6-astra", false],
   ["Related work", "related.html", "related", false],

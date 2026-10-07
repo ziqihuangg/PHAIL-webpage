@@ -278,7 +278,7 @@
         + (benchmark.flag === "saturated" ? ' <span class="scope-flag">saturated</span>' : "")
         + (benchmark.ledger ? ' <a class="scope-ledger" href="tasks.html">in ledger</a>' : "") + "</td>"
         + `<td>${escape(layer.name.replace(" layer", ""))} &rsaquo; ${escape(domain.name)}${groupName(domain, task)} &rsaquo; ${escape(task.name)}`
-        + (benchmark.placed ? `<small class="scope-placed">${escape(benchmark.placed)}</small>` : "") + "</td>"
+        + (benchmark.placed ? `<details class="why-more"><summary>Why here</summary><p>${escape(benchmark.placed)}</p></details>` : "") + "</td>"
         + `<td>${escape(benchmark.plain)}</td><td>${escape(benchmark.tasks || "")}</td><td>${escape(benchmark.models || "")}</td>`
         + `<td>${escape(benchmark.mode)}</td><td>${escape(boardLabel[benchmark.board])}</td>`
         + `<td>${escape({ policy: "Policy", agent: "Agent", both: "Both" }[benchmark.tests])}</td></tr>`).join("")

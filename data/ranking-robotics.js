@@ -51,7 +51,11 @@ window.phailRanking = {
      there too, as "no reason recorded". */
   outOfIndex: {
     "robochallenge-cvpr26": "A closed competition on RoboChallenge's own \u201cTable30 CVPR version\u201d. Its entrants are the Table30-v2 teams, scored under a different rule, so ranking both would count the same teams twice.",
-    "robochallenge-icra26": "A closed competition with only {ledger.taskTotal:robochallenge-icra26} tasks, in a different category (mobile manipulation in a shop, not table-top). Apart from the organiser's baseline its entrants are on no other board, so it adds no comparison between models."
+    "robochallenge-icra26": "A closed competition with only {ledger.taskTotal:robochallenge-icra26} tasks, in a different category (mobile manipulation in a shop, not table-top). Apart from the organiser's baseline its entrants are on no other board, so it adds no comparison between models.",
+    "rss26-single": { label: "WEB-1K (RSS 2026 challenge), single-task track",
+      reason: "A closed workshop challenge with only {ledger.taskTotal:rss26-single} tasks, some run only a few times per team. Its entrants are teams that do not name the model they post-trained, and none of them is on another board, so it adds no comparison between models." },
+    "rss26-multi": { label: "WEB-1K (RSS 2026 challenge), multi-task track",
+      reason: "The same challenge's multi-task track (one policy for all {ledger.taskTotal:rss26-multi} tasks), left out for the same reasons: few tasks and rollouts, and teams found on no other board." }
   },
 
   /* Paper tables (self-reported / third-party), used only when the reader

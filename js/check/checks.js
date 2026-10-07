@@ -201,7 +201,9 @@
       let total = 0;
       const weightBad = [];
       boards.forEach((board) => {
-        const d = board.scale === "elo" ? cfg.neutralDifficulty : clamp(1 - board.rows[0].value / 100, cfg.minDifficulty, 1);
+        const only = (cfg.boards[board.id] || {}).difficultyHarness;
+        const top = (only && board.rows.filter((entry) => only.indexOf(entry.row.harness) !== -1)[0]) || board.rows[0];
+        const d = board.scale === "elo" ? cfg.neutralDifficulty : clamp(1 - top.value / 100, cfg.minDifficulty, 1);
         const f = 1 / family.get(board.family);
         const e = cfg.evidenceWeight[board.provenance];
         const w = d * f * e;

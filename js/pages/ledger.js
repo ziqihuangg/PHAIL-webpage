@@ -224,10 +224,44 @@ function breakdownDisplay(record) {
 
 function extraLabel(key) {
   return { easy: "clean scenes", hard: "randomised", sd: "SD", evals: "A/B evals", latencyMs: "latency",
-    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X", tasks: "tasks run", d10: "10 demos", d100: "100 demos", d300: "300 demos", nominal: "seen placements", interp: "unseen placements" }[key] || key;
+    pairedSuccess: "LIBERO-Long", arx: "ARX X5", piper: "Piper", piperX: "Piper X", tasks: "tasks run", d10: "10 demos", d100: "100 demos", d300: "300 demos", nominal: "seen placements", interp: "unseen placements",
+    battery: "mouse battery", hanoi: "Tower of Hanoi", cap: "bottle cap", rollouts: "rollouts" }[key] || key;
 }
 function extraUnit(key) {
-  return { easy: "%", hard: "%", pairedSuccess: "%", d10: "%", d100: "%", d300: "%", nominal: "%", interp: "%" }[key] || "";
+  return { easy: "%", hard: "%", pairedSuccess: "%", d10: "%", d100: "%", d300: "%", nominal: "%", interp: "%", battery: "%", hanoi: "%", cap: "%" }[key] || "";
+}
+
+/* --- why a table is here: its note, and its place in an index ----------------
+   An operator-run table is either an index board or in that index's
+   `outOfIndex` list (data/ranking-*.js), whose reason is printed here as
+   written there - one reason, two tabs. Closed until the reader opens it.    */
+const INDICES = [[window.phailRanking, "Robotics Index", "robotics-index.html#boards"], [window.phailCadRanking, "CAD Index", "cad-index.html#boards"]]
+  .filter(([cfg]) => cfg);
+const escapeText = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const proseHtml = (text, where) => {
+  const html = escapeText(text).replace(/`([^`]+)`/g, "<code>$1</code>");
+  return window.phailFacts ? window.phailFacts.fill(html, where) : html;
+};
+
+function indexStatus(group) {
+  if (group.provenance !== "benchmark") return null;
+  const match = INDICES.filter(([cfg]) => !cfg.tasks || cfg.tasks.indexOf(group.task) !== -1)[0];
+  if (!match) return null;
+  const [cfg, name, href] = match;
+  if (cfg.boards[group.id]) return { inIndex: true, name: name, href: href };
+  const entry = (cfg.outOfIndex || {})[group.id];
+  return { inIndex: false, name: name, href: href, reason: entry ? entry.reason || entry : "No reason recorded yet." };
+}
+
+function whyDisplay(group) {
+  const status = indexStatus(group);
+  if (!status && !group.note) return "";
+  if (status && status.inIndex && !group.note) return `<small><a href="${status.href}">In the ${status.name}</a></small>`;
+  const summary = !status ? "About this table" : status.inIndex ? `In the ${status.name} · about this table` : `Not in the ${status.name} · why`;
+  return `<details class="why-more"><summary>${summary}</summary>`
+    + (status && !status.inIndex ? `<p><b>Not in the <a href="${status.href}">${status.name}</a>:</b> ${proseHtml(status.reason, `outOfIndex ${group.id}`)}</p>` : "")
+    + (group.note ? `<p>${proseHtml(group.note, `ledger note ${group.id}`)}</p>` : "")
+    + `</details>`;
 }
 
 /* --- chart plumbing --------------------------------------------------------
@@ -535,6 +569,7 @@ function render() {
         + `<small>${group.protocol}</small>`
         + `<small>retrieved ${group.retrieved}</small>`
         + (notes ? `<small class="record-note">${notes}</small>` : "")
+        + whyDisplay(group)
       + `</td>`
       + `</tr>`;
   }).join("") : `<tr><td colspan="8" class="empty-state">No records match these filters. That is a gap in the ledger, not a zero.</td></tr>`;

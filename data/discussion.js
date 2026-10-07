@@ -99,26 +99,18 @@ window.phailDiscussion = {
   ],
 
   cad: [
-    {
-      title: "One entry per model, or per model and harness",
-      detail: "CAD boards list a model several times, with different agent harnesses (Claude Code, Codex, mini-swe-agent) and effort levels. The index keeps each model's best entry, as it keeps a robot model's best checkpoint - so a model is credited with its best harness.",
-      decide: "Rank models, or model + harness pairs?"
-    },
-    {
-      title: "The CAD boards agree poorly",
-      detail: "Fitted without it, the pooled index orders Parametric CAD Bench's clear pairs no better than a coin flip, and BenchCAD's and MIT CADBench's worse; only CAD Arena is predicted well. Part of it is generations: older boards test older models, linked only through a few shared ones.",
-      decide: "Report the index anyway, or per board until more models overlap?"
-    },
-    {
-      title: "The hardest board carries the most weight",
-      detail: "CADWorld (computer-use agents in FreeCAD, best {cad.bestPct:cadworld}) gets the largest weight, {cad.weightPct:cadworld}, with {cad.rows:cadworld} models - the same pattern as PAW-GEN-10 on the Robotics Index.",
-      decide: "Cap the weight of small boards?"
-    },
-    {
-      title: "What the CAD Index does not measure yet",
-      detail: "Editing as experts judge it (best model {ledger.best:neuralcad-edit}% accepted, human edits {!78%}), assemblies, physics and manufacturability, tolerances and standard parts. CADEngBench and MARB exist but are not in the Ledger.",
-      decide: "Which boards next?"
-    }
+    { title: "BenchCAD carries the most weight because it is single shot",
+      detail: "A board's weight grows with how far its best entry is from {!100}. BenchCAD Vision2Code's best single-shot entry reaches {cad.bestPct:benchcad-vision2code}, so it gets the largest weight, {cad.weightPct:benchcad-vision2code}. With a Python sandbox the same task is close to solved (vendor-reported, above {!95%}): the difficulty comes from the run mode, not the parts.",
+      decide: "Read difficulty per run mode, or weight single-shot boards down?" },
+    { title: "Two CAD products rank among the top models",
+      detail: "Godela and Archie in Forge run their own harness and appear only on CADGenBench, where the models they beat ran the plain baseline. They now rank {cad.rank:godela} and {cad.rank:archie_forge} overall, resting on one board each.",
+      decide: "Keep products in the main ranking, or show them in a column of their own?" },
+    { title: "Boards beside the index",
+      detail: "CADBench (MIT) and CADWorld stay out because too few of their models are on the index boards; their agents are a model generation behind. They feed the Drawings and Workflow columns only.",
+      decide: "Ask these boards to run current frontier models?" },
+    { title: "What the CAD Index does not measure yet",
+      detail: "Editing as experts judge it (best model {ledger.best:neuralcad-edit}% accepted, human edits {!78%}), assemblies, physics and tolerances. CADEngBench (physics) and RealCADBench (assemblies) are now in the Ledger, but test older models; MARB is not transcribed.",
+      decide: "Which boards next, and ask which ones to run current models?" }
   ],
 
   ledger: [

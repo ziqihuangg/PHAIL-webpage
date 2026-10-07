@@ -71,8 +71,11 @@
   }
 
   /* A board may set `minTasks`: an entry that ran fewer of its tasks stays in
-     the ledger but not in the index (RoboChallenge counts unrun tasks as 0). */
+     the ledger but not in the index (RoboChallenge counts unrun tasks as 0).
+     It may also set `harness`, the row harnesses it admits (CADGenBench: the
+     board's own baseline and named products, not submitters' own harnesses). */
   function eligible(row, setup) {
+    if (setup && setup.harness && setup.harness.indexOf(row.harness) === -1) return false;
     return !(setup && setup.minTasks && typeof row.tasks === "number" && row.tasks < setup.minTasks);
   }
 
@@ -129,8 +132,11 @@
         eloSd: setup.eloSd,
         metric: setup.metric || group.primary,
         rows: bestRows(group.rows, (row) => primaryValue(row, setup.metric || group.primary), setup),
-        leftOut: setup.minTasks ? group.rows.filter((row) => keepModel(row.model) && !eligible(row, setup)).length : 0,
-        minTasks: setup.minTasks
+        leftOut: setup.minTasks || setup.harness ? group.rows.filter((row) => keepModel(row.model) && !eligible(row, setup)).length : 0,
+        minTasks: setup.minTasks,
+        harness: setup.harness,
+        difficultyHarness: setup.difficultyHarness,
+        run: setup.run
       });
     });
 
@@ -179,8 +185,15 @@
     const familyCount = new Map();
     boards.forEach((board) => familyCount.set(board.family, (familyCount.get(board.family) || 0) + 1));
     boards.forEach((board) => {
-      const best = board.rows[0].value;
+      /* `difficultyHarness`: the best score - so the difficulty - is read only
+         from rows with these harnesses (CADGenBench: named products run their
+         own harness, so they rank but do not set how hard the board is) */
+      const top = board.difficultyHarness
+        ? board.rows.filter((entry) => board.difficultyHarness.indexOf(entry.row.harness) !== -1)[0] || board.rows[0]
+        : board.rows[0];
+      const best = top.value;
       board.best = best;
+      board.bestModel = top.model;
       board.difficulty = board.scale === "elo"
         ? config.neutralDifficulty
         : clamp(1 - best / 100, config.minDifficulty, 1);
@@ -383,13 +396,14 @@
       if (rows.length < 2) return;
       boards.push({
         id: capability.id + ":" + group.id,
-        label: setup.label || group.id,
+        label: source.label || setup.label || group.id,
         track: group.track,
         provenance: group.provenance,
-        family: setup.family || group.id,
+        family: setup.family || source.family || group.id,
         scale: setup.scale || "percent",
         trials: source.trials || setup.trials,
         eloSd: setup.eloSd,
+        difficultyHarness: setup.difficultyHarness,
         rows: rows
       });
     });

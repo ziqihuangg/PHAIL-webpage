@@ -29,22 +29,24 @@
 
     <div class="data-table-wrap rank-table-wrap" data-rank-table tabindex="0" aria-label="Ranking table"></div>
     <button type="button" class="filter-reset rank-more" data-rank-table-more hidden></button>
-    <p class="table-footnote">Ranks count every fitted model, so a filtered view keeps the original numbers. Each model's best entry on each board is used - usually its best agent harness and effort level.</p>
+    <p class="table-footnote">Ranks count every fitted model, so a filtered view keeps the original numbers. Each model's best entry on each board is used, among the harnesses the board itself runs. PRODUCT marks a CAD product that runs its own harness.</p>
 
     <section class="slide" id="method">
       <h2>Index method</h2>
       <dl class="method-intro">
         <div><dt>Why</dt><dd data-why>No single CAD board ranks the field, and each board alone is noisy - see Board agreement.</dd></div>
-        <div><dt>Data</dt><dd>Published results from <b data-m="boards"></b> CAD leaderboards whose operators run every model themselves, on one protocol - <b data-m="results"></b> results for <b data-m="models"></b> models, copied unchanged from the Ledger. We measure nothing ourselves; numbers the model vendors report on their own set-up are off by default.</dd></div>
+        <div><dt>Data</dt><dd>Published results from <b data-m="boards"></b> CAD leaderboards that grade every entry themselves on one protocol - <b data-m="results"></b> results for <b data-m="models"></b> models, read from the boards' own files. We measure nothing ourselves; numbers the model vendors report on their own set-up, and submissions no one validated, are off by default.</dd></div>
         <div><dt>Method</dt><dd>The same as the <a href="robotics-index.html#method">Robotics Index</a>: inside each board every pair of models is compared against the board's noise, boards are weighted by the room they leave at the top, and all comparisons are pooled into one strength per model.</dd></div>
         <div><dt>Meaning</dt><dd>A model's index is its average chance of beating each of the other ranked models, taken one at a time, according to the pooled comparisons of all boards. <span data-fact>50</span> is the middle of this field. It is not a share of tasks solved, and not the share of models it is ranked above. <span data-meaning-example></span></dd></div>
       </dl>
       <h3 class="rank-out-title">What is specific to CAD</h3>
       <ol class="slide-steps">
-        <li><b>One entry per model</b><span>A board may list a model several times, with different agent harnesses (Claude Code, Codex, mini-swe-agent...) or effort levels. Its best entry counts; the harness is kept in the Ledger.</span></li>
-        <li><b>Noise from the board where it is published</b><span>Parametric CAD Bench gives a <span data-fact>95%</span> interval for every run; the index uses it directly (half-width / <span data-fact>1.96</span>). Elsewhere the noise comes from the number of tasks, with a conservative stand-in where a board does not state it.</span></li>
-        <li><b>Vendor numbers are a different claim</b><span>BenchCAD also lists numbers the model makers report from their own set-ups and subsets. They enter only with Evidence = "+ paper tables", at <span data-m="paperWeightWord"></span> weight.</span></li>
-        <li><b>Like-for-like only</b><span>Mesh-to-CAD specialists and a board whose models appear nowhere else stay in the Ledger only; the reasons are under Boards and weights.</span></li>
+        <li><b>Only boards that overlap</b><span>A board joins the index only if enough of its models are also on the others to place the rest. Boards that fail this stay beside the index - in the Ledger, in the Capabilities columns and under Boards and weights, each with its reason.</span></li>
+        <li><b>One entry per model, in the board's own harness</b><span>A board may list a model several times, with different agent harnesses (Claude Code, Codex, mini-swe-agent...) or effort levels; the best entry the board ran itself counts. On CADGenBench, where submitters run their own systems, only the board's baseline harness counts; their own harnesses stay in the Ledger.</span></li>
+        <li><b>Products rank, but do not set difficulty</b><span>CAD products that do not name their model (Godela, Archie in Forge) are ranked as entries of their own. They run their own harness, so a board's difficulty is read from its best baseline entry, not from them.</span></li>
+        <li><b>Run mode is shown, not adjusted for</b><span>BenchCAD scores one program written in one shot; the other boards let the model work in a tool loop. Each board's mode is listed under Boards and weights.</span></li>
+        <li><b>Noise from the board where it is published</b><span>Parametric CAD Bench and CAD Arena give a <span data-fact>95%</span> interval for every entry; the index uses it directly (half-width / <span data-fact>1.96</span>). Elsewhere the noise comes from the number of tasks, with a conservative stand-in where a board does not state it.</span></li>
+        <li><b>Other evidence is a different claim</b><span>Numbers model makers report from their own set-ups (BenchCAD) and unvalidated CADGenBench submissions enter only with Evidence = "+ paper tables", at <span data-m="paperWeightWord"></span> weight.</span></li>
       </ol>
       <details class="step-more">
         <summary>Details: the boards and their weights, in numbers</summary>
@@ -137,6 +139,12 @@
   <script src="data/raw/robochallenge-cvpr26.js?v=1"></script>
   <script src="data/raw/robochallenge-icra26.js?v=1"></script>
   <script src="data/raw/paw-gen-10.js?v=1"></script>
+  <script src="data/raw/rss26-posttrain.js?v=1"></script>
+  <script src="data/raw/paramcad.js?v=1"></script>
+  <script src="data/raw/cad-arena.js?v=1"></script>
+  <script src="data/raw/benchcad.js?v=1"></script>
+  <script src="data/raw/cadbench-mit.js?v=1"></script>
+  <script src="data/raw/cadgenbench.js?v=1"></script>
   <script src="js/engine/raw-sources.js?v=1"></script>
   <script src="data/scope.js?v=1"></script>
   <script src="data/ranking-cad.js?v=1"></script>
